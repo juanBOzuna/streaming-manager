@@ -205,6 +205,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         |
         */
         $this->table_row_color = array();
+        $this->table_row_color[] = ['condition'=>"[is_expired] == '1'","color"=>"danger"];
 
 
         /*
@@ -247,31 +248,28 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                         list.forEach(function (item) {
                             index2 = 0;
                             index++;
-                            console.log(item.innerText);
                             if (item.innerText == 'CAIDA') {
 
                                 list.forEach(function (item2) {
                                     index2++;
-                                    for (let index3 = 0; index3 < 8; index3++) {
-                                        if (index2 == index - index3 && index2 != index) {
-                                        item2.remove();
+//                                    for (let index3 = 0; index3 < 8; index3++) {
+//                                        if (index2 == index - index3 && index2 != index) {
+//                                          item2.style.backgroundColor = '#DD4B39';
+//                                        item2.style.color = '#FFFFFF';
+//                                        }
+//                                    }
+//                                    for (let index3 = 0; index3 < 4; index3++) {
+//                                        if (index2 == index + index3 && index2 != index) {
 //                                            item2.style.backgroundColor = '#DD4B39';
 //                                            item2.style.color = '#FFFFFF';
-                                        }
-                                    }
-                                    for (let index3 = 0; index3 < 4; index3++) {
-                                        if (index2 == index + index3 && index2 != index) {
-                                         item2.remove();
-                                            item2.style.backgroundColor = '#DD4B39';
-                                            item2.style.color = '#FFFFFF';
-                                        }
-                                    }
+//                                        }
+//                                    }
 
                                 })
-                                item.style.backgroundColor = '#DD4B39';
-                                 item.style.fontWeight= 'bold';
-                                item.style.color = '#FFFFFF';
-                                 item.remove();
+//                                item.style.backgroundColor = '#DD4B39';
+//                                 item.style.fontWeight= 'bold';
+//                                item.style.color = '#FFFFFF';
+
                             }
                         });
                       ";

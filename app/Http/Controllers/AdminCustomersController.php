@@ -1,8 +1,11 @@
 <?php namespace App\Http\Controllers;
 
+use App\Models\CmsUsers;
 use App\Models\Customers;
 use App\Models\Screens;
+use App\Models\User;
 use Carbon\Carbon;
+use Cassandra\Custom;
 use Session;
 use Request;
 use DB;
@@ -24,7 +27,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
         $this->button_action_style = "button_icon";
         $this->button_add = true;
         $this->button_edit = true;
-        $this->button_delete = true;
+        $this->button_delete = false;
         $this->button_detail = true;
         $this->button_show = true;
         $this->button_filter = true;
@@ -38,11 +41,14 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
         $this->col[] = ["label" => "Nombre", "name" => "name"];
 
         $this->col[] = ["label" => "Telefono", "name" => "number_phone"];
-        $this->col[] = ["label" => "Revendedor", "name" => "name","callback" => function ($row) {
-            if($row->revendedor_id==null){
+        $this->col[] = ["label" => "Revendedor", "name" => "revendedor_id", "callback" => function ($row) {
+
+            if ( $row->revendedor_id != null ) {
+                $cliente = CmsUsers::where('id','=',$row->revendedor_id)->first();
+                return  "#".$row->revendedor_id . " | ". $cliente->name;
+
+            } else {
                 return 'No tiene';
-            }else{
-                return "Revendedor: ". $row->revendedor_id;
             }
         }];
         # END COLUMNS DO NOT REMOVE THIS LINE
@@ -51,7 +57,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
         $this->form = [];
         $this->form[] = ['label' => 'Nombre', 'name' => 'name', 'type' => 'text', 'validation' => 'required|string|min:3|max:70', 'width' => 'col-sm-10', 'placeholder' => 'You can only enter the letter only'];
         $this->form[] = ['label' => 'Telefono', 'name' => 'number_phone', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
-       // $this->form[] = ['label' => 'Revendedor', 'name' => 'number_phone', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10',"callback" => function ($row) {
+        // $this->form[] = ['label' => 'Revendedor', 'name' => 'number_phone', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10',"callback" => function ($row) {
 //          if($row->revendedor_id==null){
 //            return 'No tiene';
 //          }else{
@@ -200,25 +206,25 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
 
 
             $htmlForTable = '
-<br>
-<span><strong>  PANTALLAS DE ESTE CLIENTE</strong></span>
-<br>
-<br>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Cuenta</th>
-      <th scope="col">Vence</th>
-      <th scope="col">Pin</th>
-      <th scope="col">Dispositvo</th>
-      <th scope="col">IP</th>
-    </tr>
-  </thead>
-  <tbody>
-    ' . $trHtml . '
-  </tbody>
-</table>';
+                <br>
+                <span><strong>  PANTALLAS DE ESTE CLIENTE</strong></span>
+                <br>
+                <br>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">ID</th>
+                      <th scope="col">Cuenta</th>
+                      <th scope="col">Vence</th>
+                      <th scope="col">Pin</th>
+                      <th scope="col">Dispositvo</th>
+                      <th scope="col">IP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ' . $trHtml . '
+                  </tbody>
+                </table>';
 
             $this->script_js = "
          let table = " . json_encode($htmlForTable) . "
@@ -226,7 +232,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
              console.log('Entro al js')
              let area = document.getElementById('parent-form-area');
              area.innerHTML+= table ;
-             console.log(area);
+
             ";
 
 
@@ -239,8 +245,8 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
             $this->script_js = "
 
           let list = document.querySelectorAll('td');
-           let idP = " .  $idP . ";
-           let myId = " . $id. ";
+           let idP = " . $idP . ";
+           let myId = " . $id . ";
                         console.log(list);
                         let index = 0;
                         let index2 = 0;
@@ -250,20 +256,31 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                             if (item.innerText != 'Revendedor: '+myId && idP!=1) {
                                 list.forEach(function (item2) {
                                     index2++;
-                                    for (let index3 = 0; index3 < 8; index3++) {
-                                        if (index2 == index - index3 && index2 != index) {
-                                        item2.remove();
-                                        }
-                                    }
-                                    for (let index3 = 0; index3 < 4; index3++) {
-                                        if (index2 == index + index3 && index2 != index) {
-                                         item2.remove();
-                                        }
-                                    }
+//                                    for (let index3 = 0; index3 < 8; index3++) {
+//                                        if (index2 == index - index3 && index2 != index) {
+//                                        item2.remove();
+//                                        }
+//                                    }
+//                                    for (let index3 = 0; index3 < 4; index3++) {
+//                                        if (index2 == index + index3 && index2 != index) {
+//                                         item2.remove();
+//                                        }
+//                                    }
                                 })
-                                 item.remove();
+//                                 item.remove();
                             }
                         });
+
+
+
+             let addData = document.querySelector('#btn_add_new_data');
+             addData.text = 'Agregar Clientes ';
+             addData.innerHTML += `<i class='fa fa-plus-circle' style='margin-left: 5px;'></i> `;
+
+             let showData = document.querySelector('#btn_show_data');
+             showData.text = 'Ver todos ';
+             showData.innerHTML += `<i class='fa fa-table' style='margin-left: 5px;'></i>`;
+
 
          ";
         }
@@ -354,7 +371,9 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
     */
     public function hook_query_index(&$query)
     {
-
+        if (\crocodicstudio\crudbooster\helpers\CRUDBooster::myId() != 1) {
+            $query->where('revendedor_id', "=", \crocodicstudio\crudbooster\helpers\CRUDBooster::myId());
+        }
         //Your code here
 
     }
@@ -380,7 +399,9 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
     public function hook_before_add(&$postdata)
     {
         //Your code here
-
+        if (\crocodicstudio\crudbooster\helpers\CRUDBooster::myPrivilegeId() == Customers::REVENDEDOR) {
+            $postdata['revendedor_id'] = \crocodicstudio\crudbooster\helpers\CRUDBooster::myId();
+        }
     }
 
     /*

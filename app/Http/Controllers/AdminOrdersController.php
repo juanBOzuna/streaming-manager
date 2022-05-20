@@ -438,7 +438,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         foreach ($typeAccountToTypeAccount as $typeAccount) {
             $price_of_membership_days = $typeAccount->price_day * $request['venta-membership_days'][$index];
 
-            $total_price .= $price_of_membership_days;
+
 
             $screens = $listToList[$index];
             $dateInstant = Carbon::parse('');
@@ -466,8 +466,10 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     'date_sold' => Carbon::parse('')->format('Y-m-d H:i:s'),
                     'price_of_membership' => intval($price_of_membership_days),
                     'date_expired' => $dateExpired->format('Y-m-d H:i:s')]);
+                $total_price = $price_of_membership_days + $total_price;
             }
             $index++;
+
         }
 
         $order->update([

@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customers extends Model
+class CmsUsers extends Model
 {
-    const REVENDEDOR = 3;
     use HasFactory;
-    protected $table = "customers";
+    protected $table = "cms_users";
     protected $fillable = [
         'name',
-        'number_phone',
-        'date_sold',
-        'revendedor_id'
+        'photo',
+        'email',
+        'password'
     ];
 
 }
