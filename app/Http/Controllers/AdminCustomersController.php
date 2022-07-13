@@ -201,6 +201,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                <td>' . $screen->code_screen . '</td>
                 <td>' . $screen->device . '</td>
                <td>' . $screen->ip . ' </td>
+               <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
                </tr>';
             }
 
@@ -227,11 +228,14 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                 </table>';
 
             $this->script_js = "
-         let table = " . json_encode($htmlForTable) . "
-
+             let table = " . json_encode($htmlForTable) . "
              console.log('Entro al js')
              let area = document.getElementById('parent-form-area');
              area.innerHTML+= table ;
+
+             function actualizar(){
+                alert();
+             }
 
             ";
 
