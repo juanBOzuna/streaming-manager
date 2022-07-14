@@ -8,19 +8,15 @@ use DB;
 use CRUDBooster;
 
 use App\Models\Customers;
-use App\Models\OrderDetail;
-use App\Models\TypeAccount;
-use App\Models\Screens;
-use DateTime;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
-class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooster\controllers\CBController
+class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster\controllers\CBController
 {
-
 	public function cbInit()
 	{
 
 		# START CONFIGURATION DO NOT REMOVE THIS LINE
-		$this->title_field = "name";
+		$this->title_field = "id";
 		$this->limit = "20";
 		$this->orderby = "id,desc";
 		$this->global_privilege = false;
@@ -35,62 +31,47 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		$this->button_filter = true;
 		$this->button_import = false;
 		$this->button_export = false;
-		$this->table = "customers";
+		$this->table = "order_details";
 		# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 		# START COLUMNS DO NOT REMOVE THIS LINE
+
 		$this->col = [];
-		$this->col[] = ["label" => "Cliente", "name" => "name"];
+		$this->col[] = ["label" => "Cliente", "name" => "nombreCliente"];
 		$this->col[] = ["label" => "Telefono", "name" => "number_phone"];
-		$this->col[] = ["label" => "No. Pantallas a expirar", "name" => "date_sold", "callback" => function ($row) {
-			$customer = Customers::where('id', '=', $row->id)->first();
-			$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->get();
-			$number_expired = 0;
-			// for ($i = 0; $i < 10; $i++) {
-			// 	if ($i == 2) {
-			// 		dd(\Carbon\Carbon::parse("")->month);
-			// 	}
-			// }
-
-			foreach ($details_of_exired as $key) {
-				date_default_timezone_set('America/Bogota');
-				$d = explode(" ", $key->finish_date);
-				$fv = \Carbon\Carbon::parse($d[0]);
-				$da = \Carbon\Carbon::parse("");
-
-				if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
-
-					// dd("Vence manana" . " id=" . $key->id);
-					$number_expired++;
-				}
-			}
-			if ($number_expired == 1) {
-				return "" . $number_expired . " pantalla";
-			} elseif ($number_expired > 1) {
-				return "" . $number_expired . " pantallas";
-			} else {
-				return "NINGUNA PANTALLA";
-			}
-		}];
-		// $this->col[] = ["label"=>"Date Expired Sold","name"=>"date_expired_sold"];
+		$this->col[] = ["label" => "Correo", "name" => "email"];
+		$this->col[] = ["label" => "Pantalla", "name" => "name"];
+		$this->col[] = ["label" => "Fecha de compra", "name" => "date_sold"];
+		$this->col[] = ["label" => "Fecha en que vencio", "name" => "date_expired"];
+		// $this->col[] = ["label"=>"Membership Days","name"=>"membership_days"];
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
 		# START FORM DO NOT REMOVE THIS LINE
 		$this->form = [];
-		// $this->form[] = ['label'=>'Name','name'=>'name','type'=>'text','validation'=>'required|string|min:3|max:70','width'=>'col-sm-10','placeholder'=>'You can only enter the letter only'];
-		// $this->form[] = ['label'=>'Number Phone','name'=>'number_phone','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-		// $this->form[] = ['label'=>'Date Sold','name'=>'date_sold','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-		// $this->form[] = ['label'=>'Date Expired Sold','name'=>'date_expired_sold','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-		// $this->form[] = ['label'=>'Revendedor Id','name'=>'revendedor_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'revendedor,id'];
+		// $this->form[] = ['label'=>'Orders Id','name'=>'orders_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'orders,id'];
+		// $this->form[] = ['label'=>'Type Account Id','name'=>'type_account_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'type_account,name'];
+		// $this->form[] = ['label'=>'Customer Id','name'=>'customer_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'customer,id'];
+		// $this->form[] = ['label'=>'Number Screens','name'=>'number_screens','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+		// $this->form[] = ['label'=>'Screen Id','name'=>'screen_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'screen,id'];
+		// $this->form[] = ['label'=>'Account Id','name'=>'account_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'account,id'];
+		// $this->form[] = ['label'=>'Membership Days','name'=>'membership_days','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+		// $this->form[] = ['label'=>'Price Of Membership Days','name'=>'price_of_membership_days','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
+		// $this->form[] = ['label'=>'Finish Date','name'=>'finish_date','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
+		// $this->form[] = ['label'=>'Is Notified','name'=>'is_notified','type'=>'radio','validation'=>'required|integer','width'=>'col-sm-10','dataenum'=>'Array'];
 		# END FORM DO NOT REMOVE THIS LINE
 
 		# OLD START FORM
 		//$this->form = [];
-		//$this->form[] = ["label"=>"Name","name"=>"name","type"=>"text","required"=>TRUE,"validation"=>"required|string|min:3|max:70","placeholder"=>"You can only enter the letter only"];
-		//$this->form[] = ["label"=>"Number Phone","name"=>"number_phone","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-		//$this->form[] = ["label"=>"Date Sold","name"=>"date_sold","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-		//$this->form[] = ["label"=>"Date Expired Sold","name"=>"date_expired_sold","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-		//$this->form[] = ["label"=>"Revendedor Id","name"=>"revendedor_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"revendedor,id"];
+		//$this->form[] = ["label"=>"Orders Id","name"=>"orders_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"orders,id"];
+		//$this->form[] = ["label"=>"Type Account Id","name"=>"type_account_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"type_account,name"];
+		//$this->form[] = ["label"=>"Customer Id","name"=>"customer_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"customer,id"];
+		//$this->form[] = ["label"=>"Number Screens","name"=>"number_screens","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+		//$this->form[] = ["label"=>"Screen Id","name"=>"screen_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"screen,id"];
+		//$this->form[] = ["label"=>"Account Id","name"=>"account_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"account,id"];
+		//$this->form[] = ["label"=>"Membership Days","name"=>"membership_days","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+		//$this->form[] = ["label"=>"Price Of Membership Days","name"=>"price_of_membership_days","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+		//$this->form[] = ["label"=>"Finish Date","name"=>"finish_date","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
+		//$this->form[] = ["label"=>"Is Notified","name"=>"is_notified","type"=>"radio","required"=>TRUE,"validation"=>"required|integer","dataenum"=>"Array"];
 		# OLD END FORM
 
 		/* 
@@ -120,13 +101,6 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	        | 
 	        */
 		$this->addaction = array();
-
-		$this->addaction[] = [
-			'label' => 'Avisar por Whatsapp',
-			'url' => CRUDBooster::mainpath('set-whatsapp/[id]'),
-			'color' => 'success',
-			'icon' => 'fa fa-whatsapp'
-		];
 
 
 		/* 
@@ -197,17 +171,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-		$this->script_js = "
-		let list = document.querySelectorAll('tr');
-		list.forEach(function (trs) {
-				 trs.childNodes.forEach(function (tds) {
-					if (tds.innerText == 'NINGUNA PANTALLA') {
-						trs.remove();
-					}
-				 });
-		 });
-
-		";
+		$this->script_js = NULL;
 
 
 		/*
@@ -295,7 +259,13 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	public function hook_query_index(&$query)
 	{
 		//Your code here
+		$query->join('customers', 'order_details.customer_id', '=', 'customers.id')
+			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
+			->join('screens', 'order_details.screen_id', 'screens.id')
+			->select('order_details.*', 'customers.name as nombreCliente', 'customers.number_phone', 'accounts.email', 'screens.name', 'screens.date_sold', 'screens.date_expired')
+			->get();
 
+			// dd($query);
 	}
 
 	/*
@@ -306,6 +276,8 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	    */
 	public function hook_row_index($column_index, &$column_value)
 	{
+		echo $column_index. " ". $column_value;
+		dd("");
 		//Your code here
 	}
 
@@ -391,62 +363,6 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 	//By the way, you can still create your own method in here... :) 
-	public function getSetWhatsapp($id)
-	{
-		$datos = "";
-		$customer = Customers::where('id', '=', $id)->first();
-		$details = OrderDetail::where('customer_id', '=', $id)->where('is_notified', '=', '0')->get();
-		$list_details_to_expired = [];
-		$number_screens = 1;
 
-		foreach ($details as $detail) {
-			date_default_timezone_set('America/Bogota');
-			$d = explode(" ", $detail->finish_date);
-			$fv = \Carbon\Carbon::parse($d[0]);
-			$da = \Carbon\Carbon::parse("");
 
-			if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
-				array_push($list_details_to_expired, $detail);
-				$number_screens++;
-			}
-		}
-
-		foreach ($list_details_to_expired as $detail) {
-			$typeAccount = TypeAccount::where('id', '=', $detail->type_account_id)->first();
-			$screen = Screens::where('id', '=', $detail->screen_id)->first();
-			$porciones = explode(" ", $screen->name);
-			$nombre = $porciones[0] . "%20" . $porciones[1];
-
-			$datos .= '*' . $typeAccount->name . '*%20' . $screen->email . '%20*' . $nombre . '*%20%0A%0A';
-		}
-
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=57' . $customer->number_phone . '&message=' . '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*',
-			// CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=573044155592&message=asd',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING => '',
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 0,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'GET',
-		));
-		$response = curl_exec($curl);
-		curl_close($curl);
-		echo $response;
-
-		if ($response == "Success") {
-			foreach ($list_details_to_expired as $detail) {
-				$order_dt = OrderDetail::where('id', '=', $detail->id)->first();
-				$order_dt->is_notified = 1;
-				$order_dt->save();
-			}
-			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
-		}else{
-			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Hubo un error al enviar el mensaje, revise el internet, y que el bot  de whatsapp sirva", "danger");
-		}
-
-		dd($response);
-	}
 }

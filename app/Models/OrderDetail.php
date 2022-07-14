@@ -21,5 +21,7 @@ class OrderDetail extends Model
         'membership_days',
         'price_of_membership_days',
         'finish_date',
+        'is_notified',
+        'nombreCliente'
     ];
 }

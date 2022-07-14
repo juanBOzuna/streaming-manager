@@ -410,7 +410,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             $screen = new Screens;
             $screen->profile_number = $i;
             $screen->account_id = $id;
-            $screen->name = "Pantalla #" . $i;
+            $screen->name = "Pantalla " . $i;
             $screen->is_sold = 0;
             $screen->price_of_membership = 0;
             $screen->type_account_id = $cuenta->type_account_id;
