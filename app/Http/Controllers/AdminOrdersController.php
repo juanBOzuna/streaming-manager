@@ -53,9 +53,13 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
 
         $columns = [];
-        $columns[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'required' => true];
+        if(CRUDBooster::getCurrentMethod() == "getDetail"){
+            $columns[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'required' => true];
+        }
+       
         $columns[] = ['label' => 'Tipo de Pantalla', 'name' => 'type_account_id', 'type' => 'datamodal', 'datamodal_table' => 'type_account', 'datamodal_columns' => 'name', 'datamodal_select_to' => 'Nombre:name', 'required' => true];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
+            
             $this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
             $this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
@@ -642,6 +646,12 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     {
         foreach ($listScreens as $screen) {
             //            $screenAct = Screens::where('id', '=', $screen)->orderBy('profile_number', 'asc')->get();
+            // $acc = 
+            $scr = Screens::where('id', '=', $screen)->first();
+            $acc = Accounts::where('id', '=', $screen->account_id)->first();
+            $acc->screens_sold = ($acc->screens_sold - 1);
+            $acc->save();
+
             Screens::where('id', $screen)->update([
                 'client_id' => null,
                 'date_sold' => null,

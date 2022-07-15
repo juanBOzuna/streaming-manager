@@ -44,15 +44,15 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
         $this->col[] = ["label" => "Cliente", "name" => "client_id", "join" => "customers,number_phone"];
         $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,name"];
         $this->col[] = ["label" => "Nombre", "name" => "name"];
-        $this->col[] = ["label" => "Vendido", "name" => "date_sold", "callback" => function ($row) {
-            if ($row->date_sold == 0) {
+        $this->col[] = ["label" => "Vendido", "name" => "is_sold", "callback" => function ($row) {
+            if ($row->is_sold == 0) {
                 return 'No';
             } else {
                 return 'VENDIDA';
             }
         }];
         $this->col[] = ["label" => "Vence", "name" => "date_expired"];
-        $this->col[] = ["label" => "Esta vendida", "name" => "is_sold"];
+        // $this->col[] = ["label" => "Esta vendida", "name" => "is_sold"];
         $this->col[] = ["label" => "Membresia", "name" => "price_of_membership", "type" => 'money'];
         $this->col[] = ["label" => "Dispositivo", "name" => "device"];
         $this->col[] = ["label" => "IP", "name" => "ip"];
@@ -209,12 +209,12 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
 
         list.forEach(function (item) {
             index++;
-            let ele = item.childNodes[17];
+            let ele = item.childNodes[13];
             if(index %2 ==0){
-                // console.log(ele.innerText);
-                if(ele.innerText=='1'){
-                    item.style.backgroundColor = '#04AA6D';
-                    // item.style.color = '#04AA6D';
+                if(ele.innerText=='VENDIDA'){                    
+                    item.style.backgroundColor = '#42AB49';
+                    item.style.color = 'white';
+                    item.style.fontWeight = 'bold';
                 }
             }
             

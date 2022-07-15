@@ -18,6 +18,7 @@ use Illuminate\Support\Arr;
 use App\Models\Accounts;
 use App\Models\TypeAccount;
 use App\Models\Screens;
+use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
 
 class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CBController
 {
@@ -83,7 +84,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $this->form[] = ['label' => 'Clave', 'name' => 'key_pass', 'type' => 'text', 'validation' => 'min:3|max:32', 'width' => 'col-sm-10'];
         $this->form[] = ['label' => 'Tipo de cuenta', 'name' => 'type_account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'type_account,name'];
 
-        if (CRUDBooster::getCurrentMethod() == "getDetail") {
+        if (HelpersCRUDBooster::getCurrentMethod() == "getDetail") {
 
             //             $this->form[] = ['label'=>'Numero de Orden','name'=>'order_number','type'=>'text','validation'=>'required|min:1|max:255','value'=>$order_number,'readonly'=>true];
             // $this->form[] = ['label'=>'Estado','name'=>'status','type'=>'text','readonly'=>true];
@@ -498,10 +499,6 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
     }
 
 
-    public function CalculateDateExpired(): Boolean
-    {
-        return true;
-    }
 
     public function getSetStatus($id)
     {
@@ -540,6 +537,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                 $screenToChange = Screens::where('is_sold', '=', '0')->where("is_account_expired", "=", "0")->first();
                 $order_detail = OrderDetail::where('customer_id', '=', $screen->client_id)->where('screen_id', '=', $screen->id)->orderBy('created_at', 'desc')->first();
 
+                // dd($order_detail);
+
                 $screenToChange->client_id = $screen->client_id;
                 $screenToChange->date_sold = $screen->date_sold;
                 $screenToChange->date_expired = $screen->date_expired;
@@ -557,6 +556,15 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                 $screen->device = null;
                 $screen->ip = null;
                 $screen->save();
+
+                $order_detail->screen_id = $screenToChange->id;
+                $order_detail->account_id = $screenToChange->account_id;
+                $order_detail->save();
+
+                // dd($order_detail);
+
+                $account->screens_sold = $account->screens_sold - 1;
+                $account->save();
             }
         }
 

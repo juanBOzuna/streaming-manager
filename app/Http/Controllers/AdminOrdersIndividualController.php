@@ -357,8 +357,10 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	public function hook_before_add(&$postdata)
 	{
 		//Your code here
+
 		date_default_timezone_set('America/Bogota');
 		$screen = Screens::where("id", "=", $postdata["pantalla_id"])->first();
+
 		$type = TypeAccount::where("id", "=", $screen->type_account_id)->first();
 
 		$total_price = doubleval($postdata["dias_membersia"]) * doubleval($type->price_day);
@@ -372,6 +374,11 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		$screen->date_expired = strval($dateExpired);
 		$screen->price_of_membership = $total_price;
 		$screen->save();
+
+		$acc = Accounts::where('id', '=', $screen->account_id)->first();
+
+		$acc->screens_sold = $acc->screens_sold + 1;
+		$acc->save();
 
 		$order = Order::create([
 			'customers_id' => $postdata["customers_id"],
