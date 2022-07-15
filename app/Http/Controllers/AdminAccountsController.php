@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Models\Customers;
 use App\Models\Order;
@@ -83,7 +85,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
 
-//             $this->form[] = ['label'=>'Numero de Orden','name'=>'order_number','type'=>'text','validation'=>'required|min:1|max:255','value'=>$order_number,'readonly'=>true];
+            //             $this->form[] = ['label'=>'Numero de Orden','name'=>'order_number','type'=>'text','validation'=>'required|min:1|max:255','value'=>$order_number,'readonly'=>true];
             // $this->form[] = ['label'=>'Estado','name'=>'status','type'=>'text','readonly'=>true];
             $screens = [];
             $screens[] = ['label' => 'Id', 'name' => 'id', 'type' => 'text'];
@@ -134,9 +136,9 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         */
         $this->addaction = array();
         $dateActual = Carbon::parse('');
-//        echo $dateActual;
+        //        echo $dateActual;
         $this->addaction[] = [
-            'label' => ''.($dateActual->month ),
+            'label' => '' . ($dateActual->month),
             'url' => CRUDBooster::mainpath('set-status/[id]'),
             'icon' => 'fa fa-refresh',
             'showIf' => "($dateActual->month < \Carbon\Carbon::parse([date_renewed])->month )|| ($dateActual->year < \Carbon\Carbon::parse([date_renewed])->year) "
@@ -205,7 +207,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         |
         */
         $this->table_row_color = array();
-        $this->table_row_color[] = ['condition'=>"[is_expired] == '1'","color"=>"danger"];
+        $this->table_row_color[] = ['condition' => "[is_expired] == '1'", "color" => "danger"];
 
 
         /*
@@ -221,14 +223,37 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $ultimo_dia_mes = new DateTime();
         $ultimo_dia_mes->modify('last day of this month');
 
-        //->whereBetween('created_at', [$primer_dia_mes->format('Y-m-d'), $ultimo_dia_mes->format('Y-m-d')]
+        $pNetflixVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '1')->count();
+        $typeAcc = TypeAccount::where('id', '=', '1')->first();
+        $cuentas  = Accounts::where('type_account_id', '=', '1')->where('is_expired', '=', '0')->count();
+        $disccount = ($typeAcc->total_screens - $typeAcc->available_screens) * $cuentas;
+        $total_p = $cuentas * $typeAcc->total_screens;
+        $total_p = (($total_p - $pNetflixVendidas) - $cuentas) - ($disccount - $cuentas);
+
+        $pDisneyVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '3')->count();
+        $typeAccD = TypeAccount::where('id', '=', '1')->first();
+        $cuentasD  = Accounts::where('type_account_id', '=', '3')->where('is_expired', '=', '0')->count();
+        $disccountD = ($typeAccD->total_screens - $typeAccD->available_screens) * $cuentasD;
+        $total_pD = $cuentasD * $typeAccD->total_screens;
+        $total_pD = (($total_pD - $pDisneyVendidas) - $cuentasD) - ($disccountD - $cuentasD);
+
+        $pAmazonVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '2')->count();
+        $typeAccAM = TypeAccount::where('id', '=', '1')->first();
+        $cuentasAM  = Accounts::where('type_account_id', '=', '2')->where('is_expired', '=', '0')->count();
+        $disccountAM = ($typeAccAM->total_screens - $typeAccAM->available_screens) * $cuentasAM;
+        $total_pAm = $cuentasAM * $typeAccAM->total_screens;
+        $total_pAm = (($total_pAm - $pAmazonVendidas) - $cuentasAM) - ($disccountAM - $cuentasAM);
+
+
+
+
         $this->index_statistic = array();
-        $this->index_statistic[] = ['label' => 'P. Netflix Disponibles ', 'count' => Screens::where('is_sold', '=', '0')->where("is_account_expired","=","0")->where('type_account_id', '=', '1')->count(), 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
-        $this->index_statistic[] = ['label' => 'P. Amazon Disponibles ', 'count' => Screens::where('is_sold', '=', '0')->where('type_account_id', '=', '2')->count(), 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
-        $this->index_statistic[] = ['label' => 'P. Disney Disponibles ', 'count' => Screens::where('is_sold', '=', '0')->where('type_account_id', '=', '3')->count(), 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
+        $this->index_statistic[] = ['label' => 'P. Netflix', 'count' => $total_p, 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
+        $this->index_statistic[] = ['label' => 'P. Amazon', 'count' => $total_pAm, 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
+        $this->index_statistic[] = ['label' => 'P. Disney', 'count' => $total_pD, 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
 
 
-        $this->index_statistic[] = ['label' => 'Pantallas Netflix Vendidas mes ', 'count' => Screens::where('is_sold', '=', '1')->where('type_account_id', '=', '3')->lastMonth()->count(), 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
+        // $this->index_statistic[] = ['label' => 'Pantallas Netflix Vendidas mes ', 'count' => Screens::where('is_sold', '=', '1')->where('type_account_id', '=', '3')->lastMonth()->count(), 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
         /*
         | ----------------------------------------------------------------------
         | Add javascript at body
@@ -238,8 +263,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         |
         */
 
-        if(\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getIndex"){
-        $this->script_js = "
+        if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getIndex") {
+            $this->script_js = "
 
                         let list = document.querySelectorAll('td');
                         console.log(list);
@@ -275,7 +300,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                       ";
         }
 
-//        $this->script_js = "  console.log('asd');";
+        //        $this->script_js = "  console.log('asd');";
 
 
         /*
@@ -331,8 +356,6 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         |
         */
         $this->load_css[] = asset("/css/All.css");
-
-
     }
 
 
@@ -408,9 +431,9 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             } while (Screens::where("code_screen", "=", $code)->first());
 
             $screen = new Screens;
-            $screen->profile_number = $i;
+            $screen->profile_number =  $i;
             $screen->account_id = $id;
-            $screen->name = "Pantalla " . $i;
+            $screen->name = "Pantalla " .  $i;
             $screen->is_sold = 0;
             $screen->price_of_membership = 0;
             $screen->type_account_id = $cuenta->type_account_id;
@@ -485,8 +508,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $dateActual = Carbon::parse('');
         $cuenta = Accounts::where('id', '=', $id)->first();
 
-        $cuenta->times_renewed = $cuenta->times_renewed+1;
-        $cuenta->is_renewed =1;
+        $cuenta->times_renewed = $cuenta->times_renewed + 1;
+        $cuenta->is_renewed = 1;
         $cuenta->date_renewed = strval($dateActual);
         $cuenta->save();
         CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Cuenta renovada exitosamente");
@@ -495,7 +518,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
     public function getSetDesactive($id)
     {
 
-        $account = Accounts::where("id","=",$id)->first();
+        $account = Accounts::where("id", "=", $id)->first();
         $account->is_expired = 1;
         $account->save();
 
@@ -514,38 +537,38 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             $screen->save();
             if ($screen->client_id != null) {
                 // $customer = Customers::where('id','=',$screen->client_id)->first();
-                $screenToChange = Screens::where('is_sold', '=', '0')->where("is_account_expired","=","0")->first();
+                $screenToChange = Screens::where('is_sold', '=', '0')->where("is_account_expired", "=", "0")->first();
                 $order_detail = OrderDetail::where('customer_id', '=', $screen->client_id)->where('screen_id', '=', $screen->id)->orderBy('created_at', 'desc')->first();
 
-                $screenToChange->client_id =$screen->client_id;
+                $screenToChange->client_id = $screen->client_id;
                 $screenToChange->date_sold = $screen->date_sold;
-                $screenToChange->date_expired= $screen->date_expired;
+                $screenToChange->date_expired = $screen->date_expired;
                 $screenToChange->is_sold = $screen->is_sold;
-                $screenToChange->price_of_membership =$screen->price_of_membership;
+                $screenToChange->price_of_membership = $screen->price_of_membership;
                 $screenToChange->device = $screen->device;
-                $screenToChange->ip =$screen->ip ;
+                $screenToChange->ip = $screen->ip;
                 $screenToChange->save();
 
-                $screen->client_id =null;
-                $screen->date_sold =null;
-                $screen->date_expired=null;
-                $screen->is_sold =0;
-                $screen->price_of_membership =0;
+                $screen->client_id = null;
+                $screen->date_sold = null;
+                $screen->date_expired = null;
+                $screen->is_sold = 0;
+                $screen->price_of_membership = 0;
                 $screen->device = null;
-                $screen->ip =null;
+                $screen->ip = null;
                 $screen->save();
             }
         }
 
         \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
-//        $asd = Accounts::where('id', '=', $id)->first();
-//        dd($asd);
+        //        $asd = Accounts::where('id', '=', $id)->first();
+        //        dd($asd);
     }
 
     public function getSetActive($id)
     {
 
-        $account = Accounts::where("id","=",$id)->first();
+        $account = Accounts::where("id", "=", $id)->first();
         $account->is_expired = 0;
         $account->save();
 

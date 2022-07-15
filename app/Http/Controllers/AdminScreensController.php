@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Models\Accounts;
 use App\Models\Customers;
@@ -42,7 +44,13 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
         $this->col[] = ["label" => "Cliente", "name" => "client_id", "join" => "customers,number_phone"];
         $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,name"];
         $this->col[] = ["label" => "Nombre", "name" => "name"];
-        $this->col[] = ["label" => "Vendido", "name" => "date_sold"];
+        $this->col[] = ["label" => "Vendido", "name" => "date_sold", "callback" => function ($row) {
+            if ($row->date_sold == 0) {
+                return 'No';
+            } else {
+                return 'VENDIDA';
+            }
+        }];
         $this->col[] = ["label" => "Vence", "name" => "date_expired"];
         $this->col[] = ["label" => "Esta vendida", "name" => "is_sold"];
         $this->col[] = ["label" => "Membresia", "name" => "price_of_membership", "type" => 'money'];
@@ -66,7 +74,6 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
 
         if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
             $this->form[] = ['label' => 'Membresia', 'name' => 'price_of_membership', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
-
         }
 
         # END FORM DO NOT REMOVE THIS LINE
@@ -179,22 +186,56 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
         | $this->script_js = "function() { ... }";
         |
         */
-//        $htmlButton = "<div><a class='btn btn-sm btn-default' title='Completar orden' onclick='' href='https://stock-manager.test/admin/orders/set-status/to-fill-order/10' target='_self'><i class='fa fa-retweet'></i> VERIFICAR PANTALLAS</a></div>";
-        $htmlButton = '<a style="margin-top:-51px" href="http://prueba.test/admin/screens/set-check-screens/" id="btn_advanced_filter" data-url-parameter="" title="Advanced Sort &amp; Filter" class="btn btn-sm btn-default ">
-                        <i class="fa fa-bell"></i> NOTIFICAR CLIENTES
-                    </a>';
+        //        $htmlButton = "<div><a class='btn btn-sm btn-default' title='Completar orden' onclick='' href='https://stock-manager.test/admin/orders/set-status/to-fill-order/10' target='_self'><i class='fa fa-retweet'></i> VERIFICAR PANTALLAS</a></div>";
+        // $htmlButton = '<a style="margin-top:-51px" href="http://prueba.test/admin/screens/set-check-screens/" id="btn_advanced_filter" data-url-parameter="" title="Advanced Sort &amp; Filter" class="btn btn-sm btn-default ">
+        //                 <i class="fa fa-bell"></i> NOTIFICAR CLIENTES
+        //             </a>';
 
         $this->script_js = "
-         let table = " . json_encode($htmlButton) . "
+        //  let table = 
 
-             let header  = document.getElementsByClassName('box-header')[0];
-             let btnFilter  = document.getElementById('btn_advanced_filter');
+        //      let header  = document.getElementsByClassName('box-header')[0];
+        //      let btnFilter  = document.getElementById('btn_advanced_filter');
 
-             console.log(btnFilter.style);
+        //      console.log(btnFilter.style);
 
-              header.innerHTML+= table ;
-            console.log(header);
-        console.log('s')
+        //       header.innerHTML+= table ;
+        //     console.log(header);
+        // console.log('s')
+        let list = document.querySelectorAll('tr');
+        // console.log(list.childNodes);
+        let index = 0;
+        let index2 = 0;
+
+        list.forEach(function (item) {
+            index++;
+            let ele = item.childNodes[17];
+            if(index %2 ==0){
+                // console.log(ele.innerText);
+                if(ele.innerText=='1'){
+                    item.style.backgroundColor = '#04AA6D';
+                    // item.style.color = '#04AA6D';
+                }
+            }
+            
+
+        });
+
+        // list.forEach(function (item) {
+        //     index2 = 0;
+        //     index++;
+        //     if (item.innerText == 'VENDIDA') {
+
+        //         list.forEach(function (item2) {
+        //             index2++;
+
+        //         })
+        //                        item.style.backgroundColor = '#DD4B39';
+        //                         item.style.fontWeight= 'bold';
+        //                        item.style.color = '#FFFFFF';
+
+        //     }
+        // });
         ";
 
 
@@ -251,8 +292,6 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
         |
         */
         $this->load_css[] = asset("/css/All.css");
-
-
     }
 
 

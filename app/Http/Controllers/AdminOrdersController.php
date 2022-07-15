@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Models\Accounts;
 use App\Models\Order;
@@ -47,22 +49,26 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         # START FORM DO NOT REMOVE THIS LINE
         $this->form = [];
-        $this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name','datatable_format'=>'name,\'  -  \',number_phone'];
+        $this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name', 'datatable_format' => 'name,\'  -  \',number_phone'];
 
 
         $columns = [];
+        $columns[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'required' => true];
         $columns[] = ['label' => 'Tipo de Pantalla', 'name' => 'type_account_id', 'type' => 'datamodal', 'datamodal_table' => 'type_account', 'datamodal_columns' => 'name', 'datamodal_select_to' => 'Nombre:name', 'required' => true];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
             $this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
             $this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
-            //  $columns[] = ['label' => 'Numero de pantallas', 'name' => 'number_screens', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Dias de membresia', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
+
+            $columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'Pantalla #', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'Cuenta #', 'name' => 'account_id', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Cuenta #', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
-            $columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'number', 'required' => true];
-
+            // $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
+            $columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
+            $columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
+            $columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
+            $columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
+            $columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
         } else {
             $columns[] = ['label' => 'Numero de pantallas', 'name' => 'number_screens', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'Dias de membresia', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
@@ -171,7 +177,98 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         |
         */
 
-        $this->script_js = NULL;
+        if (CRUDBooster::getCurrentMethod() == "getDetail") {
+            $this->script_js = "
+            let tabla = document.querySelector('#table-order_details');
+
+            console.log(tabla.childNodes[3].childNodes);
+
+            // let trs=  ;
+
+            // for(let i =0 ; i<tabla.childNodes[3].childNodes.length){
+            //     console.log(item[i]);
+            // }
+            let i=0;
+            tabla.childNodes[3].childNodes.forEach(function (item) {
+               let=i++;
+               if(i%2==0){
+                // console.log(item.children[7].innerText);
+                if(item.children[7].innerText=='0'){
+                    item.children[7].innerText = 'No';
+                    // item.children[7].style.color = '#DD4B39';
+                    item.children[7].style.fontWeight = 'bold';
+                }else{
+                    item.children[1].childElementCount=1;
+                    item.children[7].innerText = 'Si';
+                    item.children[7].style.color = '#04AA6D';
+                    item.children[7].style.fontWeight = 'bold';
+                }
+                
+               }
+               
+             });
+            ";
+        } else {
+            $pNetflixVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '1')->count();
+            $typeAcc = TypeAccount::where('id', '=', '1')->first();
+            $cuentas  = Accounts::where('type_account_id', '=', '1')->where('is_expired', '=', '0')->count();
+            $disccount = ($typeAcc->total_screens - $typeAcc->available_screens) * $cuentas;
+            $total_p = $cuentas * $typeAcc->total_screens;
+            $total_p = (($total_p - $pNetflixVendidas) - $cuentas) - ($disccount - $cuentas);
+
+
+            //
+
+            $pDisneyVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '3')->count();
+            $typeAccD = TypeAccount::where('id', '=', '1')->first();
+            $cuentasD  = Accounts::where('type_account_id', '=', '3')->where('is_expired', '=', '0')->count();
+            $disccountD = ($typeAccD->total_screens - $typeAccD->available_screens) * $cuentasD;
+            $total_pD = $cuentasD * $typeAccD->total_screens;
+            $total_pD = (($total_pD - $pDisneyVendidas) - $cuentasD) - ($disccountD - $cuentasD);
+
+            //
+
+            $pAmazonVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '2')->count();
+            $typeAccAM = TypeAccount::where('id', '=', '1')->first();
+            $cuentasAM  = Accounts::where('type_account_id', '=', '2')->where('is_expired', '=', '0')->count();
+            $disccountAM = ($typeAccAM->total_screens - $typeAccAM->available_screens) * $cuentasAM;
+            $total_pAm = $cuentasAM * $typeAccAM->total_screens;
+            $total_pAm = (($total_pAm - $pAmazonVendidas) - $cuentasAM) - ($disccountAM - $cuentasAM);
+
+
+
+            $this->script_js = "
+
+        let netflixLimit =" . json_encode($total_p) . ";
+        let amazonLimit =" . json_encode($total_pAm) . ";
+        let disneyLimit =" . json_encode($total_pD) . ";
+
+        console.log('asdasdsada');
+        let boton = document.getElementById('btn-add-table-venta');
+        // let
+        // let select = document.getElementByClassName('form-control input-label');
+    //    alert(netflixLimit);
+        
+        // console.log(selectwe.value);
+
+        boton.onmouseover = function(){
+            let selectwe = document.querySelector('.input-id');
+            let inputNumberScreens = document.querySelector('#ventanumber_screens');
+            if(selectwe.value == 1 && inputNumberScreens.value>netflixLimit ){
+                alert('No hay suficientes pantallas para lo que quieres vender (Netflix) , revisa y crea nuevas pantallas!');
+            }
+            if(selectwe.value == 2 && inputNumberScreens.value>amazonLimit ){
+                alert('No hay suficientes pantallas para lo que quieres vender (Amazon) , revisa y crea nuevas pantallas!');
+            }
+            if(selectwe.value == 3 && inputNumberScreens.value>disneyLimit ){
+                alert('No hay suficientes pantallas para lo que quieres vender (Disney) , revisa y crea nuevas pantallas!');
+            }
+        }
+        ";
+        }
+
+
+
 
 
         /*
@@ -227,8 +324,6 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         |
         */
         $this->load_css[] = asset("/css/All.css");
-
-
     }
 
 
@@ -282,10 +377,10 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     {
 
 
-//        $dateInstant = Carbon::parse('');
-//        $dateExpired = $dateInstant->addDays(5);
-//
-//        dd((string)$dateExpired->format('Y-m-d H:i:s'));
+        //        $dateInstant = Carbon::parse('');
+        //        $dateExpired = $dateInstant->addDays(5);
+        //
+        //        dd((string)$dateExpired->format('Y-m-d H:i:s'));
 
         $listToList = [];
         $typeAccountToTypeAccount = [];
@@ -306,7 +401,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $type_account = TypeAccount::where('id', '=', request()['venta-type_account_id'])->first();
             $typeAccountToTypeAccount[$index] = $type_account;
 
-            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->get();
+            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->get();
             $searchResult = $this->searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, request(), $this, $index);
             $searchToSearch[$index] = $searchResult;
             //   dd($searchResult['pantallas']);
@@ -431,13 +526,13 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $order = Order::create([
             'customers_id' => $request['customers_id'],
-            'total_price' =>0
+            'total_price' => 0
         ]);
 
         $index = 0;
         foreach ($typeAccountToTypeAccount as $typeAccount) {
             $price_of_membership_days = $typeAccount->price_day * $request['venta-membership_days'][$index];
-
+            date_default_timezone_set('America/Bogota');
 
 
             $screens = $listToList[$index];
@@ -465,11 +560,11 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     'client_id' => $request['customers_id'],
                     'date_sold' => Carbon::parse('')->format('Y-m-d H:i:s'),
                     'price_of_membership' => intval($price_of_membership_days),
-                    'date_expired' => $dateExpired->format('Y-m-d H:i:s')]);
+                    'date_expired' => $dateExpired->format('Y-m-d H:i:s')
+                ]);
                 $total_price = $price_of_membership_days + $total_price;
             }
             $index++;
-
         }
 
         $order->update([
@@ -497,23 +592,38 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
                         foreach ($screens as $screen) {
                             if (sizeof($listScreens) != intval(request()['venta-number_screens'][$index])) {
-                                if ($screen->profile_number == $type_account->available_screens) {
-                                    Accounts::where('id', $account->id)->update([
-                                        'is_sold_ordinary' => 1]);
-                                }
-                                if ($screen->profile_number == $type_account->total_screens) {
+                                // if ($screen->profile_number == $type_account->available_screens) {
+                                //     Accounts::where('id', $account->id)->update([
+                                //         'is_sold_ordinary' => 1
+                                //     ]);
+                                // }
+                                // if ($screen->profile_number != 1) {
+                                if ($screen->profile_number == ($type_account->available_screens + 1)) {
                                     array_push($accountsCompleted, $account->id);
                                     break;
                                 } else {
-                                    if ($screen->is_sold == 0) {
+                                    if ($screen->is_sold == 0 && $screen->profile_number > 1) {
                                         if (array_search($screen->id, $listScreens) == false && $screen->profile_number <= $type_account->available_screens) {
                                             Screens::where('id', $screen->id)->update([
-                                                'is_sold' => 1]);
+                                                'is_sold' => 1
+                                            ]);
+                                            $accountEdit = Accounts::where('id', $account->id)->first();
+                                            $accountEdit->screens_sold = ($accountEdit->screens_sold + 1);
+                                            $accountEdit->save();
+
                                             array_push($listScreens, $screen->id);
+                                            if ($screen->profile_number == ($type_account->available_screens + 1)) {
+                                                Accounts::where('id', $account->id)->update([
+                                                    'is_sold_ordinary' => 1
+                                                ]);
+                                            }
                                             break;
                                         }
                                     }
                                 }
+                                // } else {
+                                //     break;
+                                // }
                             } else {
                                 break;
                             }
@@ -531,7 +641,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     public static function clearScreens($listScreens)
     {
         foreach ($listScreens as $screen) {
-//            $screenAct = Screens::where('id', '=', $screen)->orderBy('profile_number', 'asc')->get();
+            //            $screenAct = Screens::where('id', '=', $screen)->orderBy('profile_number', 'asc')->get();
             Screens::where('id', $screen)->update([
                 'client_id' => null,
                 'date_sold' => null,

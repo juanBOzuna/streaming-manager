@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddIsNotifiedToOrderDetails extends Migration
+class AddIsDiscardedAndNumberRenovationsToOrderDetails extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,8 @@ class AddIsNotifiedToOrderDetails extends Migration
     {
         if (Schema::hasTable('order_details')) {
             Schema::table('order_details', function (Blueprint $table) {
-                $table->boolean('is_notified')->default(0);
+                $table->boolean('is_discarded')->default(0);
+                $table->integer('number_renovations')->default(0);
             });
         }
     }
@@ -30,7 +31,8 @@ class AddIsNotifiedToOrderDetails extends Migration
 
         if (Schema::hasTable('order_details')) {
             Schema::table('order_details', function (Blueprint $table) {
-                $table->dropColumn('is_notified')->default(0);
+                $table->dropColumn('discarded');
+                $table->dropColumn('number_renovations');
             });
         }
     }

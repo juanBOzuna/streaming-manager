@@ -16,16 +16,18 @@ class Screens extends Model
         'email',
         'client_id',
         'name',
+        'code_screen',
+        'profile_number',
+        'is_sold',
         'date_sold',
         'date_expired',
-        'is_sold',
         'price_of_membership',
-        'code_screen',
         'device',
-        'profile_number',
+        'ip',
         'type_account_id',
-        'ip'
-     ];
+        'is_account_expired',
+        'type_account_id',
+    ];
 
 
 
@@ -39,6 +41,5 @@ class Screens extends Model
 
             $query->whereBetween('screens.date_sold', [$primer_dia_mes, $ultimo_dia_mes]);
         });
-
     }
 }

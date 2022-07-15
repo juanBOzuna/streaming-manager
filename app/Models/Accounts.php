@@ -20,9 +20,12 @@ class Accounts extends Model
         'is_sold_ordinary',
         'is_sold_extraordinary',
         'is_active',
+        'is_expired',
         'date_renewed',
         'times_renewed',
-        'type_account_id'
+        'screens_sold',
+        'type_account_id',
+        
 
     ];
 

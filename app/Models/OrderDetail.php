@@ -22,6 +22,10 @@ class OrderDetail extends Model
         'price_of_membership_days',
         'finish_date',
         'is_notified',
+        'is_discarded',
+        'number_renovations',
+        'parent_order_detail',
+        'is_renewed',
         'nombreCliente'
     ];
 }

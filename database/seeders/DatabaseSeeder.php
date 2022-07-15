@@ -21,15 +21,16 @@ class DatabaseSeeder extends Seeder
         # cms_menus
         $data = [
             ["id" => "2", "name" => "Cuentas", "type" => "Route", "path" => "AdminAccountsControllerGetIndex", "color" => "normal", "icon" => "fa fa-youtube-play", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "1", "created_at" => "2021-10-18 18:41:13", "updated_at" => "2021-10-18 22:30:19"],
-            ["id" => "3", "name" => "Tipos de cuentas", "type" => "Route", "path" => "AdminTypeAccountControllerGetIndex", "color" => NULL, "icon" => "fa fa-key", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "8", "created_at" => "2021-10-18 18:43:09", "updated_at" => NULL],
-            ["id" => "4", "name" => "Recargas", "type" => "Route", "path" => "AdminRecargasControllerGetIndex", "color" => "normal", "icon" => "fa fa-phone", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "6", "created_at" => "2021-10-24 21:38:56", "updated_at" => "2021-10-24 22:47:20"],
-            ["id" => "5", "name" => "Tipo de recargas", "type" => "Route", "path" => "AdminTipoDeRecargasControllerGetIndex", "color" => NULL, "icon" => "fa fa-check", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "7", "created_at" => "2021-10-24 21:44:31", "updated_at" => NULL],
-            ["id" => "9", "name" => "Clientes", "type" => "Route", "path" => "AdminCustomersControllerGetIndex", "color" => "normal", "icon" => "fa fa-user", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "9", "created_at" => "2021-12-08 16:10:11", "updated_at" => "2022-05-15 23:04:20"],
+            ["id" => "3", "name" => "Tipos de cuentas", "type" => "Route", "path" => "AdminTypeAccountControllerGetIndex", "color" => NULL, "icon" => "fa fa-key", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "9", "created_at" => "2021-10-18 18:43:09", "updated_at" => NULL],
+            ["id" => "4", "name" => "Recargas", "type" => "Route", "path" => "AdminRecargasControllerGetIndex", "color" => "normal", "icon" => "fa fa-phone", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "7", "created_at" => "2021-10-24 21:38:56", "updated_at" => "2021-10-24 22:47:20"],
+            ["id" => "5", "name" => "Tipo de recargas", "type" => "Route", "path" => "AdminTipoDeRecargasControllerGetIndex", "color" => NULL, "icon" => "fa fa-check", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "8", "created_at" => "2021-10-24 21:44:31", "updated_at" => NULL],
+            ["id" => "9", "name" => "Clientes", "type" => "Route", "path" => "AdminCustomersControllerGetIndex", "color" => "normal", "icon" => "fa fa-user", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "10", "created_at" => "2021-12-08 16:10:11", "updated_at" => "2022-05-15 23:04:20"],
             ["id" => "10", "name" => "Ordenes", "type" => "Route", "path" => "AdminOrdersControllerGetIndex", "color" => NULL, "icon" => "fa fa-shopping-bag", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "4", "created_at" => "2021-12-08 16:26:05", "updated_at" => NULL],
             ["id" => "11", "name" => "Pantallas", "type" => "Route", "path" => "AdminScreensControllerGetIndex", "color" => NULL, "icon" => "fa fa-tv", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "2", "created_at" => "2021-12-27 04:13:41", "updated_at" => NULL],
             ["id" => "14", "name" => "Venta Individual", "type" => "Route", "path" => "AdminOrdersIndividualControllerGetIndex", "color" => NULL, "icon" => "fa fa-shopping-bag", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "3", "created_at" => "2022-05-15 00:45:57", "updated_at" => NULL],
             ["id" => "17", "name" => "vencimiento mañana", "type" => "Route", "path" => "AdminCustomersExpiredTomorrowControllerGetIndex", "color" => "normal", "icon" => "fa fa-bell", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "5", "created_at" => "2022-07-12 23:20:20", "updated_at" => "2022-07-13 18:30:53"],
-            ["id" => "18", "name" => "Usuarios", "type" => "Route", "path" => "AdminCmsUsersSystemControllerGetIndex", "color" => NULL, "icon" => "fa fa-user", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "10", "created_at" => "2022-07-14 16:09:58", "updated_at" => NULL]
+            ["id" => "18", "name" => "Usuarios", "type" => "Route", "path" => "AdminCmsUsersSystemControllerGetIndex", "color" => NULL, "icon" => "fa fa-user", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "11", "created_at" => "2022-07-14 16:09:58", "updated_at" => NULL],
+            ["id" => "19", "name" => "Renovaciones", "type" => "Route", "path" => "AdminOrderDetailsRenovationsControllerGetIndex", "color" => NULL, "icon" => "fa fa-refresh", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "6", "created_at" => "2022-07-14 18:05:52", "updated_at" => NULL]
         ];
         foreach ($data as $k => $d) {
             if (DB::table('cms_menus')->where('name', $d['name'])->count()) {
@@ -66,7 +67,8 @@ class DatabaseSeeder extends Seeder
             ["id" => "28", "id_cms_menus" => "15", "id_cms_privileges" => "1"],
             ["id" => "29", "id_cms_menus" => "16", "id_cms_privileges" => "1"],
             ["id" => "31", "id_cms_menus" => "17", "id_cms_privileges" => "1"],
-            ["id" => "32", "id_cms_menus" => "18", "id_cms_privileges" => "1"]
+            ["id" => "32", "id_cms_menus" => "18", "id_cms_privileges" => "1"],
+            ["id" => "33", "id_cms_menus" => "19", "id_cms_privileges" => "1"]
         ];
         foreach ($data as $k => $d) {
             if (DB::table('cms_menus_privileges')->where('id_cms_menus', $d['id_cms_menus'])->count()) {
@@ -101,10 +103,11 @@ class DatabaseSeeder extends Seeder
             ["id" => "20", "name" => "Ordenes", "icon" => "fa fa-shopping-bag", "path" => "orders", "table_name" => "orders", "controller" => "AdminOrdersController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-12-08 16:26:05", "updated_at" => NULL, "deleted_at" => NULL],
             ["id" => "21", "name" => "Pantallas", "icon" => "fa fa-tv", "path" => "screens", "table_name" => "screens", "controller" => "AdminScreensController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-12-27 04:13:41", "updated_at" => NULL, "deleted_at" => NULL],
             ["id" => "24", "name" => "Venta Individual", "icon" => "fa fa-shopping-bag", "path" => "ordersIndividual", "table_name" => "orders", "controller" => "AdminOrdersIndividualController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-05-15 00:45:57", "updated_at" => NULL, "deleted_at" => NULL],
-            // ["id" => "25","name" => "Pantallas vencidas hoy","icon" => "fa fa-tv","path" => "order_details_screen_expired_1","table_name" => "order_details","controller" => "AdminOrderDetailsScreenExpired1Controller","is_protected" => "0","is_active" => "0","created_at" => "2022-07-12 22:47:10","updated_at" => NULL,"deleted_at" => NULL],
-            // ["id" => "26","name" => "vencimiento mañana","icon" => "fa fa-tv","path" => "order_details_screen_expired_tomorrow","table_name" => "order_details","controller" => "AdminOrderDetailsScreenExpiredTomorrowController","is_protected" => "0","is_active" => "0","created_at" => "2022-07-12 23:00:19","updated_at" => NULL,"deleted_at" => NULL],
+
             ["id" => "27", "name" => "vencimiento mañana", "icon" => "fa fa-bell", "path" => "customers_expired_tomorrow", "table_name" => "customers", "controller" => "AdminCustomersExpiredTomorrowController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-07-12 23:20:20", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "28", "name" => "Usuarios", "icon" => "fa fa-user", "path" => "cms_users_system", "table_name" => "cms_users", "controller" => "AdminCmsUsersSystemController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-07-14 16:09:58", "updated_at" => NULL, "deleted_at" => NULL]
+            ["id" => "28", "name" => "Usuarios", "icon" => "fa fa-user", "path" => "cms_users_system", "table_name" => "cms_users", "controller" => "AdminCmsUsersSystemController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-07-14 16:09:58", "updated_at" => NULL, "deleted_at" => NULL],
+            ["id" => "29", "name" => "Renovaciones", "icon" => "fa fa-refresh", "path" => "order_details_renovations", "table_name" => "order_details", "controller" => "AdminOrderDetailsRenovationsController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-07-14 18:05:52", "updated_at" => NULL, "deleted_at" => NULL]
+
         ];
 
         foreach ($data as $k => $d) {
@@ -122,23 +125,24 @@ class DatabaseSeeder extends Seeder
         # cms_privileges_roles
         $data = [
             //Admin cms_privileges_roles
-            ["id" => "29", "is_visible" => "1", "is_create" => "0", "is_read" => "1", "is_edit" => "0", "is_delete" => "0", "id_cms_privileges" => "2", "id_cms_moduls" => "13", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "30", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "2", "id_cms_moduls" => "15", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "31", "is_visible" => "1", "is_create" => "0", "is_read" => "1", "is_edit" => "0", "is_delete" => "0", "id_cms_privileges" => "2", "id_cms_moduls" => "12", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "40", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "3", "id_cms_moduls" => "19", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "41", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "19", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "42", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "13", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "43", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "20", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "44", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "21", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "45", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "15", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "46", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "16", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "47", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "14", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "48", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "4", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "49", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "24", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "50", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "25", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "51", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "26", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "52", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "27", "created_at" => NULL, "updated_at" => NULL],
-            ["id" => "53", "is_visible" => "1", "is_create" => "1", "is_read" => "1", "is_edit" => "1", "is_delete" => "1", "id_cms_privileges" => "1", "id_cms_moduls" => "28", "created_at" => NULL, "updated_at" => NULL]
+            ["id" => "29","is_visible" => "1","is_create" => "0","is_read" => "1","is_edit" => "0","is_delete" => "0","id_cms_privileges" => "2","id_cms_moduls" => "13","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "30","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "2","id_cms_moduls" => "15","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "31","is_visible" => "1","is_create" => "0","is_read" => "1","is_edit" => "0","is_delete" => "0","id_cms_privileges" => "2","id_cms_moduls" => "12","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "40","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "3","id_cms_moduls" => "19","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "41","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "19","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "42","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "13","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "43","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "20","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "44","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "21","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "45","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "15","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "46","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "16","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "47","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "14","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "48","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "4","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "49","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "24","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "50","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "25","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "51","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "26","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "52","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "27","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "53","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "28","created_at" => NULL,"updated_at" => NULL],
+            ["id" => "54","is_visible" => "1","is_create" => "1","is_read" => "1","is_edit" => "1","is_delete" => "1","id_cms_privileges" => "1","id_cms_moduls" => "29","created_at" => NULL,"updated_at" => NULL]
         ];
 
         foreach ($data as $k => $d) {
@@ -155,29 +159,30 @@ class DatabaseSeeder extends Seeder
 
         # cms_menus_privileges
         $data = [
-            ["id" => "3", "id_cms_menus" => "3", "id_cms_privileges" => "1"],
-            ["id" => "4", "id_cms_menus" => "1", "id_cms_privileges" => "2"],
-            ["id" => "5", "id_cms_menus" => "1", "id_cms_privileges" => "1"],
-            ["id" => "6", "id_cms_menus" => "2", "id_cms_privileges" => "2"],
-            ["id" => "7", "id_cms_menus" => "2", "id_cms_privileges" => "1"],
-            ["id" => "9", "id_cms_menus" => "5", "id_cms_privileges" => "1"],
-            ["id" => "10", "id_cms_menus" => "4", "id_cms_privileges" => "2"],
-            ["id" => "11", "id_cms_menus" => "4", "id_cms_privileges" => "1"],
-            ["id" => "12", "id_cms_menus" => "6", "id_cms_privileges" => "1"],
-            ["id" => "13", "id_cms_menus" => "7", "id_cms_privileges" => "2"],
-            ["id" => "14", "id_cms_menus" => "7", "id_cms_privileges" => "1"],
-            ["id" => "15", "id_cms_menus" => "8", "id_cms_privileges" => "1"],
-            ["id" => "17", "id_cms_menus" => "10", "id_cms_privileges" => "1"],
-            ["id" => "18", "id_cms_menus" => "11", "id_cms_privileges" => "1"],
-            ["id" => "19", "id_cms_menus" => "12", "id_cms_privileges" => "1"],
-            ["id" => "20", "id_cms_menus" => "13", "id_cms_privileges" => "1"],
-            ["id" => "21", "id_cms_menus" => "14", "id_cms_privileges" => "1"],
-            ["id" => "26", "id_cms_menus" => "9", "id_cms_privileges" => "3"],
-            ["id" => "27", "id_cms_menus" => "9", "id_cms_privileges" => "1"],
-            ["id" => "28", "id_cms_menus" => "15", "id_cms_privileges" => "1"],
-            ["id" => "29", "id_cms_menus" => "16", "id_cms_privileges" => "1"],
-            ["id" => "31", "id_cms_menus" => "17", "id_cms_privileges" => "1"],
-            ["id" => "32", "id_cms_menus" => "18", "id_cms_privileges" => "1"]
+            ["id" => "3","id_cms_menus" => "3","id_cms_privileges" => "1"],
+            ["id" => "4","id_cms_menus" => "1","id_cms_privileges" => "2"],
+            ["id" => "5","id_cms_menus" => "1","id_cms_privileges" => "1"],
+            ["id" => "6","id_cms_menus" => "2","id_cms_privileges" => "2"],
+            ["id" => "7","id_cms_menus" => "2","id_cms_privileges" => "1"],
+            ["id" => "9","id_cms_menus" => "5","id_cms_privileges" => "1"],
+            ["id" => "10","id_cms_menus" => "4","id_cms_privileges" => "2"],
+            ["id" => "11","id_cms_menus" => "4","id_cms_privileges" => "1"],
+            ["id" => "12","id_cms_menus" => "6","id_cms_privileges" => "1"],
+            ["id" => "13","id_cms_menus" => "7","id_cms_privileges" => "2"],
+            ["id" => "14","id_cms_menus" => "7","id_cms_privileges" => "1"],
+            ["id" => "15","id_cms_menus" => "8","id_cms_privileges" => "1"],
+            ["id" => "17","id_cms_menus" => "10","id_cms_privileges" => "1"],
+            ["id" => "18","id_cms_menus" => "11","id_cms_privileges" => "1"],
+            ["id" => "19","id_cms_menus" => "12","id_cms_privileges" => "1"],
+            ["id" => "20","id_cms_menus" => "13","id_cms_privileges" => "1"],
+            ["id" => "21","id_cms_menus" => "14","id_cms_privileges" => "1"],
+            ["id" => "26","id_cms_menus" => "9","id_cms_privileges" => "3"],
+            ["id" => "27","id_cms_menus" => "9","id_cms_privileges" => "1"],
+            ["id" => "28","id_cms_menus" => "15","id_cms_privileges" => "1"],
+            ["id" => "29","id_cms_menus" => "16","id_cms_privileges" => "1"],
+            ["id" => "31","id_cms_menus" => "17","id_cms_privileges" => "1"],
+            ["id" => "32","id_cms_menus" => "18","id_cms_privileges" => "1"],
+            ["id" => "33","id_cms_menus" => "19","id_cms_privileges" => "1"]
         ];
 
         foreach ($data as $k => $d) {
