@@ -422,7 +422,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=57' . $customer->number_phone . '&message=' . '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*',
+			CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=' . $customer->number_phone . '&message=' . '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*',
 			// CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=573044155592&message=asd',
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => '',
