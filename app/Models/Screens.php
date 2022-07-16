@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model as EloquentModel;
 use DateTime;
 
-class Screens extends Model
+class Screens extends EloquentModel
 {
-    use HasFactory;
+    // use HasFactory;
+    protected $connection = 'mongodb';
     protected $table = "screens";
 
     protected $fillable = [

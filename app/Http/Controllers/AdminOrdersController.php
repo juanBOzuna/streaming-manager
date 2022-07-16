@@ -53,13 +53,13 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
 
         $columns = [];
-        if(CRUDBooster::getCurrentMethod() == "getDetail"){
+        if (CRUDBooster::getCurrentMethod() == "getDetail") {
             $columns[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'required' => true];
         }
-       
+
         $columns[] = ['label' => 'Tipo de Pantalla', 'name' => 'type_account_id', 'type' => 'datamodal', 'datamodal_table' => 'type_account', 'datamodal_columns' => 'name', 'datamodal_select_to' => 'Nombre:name', 'required' => true];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
-            
+
             $this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
             $this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
@@ -409,7 +409,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $searchResult = $this->searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, request(), $this, $index);
             $searchToSearch[$index] = $searchResult;
             //   dd($searchResult['pantallas']);
-
+            // dd($searchResult);
             if (sizeof($searchResult['pantallas']) != intval(request()['venta-number_screens'][$index])) {
                 $this->clearScreens($searchResult['pantallas']);
                 $containsError++;
@@ -602,12 +602,12 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                                 //     ]);
                                 // }
                                 // if ($screen->profile_number != 1) {
-                                if ($screen->profile_number == ($type_account->available_screens + 1)) {
+                                if ($screen->profile_number >= ($type_account->available_screens + 2)) {
                                     array_push($accountsCompleted, $account->id);
                                     break;
                                 } else {
                                     if ($screen->is_sold == 0 && $screen->profile_number > 1) {
-                                        if (array_search($screen->id, $listScreens) == false && $screen->profile_number <= $type_account->available_screens) {
+                                        if (array_search($screen->id, $listScreens) == false && !($screen->profile_number >= ($type_account->available_screens + 2))) {
                                             Screens::where('id', $screen->id)->update([
                                                 'is_sold' => 1
                                             ]);
@@ -649,7 +649,9 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             // $acc = 
             $scr = Screens::where('id', '=', $screen)->first();
             $acc = Accounts::where('id', '=', $screen->account_id)->first();
-            $acc->screens_sold = ($acc->screens_sold - 1);
+            if ($acc->screens_sold > 0) {
+                $acc->screens_sold = ($acc->screens_sold - 1);
+            }
             $acc->save();
 
             Screens::where('id', $screen)->update([

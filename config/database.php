@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'mongodb'),// esrrque entonces todo sera de mongo, ya tu le estas diciendoi al modelo de donde es la coneccion, asi que no es necesario
 
     /*
     |--------------------------------------------------------------------------
@@ -89,6 +89,12 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
+        ],
+
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => 'mongodb+srv://user_juan:eyhI5oa6tdyZeHah@telecor-mosercon.3bmlu.mongodb.net/?retryWrites=true&w=majority',
+            'database' =>  'telecor-mosercon',
         ],
 
     ],

@@ -14,7 +14,7 @@ class CreateOrderDetailsTable extends Migration
     public function up()
     {
         Schema::create('order_details', function (Blueprint $table) {
-            $table->id();
+            $table->id('id');
             $table->unsignedBigInteger('orders_id');
             $table->unsignedBigInteger('type_account_id');
             $table->unsignedBigInteger('customer_id');

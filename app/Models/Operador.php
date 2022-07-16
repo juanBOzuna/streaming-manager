@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model as EloquentModel;
 
-class Operador extends Model
+class Operador extends EloquentModel
 {
-    use HasFactory;
+    // use HasFactory;
+    protected $connection = 'mongodb';
 }

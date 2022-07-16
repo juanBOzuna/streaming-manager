@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model as EloquentModel;
 
-class CmsUsers extends Model
+class CmsUsers extends EloquentModel
 {
-    use HasFactory;
+    // use HasFactory;
+    protected $connection = 'mongodb';
     protected $table = "cms_users";
     protected $fillable = [
         'name',

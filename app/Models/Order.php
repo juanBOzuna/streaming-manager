@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Mongodb\Eloquent\Model as EloquentModel;
 
-class Order extends Model
+class Order extends EloquentModel
 {
-    use HasFactory;
-
+    // use HasFactory;
+    protected $connection = 'mongodb';
     protected $table = "orders";
 
     protected $fillable = [

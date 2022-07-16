@@ -11,7 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class CustomersController extends Controller
+class CustomersController extends Controller // como se crea
+
 {
 
     public function index()

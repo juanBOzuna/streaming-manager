@@ -14,7 +14,7 @@ class CreateTipoDeRecargasTable extends Migration
     public function up()
     {
         Schema::create('tipo_de_recargas', function (Blueprint $table) {
-            $table->id();
+            $table->id('id');
             $table->string('name');
             $table->timestamps();
         });

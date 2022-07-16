@@ -31,7 +31,7 @@ class AddIsDiscardedAndNumberRenovationsToOrderDetails extends Migration
 
         if (Schema::hasTable('order_details')) {
             Schema::table('order_details', function (Blueprint $table) {
-                $table->dropColumn('discarded');
+                $table->dropColumn('is_discarded');
                 $table->dropColumn('number_renovations');
             });
         }

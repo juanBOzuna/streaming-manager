@@ -160,8 +160,9 @@ return [
         Illuminate\Session\SessionServiceProvider::class,
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
-        Illuminate\View\ViewServiceProvider::class,
-
+        Illuminate\View\ViewServiceProvider::class,//como, ya usalo, Test->create({""...}) 
+        Jenssegers\Mongodb\MongodbServiceProvider::class,
+        // Mongodb\
         /*
          * Package Service Providers...
          */

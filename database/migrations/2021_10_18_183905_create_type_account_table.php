@@ -14,7 +14,7 @@ class CreateTypeAccountTable extends Migration
     public function up()
     {
         Schema::create('type_account', function (Blueprint $table) {
-            $table->id();
+            $table->id('id');
             $table->string("name");
             $table->integer("total_screens");
             $table->integer("available_screens");

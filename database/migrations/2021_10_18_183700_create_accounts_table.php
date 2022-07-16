@@ -15,7 +15,7 @@ class CreateAccountsTable extends Migration
     {
         date_default_timezone_set('America/Bogota');
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id();
+            $table->id('id');
             $table->string("email");
             $table->string("key_pass");
             $table->boolean('is_renewed')->default(0);
