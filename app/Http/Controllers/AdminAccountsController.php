@@ -50,7 +50,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $this->col[] = ["label" => "Id", "name" => "id"];
         $this->col[] = ["label" => "Correo", "name" => "email"];
         $this->col[] = ["label" => "Clave", "name" => "key_pass"];
-        $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,picture", "image" => true];
+        // $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,picture", "image" => true];
+        $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,name"];
         $this->col[] = ["label" => "fecha de creacion", "name" => "created_at"];
         $this->col[] = ["label" => "esta renovada?", "name" => "is_renewed", "callback" => function ($row) {
             if ($row->is_renewed == 0) {
@@ -80,7 +81,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
         # START FORM DO NOT REMOVE THIS LINE
         $this->form = [];
-        $this->form[] = ['label' => 'Correo', 'name' => 'email', 'type' => 'email', 'validation' => 'required|min:1|max:255|email|unique:accounts', 'width' => 'col-sm-10', 'placeholder' => 'Please enter a valid email address'];
+        $this->form[] = ['label' => 'Correo', 'name' => 'email', 'type' => 'email', 'validation' => 'required|min:1|max:255|email', 'width' => 'col-sm-10', 'placeholder' => 'Please enter a valid email address'];
         $this->form[] = ['label' => 'Clave', 'name' => 'key_pass', 'type' => 'text', 'validation' => 'min:3|max:32', 'width' => 'col-sm-10'];
         $this->form[] = ['label' => 'Tipo de cuenta', 'name' => 'type_account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'type_account,name'];
 
@@ -411,6 +412,21 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
     public function hook_before_add(&$postdata)
     {
         //Your code here
+
+        $acc = Accounts::where('type_account_id', '=', $postdata['type_account_id'])->where('email', '=', $postdata['email'])->get();
+        // {
+
+        // }
+
+        if (sizeof($acc) >= 1) {
+            \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Ojo, ya hay una cuenta de este tipo con este correo", "warning");
+        }
+
+        // dd();
+
+        // if(){
+
+        // }
 
     }
 

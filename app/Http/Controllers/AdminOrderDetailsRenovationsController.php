@@ -398,16 +398,27 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 
 		if (isset($detail->parent_order_detail)) {
 			$date_finish_detail = Carbon::parse($detail->finish_date);
-			echo 'fin: ' . $date_finish_detail;
-			echo '  | acutal: ' . $dateInstant;
+			// echo 'fin: ' . $date_finish_detail;
+			// echo '  | acutal: ' . $dateInstant;
 			// dd($date_finish_detail->isBefore($dateInstant));
 			// dd($date_finish_detail >= $dateInstant);
+			$dateExpired = null;
 
 			if ($date_finish_detail >= $dateInstant) {
-				$dateExpired = $dateInstant->addDays($detail->membership_days);
-			} else {
+				// echo '</br>sirvio </br>  '; 
 				$dateExpired = $date_finish_detail->addDays($detail->membership_days);
+			} else {
+				// echo '</br>NO sirvio </br>  ';
+				$dateExpired = $dateInstant->addDays($detail->membership_days);
 			}
+
+			echo ' df = ' . $date_finish_detail;
+			echo ' di = ' . $dateInstant;
+			echo ' de = ' . $dateExpired;
+			echo ' format = ' . (string)$dateExpired->format('Y-m-d H:i:s');
+
+			dd($dateExpired);
+
 			// if(){
 
 			// }
@@ -421,9 +432,10 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 				'price_of_membership_days' => $detail->price_of_membership_days,
 				'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s'),
 				'parent_order_detail' => $detail->parent_order_detail,
-
 			]);
-			dd($s);
+
+			// dd($s);
+			// dd($s);
 
 			$detail_parent = OrderDetail::where('id', '=', $detail->parent_order_detail)->first();
 			$detail_parent->number_renovations = $detail->number_renovations + 1;
@@ -438,7 +450,16 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 			$screen->save();
 			HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta renovada exitosamente.", "success");
 		} else {
-			$dateExpired = $dateInstant->addDays($detail->membership_days);
+			$date_finish_detail = Carbon::parse($detail->finish_date);
+			if ($date_finish_detail >= $dateInstant) {
+				// echo '</br>sirvio </br>  '; 
+				$dateExpired = $date_finish_detail->addDays($detail->membership_days);
+			} else {
+				// echo '</br>NO sirvio </br>  ';
+				$dateExpired = $dateInstant->addDays($detail->membership_days);
+			}
+
+			// $dateExpired = $dateInstant->addDays($detail->membership_days);
 			OrderDetail::create([
 				'orders_id' => $detail->orders_id,
 				'type_account_id' => $detail->type_account_id,
