@@ -44,6 +44,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		$this->col = [];
 		$this->col[] = ["label" => "Cliente", "name" => "customers.name"];
 		$this->col[] = ["label" => "Telefono", "name" => "customers.number_phone"];
+		$this->col[] = ["label" => "Orden", "name" => "order_details.orders_id"];
 		$this->col[] = ["label" => "Correo", "name" => "accounts.email"];
 		$this->col[] = ["label" => "Pantalla #", "name" => "screens.name"];
 		$this->col[] = ["label" => "Fecha de COMPRA", "name" => "screens.date_sold"];
@@ -403,21 +404,28 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 			// dd($date_finish_detail->isBefore($dateInstant));
 			// dd($date_finish_detail >= $dateInstant);
 			$dateExpired = null;
-
+			// echo ' df = ' . $date_finish_detail;
+			// echo ' di = ' . $dateInstant;
 			if ($date_finish_detail >= $dateInstant) {
-				// echo '</br>sirvio </br>  '; 
+				echo '</br>sirvio </br>  '; 
 				$dateExpired = $date_finish_detail->addDays($detail->membership_days);
 			} else {
-				// echo '</br>NO sirvio </br>  ';
+				echo '</br>NO sirvio </br>  ';
 				$dateExpired = $dateInstant->addDays($detail->membership_days);
 			}
 
-			echo ' df = ' . $date_finish_detail;
-			echo ' di = ' . $dateInstant;
-			echo ' de = ' . $dateExpired;
-			echo ' format = ' . (string)$dateExpired->format('Y-m-d H:i:s');
+			// echo ''$date_finish_detail
+			
+			
+			// echo ' de = ' . $dateExpired;
+			// dd($dateExpired);
 
-			dd($dateExpired);
+		//	echo ' df = ' . $date_finish_detail;
+		//	echo ' di = ' . $dateInstant;
+		//	echo ' de = ' . $dateExpired;
+		//	echo ' format = ' . (string)$dateExpired->format('Y-m-d H:i:s');
+
+			//dd($dateExpired);
 
 			// if(){
 
@@ -496,5 +504,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 
 	public function getSetDesechar($id)
 	{
+		dd($id);
+		
 	}
 }

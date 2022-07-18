@@ -419,34 +419,46 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 			$datos .= '*' . $typeAccount->name . '*%20' . $screen->email . '%20*' . $nombre . '*%20%0A%0A';
 		}
+		///\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
+		$telefono =  $customer->number_phone;
+		echo "
+		<script>
+		let datos = ".json_encode($datos)."
+		let telefono = ".json_encode($telefono)."
+		//alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
+		window.open('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*','_blank');
+		window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow'
+		</script>
+		";
 
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=' . $customer->number_phone . '&message=' . '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*',
-			// CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=573044155592&message=asd',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING => '',
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 0,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'GET',
-		));
-		$response = curl_exec($curl);
-		curl_close($curl);
-		echo $response;
+		
+		//$curl = curl_init();
+		//curl_setopt_array($curl, array(
+	//		CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=' . $customer->number_phone . '&message=' . '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*',
+			//// CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=573044155592&message=asd',
+	//		CURLOPT_RETURNTRANSFER => true,
+	//		CURLOPT_ENCODING => '',
+	//		CURLOPT_MAXREDIRS => 10,
+	//		CURLOPT_TIMEOUT => 0,
+	//		CURLOPT_FOLLOWLOCATION => true,
+	//		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	///		CURLOPT_CUSTOMREQUEST => 'GET',
+	//	));
+	//	$response = curl_exec($curl);
+	//	curl_close($curl);
+	//	echo $response;
 
-		if ($response == "Success") {
-			foreach ($list_details_to_expired as $detail) {
-				$order_dt = OrderDetail::where('id', '=', $detail->id)->first();
-				$order_dt->is_notified = 1;
-				$order_dt->save();
-			}
-			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
-		}else{
-			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Hubo un error al enviar el mensaje, revise el internet, y que el bot  de whatsapp sirva", "danger");
-		}
+	//	if ($response == "Success") {
+	//		foreach ($list_details_to_expired as $detail) {
+	///			$order_dt = OrderDetail::where('id', '=', $detail->id)->first();
+	//			$order_dt->is_notified = 1;
+	//			$order_dt->save();
+	//		}
+	//		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
+	//	}else{
+	//		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Hubo un error al enviar el mensaje, revise el internet, y que el bot  de whatsapp sirva", "danger");
+	//	}
 
-		dd($response);
+		//dd($response);
 	}
 }

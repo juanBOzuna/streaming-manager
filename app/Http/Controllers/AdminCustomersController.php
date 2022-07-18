@@ -2,6 +2,7 @@
 
 use App\Models\CmsUsers;
 use App\Models\Customers;
+use App\Models\TypeAccount;
 use App\Models\Screens;
 use App\Models\User;
 use Carbon\Carbon;
@@ -194,8 +195,11 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
             $trHtml = '';
 
             foreach ($screens as $screen) {
+                $type = TypeAccount::where('id','=',$screen->type_account_id)->first();
+		$nameType=$type->name;
                 $trHtml .= '  <tr>
                <th scope="row">' . $screen->id . '</th>
+  <td>' . $nameType . ' </td>
                <td>' . $screen->email . ' </td>
                <td>' . Carbon::parse($screen->date_expired)->format('Y-m-d H:i:s') . '</td>
                <td>' . $screen->code_screen . '</td>
@@ -215,6 +219,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                   <thead>
                     <tr>
                       <th scope="col">ID</th>
+			<th scope="col">Tipo</th>
                       <th scope="col">Cuenta</th>
                       <th scope="col">Vence</th>
                       <th scope="col">Pin</th>

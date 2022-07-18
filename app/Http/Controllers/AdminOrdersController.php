@@ -42,6 +42,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         # START COLUMNS DO NOT REMOVE THIS LINE
         $this->col = [];
+        $this->col[] = ["label" => "ID", "name" => "id"];
         $this->col[] = ["label" => "Cliente", "name" => "customers_id", "join" => "customers,name"];
         $this->col[] = ["label" => "Telefono", "name" => "customers_id", "join" => "customers,number_phone"];
         $this->col[] = ["label" => "Precio Total", "name" => "total_price"];
