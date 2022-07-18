@@ -577,7 +577,16 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         ]);
 
         if ($containsError == 0) {
-            CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
+            CRUDBooster::redirect($_SERVER['HTTP_REFERER'] . '/is_sold_successfull=1', "Se creo el pedido exitosamente", "success");
+            //     echo "
+            // <script>
+            // let datos = " . json_encode($datos) . "
+            // let telefono = " . json_encode($telefono) . "
+            // //alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
+            // window.open('https://wa.me/3044155592','_blank');
+            // // window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow'
+            // </script>
+            // ";
         } else {
             CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente" . $errorsInSearch, "success");
         }
