@@ -19,7 +19,7 @@ class CreateOrderDetailsTable extends Migration
             $table->unsignedBigInteger('type_account_id');
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('number_screens')->nullable();
-            $table->unsignedInteger('screen_id');
+            $table->unsignedInteger('screen_id')->nullable();
             $table->unsignedInteger('account_id');
             $table->unsignedInteger('membership_days');
             $table->unsignedInteger('price_of_membership_days');

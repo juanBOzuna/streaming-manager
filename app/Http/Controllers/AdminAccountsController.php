@@ -62,7 +62,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         }];
         $this->col[] = ["label" => "ESTA CAIDA?", "name" => "is_expired", "callback" => function ($row) {
             if ($row->is_expired == 0) {
-                return 'No';
+                return 'ESTABLE';
             } else {
                 return 'CAIDA';
             }
@@ -209,7 +209,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         |
         */
         $this->table_row_color = array();
-        $this->table_row_color[] = ['condition' => "[is_expired] == '1'", "color" => "danger"];
+       // $this->table_row_color[] = ['condition' => "[is_expired] == '1'", "color" => "danger"];
 
 
         /*
@@ -279,25 +279,52 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
                                 list.forEach(function (item2) {
                                     index2++;
-//                                    for (let index3 = 0; index3 < 8; index3++) {
-//                                        if (index2 == index - index3 && index2 != index) {
-//                                          item2.style.backgroundColor = '#DD4B39';
-//                                        item2.style.color = '#FFFFFF';
-//                                        }
-//                                    }
-//                                    for (let index3 = 0; index3 < 4; index3++) {
-//                                        if (index2 == index + index3 && index2 != index) {
-//                                            item2.style.backgroundColor = '#DD4B39';
-//                                            item2.style.color = '#FFFFFF';
-//                                        }
-//                                    }
+                                   for (let index3 = 0; index3 < 8; index3++) {
+                                       if (index2 == index - index3 && index2 != index) {
+                                         item2.style.backgroundColor = '#DD4B39';
+                                       item2.style.color = '#FFFFFF';
+                                       }
+                                   }
+                                   for (let index3 = 0; index3 < 4; index3++) {
+                                       if (index2 == index + index3 && index2 != index) {
+                                           item2.style.backgroundColor = '#DD4B39';
+                                           item2.style.color = '#FFFFFF';
+                                       }
+                                   }
 
                                 })
-//                                item.style.backgroundColor = '#DD4B39';
-//                                 item.style.fontWeight= 'bold';
-//                                item.style.color = '#FFFFFF';
+                               item.style.backgroundColor = '#DD4B39';
+                                item.style.fontWeight= 'bold';
+                               item.style.color = '#FFFFFF';
 
                             }
+                            
+
+                            if (item.innerText == 'ESTABLE') {
+
+                                list.forEach(function (item2) {
+                                    index2++;
+                                    for (let index3 = 0; index3 < 8; index3++) {
+                                        if (index2 == index - index3 && index2 != index) {
+                                          item2.style.backgroundColor = '#47b425';
+                                        item2.style.color = '#FFFFFF';
+                                        }
+                                    }
+                                    for (let index3 = 0; index3 < 4; index3++) {
+                                        if (index2 == index + index3 && index2 != index) {
+                                            item2.style.backgroundColor = '#47b425';
+                                            item2.style.color = '#FFFFFF';
+                                        }
+                                    }
+    
+                                 })
+                                item.style.backgroundColor = '#47b425';
+                                 item.style.fontWeight= 'bold';
+                                item.style.color = '#FFFFFF';
+
+                            }
+
+
                         });
                       ";
         }
@@ -443,10 +470,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $type = TypeAccount::where('id', '=', $cuenta->type_account_id)->first()->total_screens;
 
         for ($i = 1; $i <= $type; $i++) {
-            do {
-                $code = random_int(1000, 9999);
-            } while (Screens::where("code_screen", "=", $code)->first());
-
+          
             $screen = new Screens;
             $screen->profile_number =  $i;
             $screen->account_id = $id;
@@ -454,7 +478,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             $screen->is_sold = 0;
             $screen->price_of_membership = 0;
             $screen->type_account_id = $cuenta->type_account_id;
-            $screen->code_screen = $code;
+            
             $screen->email = $cuenta->email;
             $screen->save();
         }
@@ -546,7 +570,6 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         }
 
         foreach ($screensOfAccount as $screen) {
-
             $screen->save();
             if ($screen->client_id != null) {
                 // $customer = Customers::where('id','=',$screen->client_id)->first();

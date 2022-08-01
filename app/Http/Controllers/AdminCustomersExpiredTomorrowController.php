@@ -57,12 +57,20 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				$d = explode(" ", $key->finish_date);
 				$fv = \Carbon\Carbon::parse($d[0]);
 				$da = \Carbon\Carbon::parse("");
+				$da2 = explode(" ", $da);
+				$da = \Carbon\Carbon::parse($da2[0]);
+				$da->addDays(1);
+				//if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
 
-				if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
+				//	dd("Vence manana" . " id=" . $key->id);
+				//	$number_expired++;
+				//}
+				//echo $fv ."  ".$da;
 
-					// dd("Vence manana" . " id=" . $key->id);
+				if($fv == $da){
 					$number_expired++;
 				}
+
 			}
 			if ($number_expired == 1) {
 				return "" . $number_expired . " pantalla";
@@ -207,23 +215,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				 });
 		 });
 
-		 const valores = window.location.search;
-		//  console.log(valores);
-		 const urlParams = new URLSearchParams(valores);
-		 var producto = urlParams.get('is_renewed_successfull');
-		 var rutaWP = urlParams.get('rutawp');
-		//  console.log(producto);
-		 if(producto!=null){
-			if(producto ==1 ){
-				
-				
-				// alert(window.localStorage.getItem('miGato2'));
-				// alert(window.location.hostname);
-				window.open(rutaWP,'_blank');	
-				window.location.replace('customers_expired_tomorrow');
-
-			}
-		 }
+		
 		";
 
 
@@ -235,6 +227,43 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
+			if(null!=$_REQUEST["isSuccess"]){
+				//session(['linkWp' => NULL	]);
+				$telefono = session("telefonoCliente");
+				$datos = session('linkWp');
+				
+					 echo "
+					<script>
+					let datos = " . json_encode($datos) . "
+					let telefono = " . json_encode($telefono) . "
+					// alert();
+					//window.localStorage.setItem('miGato2', 'Juan');
+					//alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
+					window.open('https://wa.me/'+telefono+'?text='+datos,'_blank');
+					window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow?isSendSms=1'
+
+					</script>
+					";
+			}
+
+			if(null!=$_REQUEST["isSendSms"]){
+				echo"
+				<script>
+				window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow?sendMessageSuccesfull=1';
+				</script>
+				";
+			}
+
+			if(null!= $_REQUEST["sendMessageSuccesfull"]){
+				
+			foreach (session('listDetail') as $detail) {
+				$order_dt = OrderDetail::where('id', '=', $detail->id)->first();
+				$order_dt->is_notified = 1;
+				$order_dt->save();
+			}
+			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect("http://streaming-manager.test/admin/customers_expired_tomorrow", "El cliente fue avisado exitosamente", "success");
+			
+			}
 		$this->pre_index_html = null;
 
 
@@ -419,14 +448,18 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		foreach ($details as $detail) {
 			date_default_timezone_set('America/Bogota');
 			$d = explode(" ", $detail->finish_date);
-			$fv = \Carbon\Carbon::parse($d[0]);
-			$da = \Carbon\Carbon::parse("");
-
-			if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
-				array_push($list_details_to_expired, $detail);
+				$fv = \Carbon\Carbon::parse($d[0]);
+				$da = \Carbon\Carbon::parse("");
+				$da2 = explode(" ", $da);
+				$da = \Carbon\Carbon::parse($da2[0]);
+				$da->addDays(1);
+				
+			if($fv == $da){
+			array_push($list_details_to_expired, $detail);
 				$number_screens++;
 			}
 		}
+		
 
 		foreach ($list_details_to_expired as $detail) {
 			$typeAccount = TypeAccount::where('id', '=', $detail->type_account_id)->first();
@@ -436,8 +469,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 			$datos .= '*' . $typeAccount->name . '*%20' . $screen->email . '%20*' . $nombre . '*%20%0A%0A';
 		}
+
 		///\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
 		$telefono =  $customer->number_phone;
+		
 
 		// echo "
 		// <script>
@@ -452,38 +487,11 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		// </script>
 		// ";
 
-		//$curl = curl_init();
-		//curl_setopt_array($curl, array(
-		//		CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=' . $customer->number_phone . '&message=' . '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*',
-		//// CURLOPT_URL => 'https://wp-bot-automatic.herokuapp.com/auto?tell=573044155592&message=asd',
-		//		CURLOPT_RETURNTRANSFER => true,
-		//		CURLOPT_ENCODING => '',
-		//		CURLOPT_MAXREDIRS => 10,
-		//		CURLOPT_TIMEOUT => 0,
-		//		CURLOPT_FOLLOWLOCATION => true,
-		//		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		///		CURLOPT_CUSTOMREQUEST => 'GET',
-		//	));
-		//	$response = curl_exec($curl);
-		//	curl_close($curl);
-		//	echo $response;
+		session(['linkWp' => '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*']);
+		session(['telefonoCliente' => $telefono.""]);
+		session(['listDetail' => $list_details_to_expired]);
+		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER']."?isSuccess=1", "El cliente fue avisado exitosamente", "success");
 
-		//	if ($response == "Success") {
-		// foreach ($list_details_to_expired as $detail) {
-		// 	$order_dt = OrderDetail::where('id', '=', $detail->id)->first();
-		// 	$order_dt->is_notified = 1;
-		// 	$order_dt->save();
-		// }
-	
-	
-		//	\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect('https://wa.me/'+$telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + $datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*' , "success");
-	
-		header('Location:'.' https://wa.me/573044155592');
-	//		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
-		//	}else{
-		//		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Hubo un error al enviar el mensaje, revise el internet, y que el bot  de whatsapp sirva", "danger");
-		//	}
-
-		//dd($response);
-	}
+		
+}
 }

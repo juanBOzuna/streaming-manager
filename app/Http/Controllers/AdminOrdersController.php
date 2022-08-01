@@ -8,6 +8,7 @@ use App\Models\OrderDetail;
 use App\Models\Orders;
 use App\Models\Screens;
 use App\Models\TypeAccount;
+use App\Models\Customers;
 use Carbon\Carbon;
 use crocodicstudio\crudbooster\helpers\CRUDBooster;
 use phpDocumentor\Reflection\Types\Boolean;
@@ -594,7 +595,10 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
     public static function searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, $request, $thisContext, $index): array
     {
+        //dd();
         $validation = true;
+        $cliente = Customers::where('id','=',request()['customers_id'])->first()->number_phone;
+        $c=  strrev(substr(strrev( strval($cliente)), 0, 4))  ;
         while ($validation) {
             if (sizeof($arrayAccounts) == sizeof($accountsCompleted) || sizeof($listScreens) == intval(request()['venta-number_screens'][$index])) {
                 $validation = false;
@@ -619,7 +623,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                                     if ($screen->is_sold == 0 && $screen->profile_number > 1) {
                                         if (array_search($screen->id, $listScreens) == false && !($screen->profile_number >= ($type_account->available_screens + 2))) {
                                             Screens::where('id', $screen->id)->update([
-                                                'is_sold' => 1
+                                                'is_sold' => 1,
+                                                'code_screen'=>$c
                                             ]);
                                             $accountEdit = Accounts::where('id', $account->id)->first();
                                             $accountEdit->screens_sold = ($accountEdit->screens_sold + 1);
@@ -675,6 +680,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             Screens::where('id', $screen)->update([
                 'client_id' => null,
                 'date_sold' => null,
+                'code_screen'=>null,
                 'date_expired' => null,
                 'is_sold' => 0,
                 'device' => null,

@@ -279,13 +279,14 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 	{
 		date_default_timezone_set('America/Bogota');
 		$da = \Carbon\Carbon::parse("");
+		$da->addDays(2);
 		$month = $da->month > 9 ? '' . $da->month : '0' . $da->month;
 		$day = $da->day > 9 ? '' . $da->day : '0' . $da->day;
-		$dateSimpli = $da->year . '-' . $month . '-' . ($day + 2) . ' 01:00:00';
-		// dd($dateSimpli);
+		$dateSimpli = $da->year . '-' . $month . '-' . $day . ' 00:00:00';
+		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('order_details.is_renewed', '=', '0')->where('finish_date', '<', $dateSimpli)->join('customers', 'order_details.customer_id', '=', 'customers.id')
+		$query->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor','=','0')->where('finish_date', '<', $dateSimpli)->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
 			->join('screens', 'order_details.screen_id', 'screens.id')
 			->select('order_details.*',  'customers.name', 'customers.number_phone', 'accounts.email', 'screens.name', 'screens.date_sold', 'screens.date_expired')
@@ -449,7 +450,6 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 			$detail_parent->number_renovations = $detail->number_renovations + 1;
 			$detail_parent->is_renewed = 1;
 			$detail_parent->save();
-
 			$detail->is_renewed = 1;
 			$detail->save();
 
