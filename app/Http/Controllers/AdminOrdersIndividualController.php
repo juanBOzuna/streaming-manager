@@ -157,16 +157,17 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	        */
 
 		$d = array();
-		$screens = Screens::where('is_sold', '=', '0')->get();
+		$screens = Screens::where('is_sold', '=', '0')->where('is_sold_revendedor','=','0')->get();
 		$customers = Customers::get();
 
 		$text = '{';
 		$i = 0;
 		foreach ($screens as $key) {
 			if ($i + 1 == sizeof($screens)) {
-				$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id  . " | " . $key->email . '"}';
+				$type = TypeAccount::where('id','=',$key->type_account_id)->first()->name;
+				$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id  . " | " .$type ." | " . $key->email . '"}';
 			} else {
-				$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id . " | " . $key->email . '"},';
+				$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id . " | " .$type ." | " . $key->email . '"},';
 			}
 			$i++;
 		}
@@ -333,7 +334,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	public function hook_query_index(&$query)
 	{
 		//Your code here
-
+		$query->where('is_venta_revendedor','=','0');
 	}
 
 	/*
@@ -382,7 +383,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 
 		$order = Order::create([
 			'customers_id' => $postdata["customers_id"],
-			'total_price' => $total_price
+			'total_price' => $total_price,
+			'type_order'=>'Pantalla Individual',
 		]);
 
 		OrderDetail::create([
@@ -391,6 +393,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			'customer_id' => $postdata["customers_id"],
 			'screen_id' => $postdata["pantalla_id"],
 			'account_id' => $screen->account_id,
+			'type_order'=>'Pantalla Individual',
 			'membership_days' => $postdata["dias_membersia"],
 			'price_of_membership_days' => $total_price,
 			'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s')

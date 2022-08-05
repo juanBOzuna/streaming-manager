@@ -4,20 +4,24 @@ namespace App\Http\Controllers;
 
 use Session;
 use Request;
-use DB;
-use CRUDBooster;
 
-use App\Models\Customers;
 use App\Models\Order;
+use App\Models\Customers;
+use App\Models\Revendedores;
+
+// use App\Models\Customers;
+// use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Screens;
 use App\Models\Accounts;
 use Carbon\Carbon;
 use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
-use Illuminate\Support\Facades\DB as FacadesDB;
+use DB;
+use CRUDBooster;
 
-class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster\controllers\CBController
+class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\crudbooster\controllers\CBController
 {
+
 	public function cbInit()
 	{
 
@@ -41,30 +45,46 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 		# START COLUMNS DO NOT REMOVE THIS LINE
-
 		$this->col = [];
-		$this->col[] = ["label" => "Cliente", "name" => "customers.name"];
-		$this->col[] = ["label" => "Telefono", "name" => "customers.number_phone"];
+		$this->col[] = ["label" => "Vendido a", "name" => "customer_id", "callback" => function ($row) {
+			if ($row->is_venta_revendedor == 1) {
+				return "REVENDEDOR";
+			} else {
+				return "Cliente";
+			}
+		}];
+		$this->col[] = ["label" => "Nombre comprador", "name" => "customer_id", "callback" => function ($row) {
+			$customer = null;
+			if ($row->is_venta_revendedor == 1) {
+				$customer = Customers::where('id', '=', $row->customer_id)->first();
+			} else {
+				$customer = Revendedores::where('id', '=', $row->customer_id)->first();
+			}
+			return $customer->name;
+		}];
+		$this->col[] = ["label" => "Telefono comprador", "name" => "customer_id", "callback" => function ($row) {
+
+			$customer = null;
+			$telefono = 0;
+			if ($row->is_venta_revendedor == 1) {
+				$customer = Customers::where('id', '=', $row->customer_id)->first();
+				$telefono = $customer->number_phone;
+			} else {
+				$customer = Revendedores::where('id', '=', $row->customer_id)->first();
+				$telefono = $customer->telefono;
+			}
+			return $telefono;
+		}];
 		$this->col[] = ["label" => "Orden", "name" => "order_details.orders_id"];
 		$this->col[] = ["label" => "Correo", "name" => "accounts.email"];
-		$this->col[] = ["label" => "Pantalla #", "name" => "screens.name"];
-		$this->col[] = ["label" => "Fecha de COMPRA", "name" => "screens.date_sold"];
+		// $this->col[] = ["label" => "Pantalla #", "name" => "screens.name"];
+		// $this->col[] = ["label" => "Fecha de COMPRA", "name" => "screens.date_sold"];
 		$this->col[] = ["label" => "Fecha de VENCIMIENTO", "name" => "order_details.finish_date"];
-		// $this->col[] = ["label"=>"Membership Days","name"=>"membership_days"];
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
 		# START FORM DO NOT REMOVE THIS LINE
 		$this->form = [];
-		// $this->form[] = ['label'=>'Orders Id','name'=>'orders_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'orders,id'];
-		// $this->form[] = ['label'=>'Type Account Id','name'=>'type_account_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'type_account,name'];
-		// $this->form[] = ['label'=>'Customer Id','name'=>'customer_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'customer,id'];
-		// $this->form[] = ['label'=>'Number Screens','name'=>'number_screens','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-		// $this->form[] = ['label'=>'Screen Id','name'=>'screen_id','type'=>'select2','validation'=>'required|min:1|max:255','width'=>'col-sm-10','datatable'=>'screen,id'];
-		// $this->form[] = ['label'=>'Account Id','name'=>'account_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'account,id'];
-		// $this->form[] = ['label'=>'Membership Days','name'=>'membership_days','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-		// $this->form[] = ['label'=>'Price Of Membership Days','name'=>'price_of_membership_days','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-		// $this->form[] = ['label'=>'Finish Date','name'=>'finish_date','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
-		// $this->form[] = ['label'=>'Is Notified','name'=>'is_notified','type'=>'radio','validation'=>'required|integer','width'=>'col-sm-10','dataenum'=>'Array'];
+		$this->form[] = ['label' => 'Orders Id', 'name' => 'orders_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'orders,id'];
 		# END FORM DO NOT REMOVE THIS LINE
 
 		# OLD START FORM
@@ -72,13 +92,19 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		//$this->form[] = ["label"=>"Orders Id","name"=>"orders_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"orders,id"];
 		//$this->form[] = ["label"=>"Type Account Id","name"=>"type_account_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"type_account,name"];
 		//$this->form[] = ["label"=>"Customer Id","name"=>"customer_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"customer,id"];
-		//$this->form[] = ["label"=>"Number Screens","name"=>"number_screens","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-		//$this->form[] = ["label"=>"Screen Id","name"=>"screen_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"screen,id"];
+		//$this->form[] = ["label"=>"Number Screens","name"=>"number_screens","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+		//$this->form[] = ["label"=>"Screen Id","name"=>"screen_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"screen,id"];
 		//$this->form[] = ["label"=>"Account Id","name"=>"account_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"account,id"];
-		//$this->form[] = ["label"=>"Membership Days","name"=>"membership_days","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-		//$this->form[] = ["label"=>"Price Of Membership Days","name"=>"price_of_membership_days","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-		//$this->form[] = ["label"=>"Finish Date","name"=>"finish_date","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
+		//$this->form[] = ["label"=>"Membership Days","name"=>"membership_days","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+		//$this->form[] = ["label"=>"Price Of Membership Days","name"=>"price_of_membership_days","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+		//$this->form[] = ["label"=>"Finish Date","name"=>"finish_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
+		//$this->form[] = ["label"=>"Is Discarded","name"=>"is_discarded","type"=>"radio","required"=>TRUE,"validation"=>"required|integer","dataenum"=>"Array"];
+		//$this->form[] = ["label"=>"Number Renovations","name"=>"number_renovations","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
 		//$this->form[] = ["label"=>"Is Notified","name"=>"is_notified","type"=>"radio","required"=>TRUE,"validation"=>"required|integer","dataenum"=>"Array"];
+		//$this->form[] = ["label"=>"Is Renewed","name"=>"is_renewed","type"=>"radio","required"=>TRUE,"validation"=>"required|integer","dataenum"=>"Array"];
+		//$this->form[] = ["label"=>"Parent Order Detail","name"=>"parent_order_detail","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+		//$this->form[] = ["label"=>"Is Venta Revendedor","name"=>"is_venta_revendedor","type"=>"radio","required"=>TRUE,"validation"=>"required|integer","dataenum"=>"Array"];
+		//$this->form[] = ["label"=>"Type Order","name"=>"type_order","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
 		# OLD END FORM
 
 		/* 
@@ -276,8 +302,10 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 	    | @query = current sql query 
 	    |
 	    */
-	public function hook_query_index(&$query) // este se ejecuta antes? si, no es el as, porque si se lo quito y uso el number_phone tampoco sale
+	public function hook_query_index(&$query)
 	{
+		//Your code here
+
 		date_default_timezone_set('America/Bogota');
 		$da = \Carbon\Carbon::parse("");
 		$da->addDays(2);
@@ -287,13 +315,13 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)->where('screen_id', '!=', null)->join('customers', 'order_details.customer_id', '=', 'customers.id')
+		$query->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)
+			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
+			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
-			->join('screens', 'order_details.screen_id', 'screens.id')
-			->select('order_details.*',  'customers.name', 'customers.number_phone', 'accounts.email', 'screens.name', 'screens.date_sold', 'screens.date_expired')
+			// ->join('screens', 'order_details.screen_id', 'screens.id')
+			->select('order_details.*',   'accounts.email')
 			->get();
-
-		// dd($query); // pues si y cual es el error
 	}
 
 	/*
@@ -304,8 +332,6 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 	    */
 	public function hook_row_index($column_index, &$column_value)
 	{
-		// echo $column_index. " ". $column_value;
-		// dd("");
 		//Your code here
 	}
 
@@ -399,6 +425,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		$date_of_created_At = Carbon::parse('');
 		$screen = Screens::where('id', '=', $detail->screen_id)->first();
 
+
 		if (isset($detail->parent_order_detail)) {
 			$date_finish_detail = Carbon::parse($detail->finish_date);
 			$dateExpired = null;
@@ -409,15 +436,14 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 				// echo '</br>NO sirvio </br>  ';
 				$dateExpired = $dateInstant->addDays($detail->membership_days);
 			}
-			// if($detail->type_order == Order::TYPE_INDIVIDUAL){
-			$s = OrderDetail::create([
+
+			 OrderDetail::create([
 				'orders_id' => $detail->orders_id,
 				'type_account_id' => $detail->type_account_id,
 				'customer_id' => $detail->customer_id,
-				'screen_id' => $detail->screen_id,
+				'type_order' => Order::TYPE_FULL,
+				'is_venta_revendedor' => $detail->is_venta_revendedor,
 				'account_id' => $detail->account_id,
-				'is_venta_revendedor' => 0,
-				'type_order' => Oder::TYPE_INDIVIDUAL,
 				'membership_days' => $detail->membership_days,
 				'price_of_membership_days' => $detail->price_of_membership_days,
 				'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s'),
@@ -431,14 +457,17 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 			$detail->is_renewed = 1;
 			$detail->save();
 
-			$screen->date_sold = (string)$date_of_created_At->format('Y-m-d H:i:s');
-			$screen->date_expired = (string)$dateExpired->format('Y-m-d H:i:s');
-			$screen->save();
-			// }
+			$screensAux = Screens::where('account_id', '=', $detail->account_id)->get();
 
-			HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta renovada exitosamente.", "success");
+			foreach ($screensAux as $screenAux) {
+				# code...
+				$screenAux->date_sold = (string)$date_of_created_At->format('Y-m-d H:i:s');
+				$screenAux->date_expired = (string)$dateExpired->format('Y-m-d H:i:s');
+				$screenAux->save();
+			}
 		} else {
 			$date_finish_detail = Carbon::parse($detail->finish_date);
+			$dateExpired = null;
 			if ($date_finish_detail >= $dateInstant) {
 				// echo '</br>sirvio </br>  '; 
 				$dateExpired = $date_finish_detail->addDays($detail->membership_days);
@@ -447,19 +476,14 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 				$dateExpired = $dateInstant->addDays($detail->membership_days);
 			}
 
-			// $dateExpired = $dateInstant->addDays($detail->membership_days);
 
-
-
-			// if($detail->type_order == Order::TYPE_INDIVIDUAL){
 			OrderDetail::create([
 				'orders_id' => $detail->orders_id,
 				'type_account_id' => $detail->type_account_id,
 				'customer_id' => $detail->customer_id,
-				'screen_id' => $detail->screen_id,
+				'type_order' => Order::TYPE_FULL,
+				'is_venta_revendedor' => $detail->is_venta_revendedor,
 				'account_id' => $detail->account_id,
-				'is_venta_revendedor' => 0,
-				'type_order' => Oder::TYPE_INDIVIDUAL,
 				'membership_days' => $detail->membership_days,
 				'price_of_membership_days' => $detail->price_of_membership_days,
 				'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s'),
@@ -480,14 +504,9 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 				$screenAux->date_expired = (string)$dateExpired->format('Y-m-d H:i:s');
 				$screenAux->save();
 			}
-			// }
-
-			HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta renovada exitosamente.", "success");
-			// echo $detail->finish_date;
-			// dd($detail_create);
 		}
+		HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta renovada exitosamente.", "success");
 	}
-
 	public function getSetDesechar($id)
 	{
 		dd($id);

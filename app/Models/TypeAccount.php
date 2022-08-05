@@ -17,6 +17,7 @@ class TypeAccount extends Model
         'available_screens',
         'extraordinary_available_screens',
         'price_day',
+        'price_full',
         'picture'
     ];
 }

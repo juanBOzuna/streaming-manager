@@ -44,8 +44,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		$this->col[] = ["label" => "Telefono", "name" => "number_phone"];
 		$this->col[] = ["label" => "No. Pantallas a expirar", "name" => "date_sold", "callback" => function ($row) {
 			$customer = Customers::where('id', '=', $row->id)->first();
-			$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->get();
-			$number_expired = 0;
+			$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','!=',null)->get();
+			$details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','=',null)->get();
+			$number_screens_expired = 0;
+			$number_accounts_expired=0;
 			// for ($i = 0; $i < 10; $i++) {
 			// 	if ($i == 2) {
 			// 		dd(\Carbon\Carbon::parse("")->month);
@@ -63,22 +65,67 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				//if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
 
 				//	dd("Vence manana" . " id=" . $key->id);
-				//	$number_expired++;
+				//	$number_screens_expired++;
 				//}
 				//echo $fv ."  ".$da;
 
 				if($fv == $da){
-					$number_expired++;
+					$number_screens_expired++;
 				}
+			}
 
+			foreach ($details_of_exired_accounts_completed as $key) {
+				date_default_timezone_set('America/Bogota');
+				$d = explode(" ", $key->finish_date);
+				$fv = \Carbon\Carbon::parse($d[0]);
+				$da = \Carbon\Carbon::parse("");
+				$da2 = explode(" ", $da);
+				$da = \Carbon\Carbon::parse($da2[0]);
+				$da->addDays(1);
+				//if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
+
+				//	dd("Vence manana" . " id=" . $key->id);
+				//	$number_screens_expired++;
+				//}
+				//echo $fv ."  ".$da;
+
+				if($fv == $da){
+					$number_accounts_expired++;
+				}
 			}
-			if ($number_expired == 1) {
-				return "" . $number_expired . " pantalla";
-			} elseif ($number_expired > 1) {
-				return "" . $number_expired . " pantallas";
-			} else {
-				return "NINGUNA PANTALLA";
+
+			$text = '';
+			if ($number_screens_expired == 1) {
+				$text = $number_screens_expired . " pantalla";
+			} 
+
+			if($number_screens_expired > 1){
+				$text= $number_screens_expired . " pantallas";
 			}
+
+			if ($number_accounts_expired == 1) {
+				if($number_screens_expired > 1){
+					$text .=' y '. $number_accounts_expired . " cuenta Completa";
+				}else{
+					$text .=$number_accounts_expired . " cuenta Completa";
+				}
+				
+			} 
+
+			if($number_accounts_expired > 1){
+				if($number_screens_expired > 1){
+					$text .=' y '. $number_accounts_expired . " cuentas Completas";
+				}else{
+					$text .=$number_accounts_expired . " cuentas Completas";
+				}
+				
+			}
+
+			if($number_screens_expired==0 && $number_accounts_expired==0){
+$text="NINGUNA PANTALLA";
+			}
+
+			return $text;
 		}];
 		// $this->col[] = ["label"=>"Date Expired Sold","name"=>"date_expired_sold"];
 		# END COLUMNS DO NOT REMOVE THIS LINE

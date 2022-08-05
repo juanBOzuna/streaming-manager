@@ -20,7 +20,7 @@ class CreateTypeAccountTable extends Migration
             $table->integer("available_screens");
             $table->integer("extraordinary_available_screens");
             $table->unsignedBigInteger('price_day');
-            $table->string("picture");
+            $table->string("picture")->nullable();
             $table->timestamps();
         });
     }

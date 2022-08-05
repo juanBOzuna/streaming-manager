@@ -4,7 +4,18 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
-
+	use App\Models\Revendedores;
+	
+use App\Models\Order;
+use App\Models\OrderDetail;
+	use App\Models\Accounts;
+	use App\Models\Screens;
+	use App\Models\Customers;
+	// use App\Models\Revendedores;
+	
+use Carbon\Carbon;
+	
+use App\Models\TypeAccount;
 	class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
@@ -30,15 +41,57 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label" => "revendedor", "name" => "customers_id", "join" => "revendedores,id"];
+			// $this->col[] = ["label" => "revendedor", "name" => "customers_id", "join" => "revendedores,id"];
+			$this->col[] = ["label" => "Vendido a", "name" => "customers_id", "callback" => function ($row) {
+				if ($row->is_venta_revendedor == 1) {
+					return "REVENDEDOR";
+				} else {
+					return "Cliente";
+				}
+			}];
+			$this->col[] = ["label" => "Nombre comprador", "name" => "customers_id", "callback" => function ($row) {
+				$customer = null;
+				if ($row->is_venta_revendedor == 1) {
+					$customer = Customers::where('id', '=', $row->customers_id)->first();
+				} else {
+					$customer = Revendedores::where('id', '=', $row->customers_id)->first();
+				}
+				return $customer->name;
+			}];
+			$this->col[] = ["label" => "Telefono comprador", "name" => "customers_id", "callback" => function ($row) {
+	
+				$customer = null;
+				$telefono = 0;
+				if ($row->is_venta_revendedor == 1) {
+					$customer = Customers::where('id', '=', $row->customers_id)->first();
+					$telefono = $customer->number_phone;
+				} else {
+					$customer = Revendedores::where('id', '=', $row->customers_id)->first();
+					$telefono = $customer->telefono;
+				}
+				return $telefono;
+			}];
 			$this->col[] = ["label" => "Precio Total", "name" => "total_price"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label' => 'Revendedor', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,name'];
-			$this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
-			$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+			if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
+
+				$this->form[] = ['label' => 'Revendedor', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,id'];
+				$this->form[] = ['label' => 'CLiente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
+				$this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
+				$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+			}
+			// dd(\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod());
+			if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getAdd") {
+
+				$this->form[] = ['label' => 'Revendedor', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,id'];
+				$this->form[] = ['label' => 'CLiente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
+				$this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
+				$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+			}
+			
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
@@ -144,7 +197,133 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = NULL;
+
+			$d = array();
+			$accounts = Accounts::where('screens_sold', '=', '0')->get();
+			$revendedores = Revendedores::get();
+			$clientes = Customers::get();
+
+			$text = '{';
+				$i = 0;
+				foreach ($accounts as $key) {
+					if ($i + 1 == sizeof($accounts)) {
+						$type = TypeAccount::where('id','=',$key->type_account_id)->first()->name;
+						$text .= '"' . $i . '": {"id": ' . $key->id . ', "nombre": "' . $key->id  . " | " .$type ." | ". $key->email . '"}';
+					} else {
+						$type = TypeAccount::where('id','=',$key->type_account_id)->first()->name;
+						$text .= '"' . $i . '": {"id": ' . $key->id .', "nombre": "' . $key->id . " | " .$type ." | "  . $key->email . '"},';
+					}
+					$i++;
+				}
+				$text .= '}';
+
+				$text3 = '{';
+					$i = 0;
+					foreach ($clientes as $key2) {
+						if ($i + 1 == sizeof($clientes)) {
+							
+							$text3 .= '"' . $i . '": {"id": ' . $key2->id . ',"nombre": "' . $key2->number_phone  . " | " . $key2->name . '"}';
+						} else {
+							$text3 .= '"' . $i . '": {"id": ' . $key2->id . ',"nombre": "' . $key2->number_phone . " | " . $key2->name . '"},';
+						}
+						$i++;
+					}
+					$text3 .= '}';
+
+
+				$text2 = '{';
+					$i = 0;
+					foreach ($revendedores as $cus) {
+						if ($i + 1 == sizeof($revendedores)) {
+							$text2 .= '"' . $i . '": {"id": ' . $cus->id . ',"nombre": "' . $cus->telefono  . " | " . $cus->name . '"}';
+						} else {
+							$text2 .= '"' . $i . '": {"id": ' . $cus->id . ',"nombre": "' . $cus->telefono . " | " . $cus->name . '"},';
+						}
+						$i++;
+					}
+					$text2 .= '}';
+
+
+
+	        $this->script_js = "
+			let select2 = document.getElementById('account_id');
+			let list = " . json_encode($text) . ";
+			let jsonList = JSON.parse(list); 
+
+			var res = [];
+            for(var i in jsonList){
+                res.push(jsonList[i]);
+			}
+
+			var length = select2.options.length;
+			for (i = length-1; i >= 1; i--) { 
+				select2.options.remove(i);
+			 }
+
+			res.forEach(function (trs) {
+				// console.log(trs);
+				const option = document.createElement('option');
+				// const valor = 1;
+				option.value = trs.id;
+				option.text = trs.nombre;
+				select2.appendChild(option);
+			});
+
+
+			let select2Cus = document.getElementById('customers_id');
+			let listCus = " . json_encode($text2) . ";
+			let jsonListCus = JSON.parse(listCus); 
+	
+			// console.log(select2Cus.options);
+
+			var resCus = [];
+            for(var i in jsonListCus){
+                resCus.push(jsonListCus[i]);
+			}
+
+			var length = select2Cus.options.length;
+			for (i = length-1; i >= 1; i--) { 
+				select2Cus.options.remove(i);
+			 }
+			 
+			resCus.forEach(function (trsCus) {
+				// console.log(trsCus);
+				const option = document.createElement('option');
+				// const valor = 1;
+				option.value = trsCus.id;
+				option.text = trsCus.nombre;
+				select2Cus.appendChild(option);
+			});
+
+			let select2Cus2 = document.getElementById('customers_id2');
+			// console.log(select2Cus2);
+			let listCus2 = " . json_encode($text3) . ";
+			let jsonListCus2 = JSON.parse(listCus2); 
+			console.log(jsonListCus2);
+			// console.log(select2Cus2.options);
+
+			var resCus2 = [];
+            for(var i in jsonListCus2){
+                resCus2.push(jsonListCus2[i]);
+			}
+
+			var length = select2Cus2.options.length;
+			for (i = length-1; i >= 1; i--) { 
+				select2Cus2.options.remove(i);
+			 }
+			 
+			resCus2.forEach(function (trsCus) {
+				// console.log(trsCus);
+				const option = document.createElement('option');
+				// const valor = 1;
+				option.value = trsCus.id;
+				option.text = trsCus.nombre;
+				select2Cus2.appendChild(option);
+			});
+
+
+
+			";
 
 
             /*
@@ -232,6 +411,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
+			// $query->where('is_venta_revendedor','=','1');
 	            
 	    }
 
@@ -254,6 +434,110 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
+			$validationIf =0;
+			if($postdata['customers_id']==0 && $postdata['customers_id2']==0 ){
+				$validationIf=1;
+				\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "OJO, DEBE SELECCIONAR UN CLIENTE O UN REVENDEDOR ALMENOS", "warning");
+				
+			}
+			if($postdata['customers_id']==1 && $postdata['customers_id2']==1 ){
+				$validationIf=1;
+				\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "OJO, SI ESCOGE REVENDEDOR NO PUEDE ESCOGER CLIENTE, IGUAL EN VICEVERSA", "warning");
+				
+			}
+
+			if($validationIf==0){
+				date_default_timezone_set('America/Bogota');
+				$accounts = Accounts::where("id", "=", $postdata["account_id"])->first();
+		
+				// dd($postdata);
+		
+				$type = TypeAccount::where("id", "=", $accounts->type_account_id)->first();
+			
+				$total_price = doubleval($type->price_full);
+				
+				// dd($dateInstant);
+				
+				// dd($dateInstant->addDays(30));
+
+				$screens = Screens::where('account_id','=',$accounts->id)->get();
+		// dd($screens);
+				foreach ($screens as $screen) {
+					# code...\
+					$dateInstant = Carbon::parse('');
+				$screen->is_sold = 1;
+				if(!$postdata['customers_id']==0){
+					$screen->is_sold_revendedor = 1;
+					$screen->revendedor_id = $postdata["customers_id"];
+				}
+				$screen->date_sold =  strval($dateInstant);
+				$dateExpired = $dateInstant->addDays(30);
+				$screen->date_expired = strval($dateExpired);
+				$screen->price_of_membership = $total_price;
+				$screen->save();
+				}
+		
+				//$acc = Accounts::where('id', '=', $screen->account_id)->first();
+		
+				$accounts->screens_sold = $type->available_screens;
+				$accounts->revendedor_id = $postdata["customers_id"];
+				$accounts->save();
+		
+				if($postdata['customers_id']!=0){
+					$order = Order::create([
+						'customers_id' => $postdata["customers_id"],
+						'total_price' => $total_price,
+						'type_order'=>'Cuenta Completa',
+						'is_venta_revendedor'=>1
+					]);
+				}else{
+					$order = Order::create([
+						'customers_id' => $postdata["customers_id2"],
+						'total_price' => $total_price,
+						'type_order'=>'Cuenta Completa',
+						'is_venta_revendedor'=>0
+					]);
+				}
+				$dateInstant = Carbon::parse('');
+				if($postdata['customers_id']!=0){
+					$d =OrderDetail::create([
+						'orders_id' => $order->id,
+						'type_account_id' => $accounts->type_account_id,
+						'customer_id' => $postdata["customers_id"],
+						'is_venta_revendedor'=>1,
+						'type_order'=>Order::TYPE_FULL,
+						'account_id' => $accounts->id,
+						'membership_days' => $postdata["dias_membersia"],
+						'price_of_membership_days' => $total_price,
+						'finish_date' => (string)$dateInstant->format('Y-m-d H:i:s')
+					]);
+				}else{
+					$d =OrderDetail::create([
+						'orders_id' => $order->id,
+						'type_account_id' => $accounts->type_account_id,
+						'customer_id' => $postdata["customers_id2"],
+						'is_venta_revendedor'=>0,
+						'type_order'=>Order::TYPE_FULL,
+						'account_id' => $accounts->id,
+						'membership_days' => $postdata["dias_membersia"],
+						'price_of_membership_days' => $total_price,
+						'finish_date' => (string)$dateInstant->format('Y-m-d H:i:s')
+					]);
+				}
+				
+				// $screensAux = Screens::where('account_id','=', $detail->account_id)->get();
+
+				// foreach ($screensAux as $screenAux) {
+				// 	# code...
+				// 	$screenAux->date_sold = (string)$date_of_created_At->format('Y-m-d H:i:s');
+				// $screenAux->date_expired = (string)$dateExpired->format('Y-m-d H:i:s');
+				// $screenAux->save();
+				// }
+				// dd($d);
+				\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
+			}
+			
+			
 
 	    }
 

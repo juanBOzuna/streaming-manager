@@ -56,10 +56,11 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $columns = [];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
+             $columns[] = ['label' => 'Tipo de venta', 'name' => 'type_order', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'required' => true];
         }
 
-        $columns[] = ['label' => 'Tipo de Pantalla', 'name' => 'type_account_id', 'type' => 'datamodal', 'datamodal_table' => 'type_account', 'datamodal_columns' => 'name', 'datamodal_select_to' => 'Nombre:name', 'required' => true];
+        $columns[] = ['label' => 'Tipo de Servicio', 'name' => 'type_account_id', 'type' => 'datamodal', 'datamodal_table' => 'type_account', 'datamodal_columns' => 'name', 'datamodal_select_to' => 'Nombre:name', 'required' => true];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
 
             $this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
@@ -67,8 +68,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
 
             $columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Pantalla #', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Cuenta #', 'name' => 'account_id', 'type' => 'number', 'required' => true];
+            $columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
+            $columns[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'number', 'required' => true];
             // $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
             $columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
             $columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
@@ -358,6 +359,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     public function hook_query_index(&$query)
     {
         //Your code here
+        $query->where('is_venta_revendedor','=','0');
 
     }
 
@@ -407,7 +409,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $type_account = TypeAccount::where('id', '=', request()['venta-type_account_id'])->first();
             $typeAccountToTypeAccount[$index] = $type_account;
 
-            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->get();
+            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->where('is_venta_revendedor','=','0')->get();
+            
             $searchResult = $this->searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, request(), $this, $index);
             $searchToSearch[$index] = $searchResult;
             //   dd($searchResult['pantallas']);
@@ -532,6 +535,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $order = Order::create([
             'customers_id' => $request['customers_id'],
+            'type_order'=>Oder::TYPE_INDIVIDUAL,
             'total_price' => 0
         ]);
 
@@ -556,6 +560,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     'type_account_id' => $typeAccount->id,
                     'customer_id' => $request['customers_id'],
                     'screen_id' => $screenSelected->id,
+                    'type_order'=>Oder::TYPE_INDIVIDUAL,
                     'account_id' => $screenSelected->account_id,
                     'membership_days' => $request['venta-membership_days'][$index],
                     'price_of_membership_days' => intval($price_of_membership_days),

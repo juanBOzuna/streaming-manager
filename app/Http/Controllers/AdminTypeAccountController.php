@@ -38,6 +38,9 @@ class AdminTypeAccountController extends \crocodicstudio\crudbooster\controllers
         $this->col[] = ["label" => "Precio por Dia", "name" => "price_day", "callback" => function ($row) {
             return "$ " . $row->price_day;
         }];
+        $this->col[] = ["label" => "Precio cuenta Completa", "name" => "price_full", "callback" => function ($row) {
+            return "$ " . $row->price_full;
+        }];
         $this->col[] = ["label" => "Imagen", "name" => "picture", "image" => true];
         # END COLUMNS DO NOT REMOVE THIS LINE
 
@@ -48,7 +51,8 @@ class AdminTypeAccountController extends \crocodicstudio\crudbooster\controllers
         $this->form[] = ['label' => 'Pantallas vendibles', 'name' => 'available_screens', 'type' => 'number', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
         $this->form[] = ['label' => 'Pantallas vendibles en caso extremo', 'name' => 'extraordinary_available_screens', 'type' => 'number', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
         $this->form[] = ['label' => 'Precio Por Dia', 'name' => 'price_day', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
-        $this->form[] = ['label' => 'imagen', 'name' => 'picture', 'type' => 'upload', 'validation' => 'required|image|max:3000', 'width' => 'col-sm-10', 'help' => 'File types support : JPG, JPEG, PNG, GIF, BMP'];
+        $this->form[] = ['label' => 'Precio Cuenta Completa', 'name' => 'price_full', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+        $this->form[] = ['label' => 'imagen', 'name' => 'picture', 'type' => 'upload', 'validation' => 'image|max:3000', 'width' => 'col-sm-10', 'help' => 'File types support : JPG, JPEG, PNG, GIF, BMP'];
         # END FORM DO NOT REMOVE THIS LINE
 
         # OLD START FORM

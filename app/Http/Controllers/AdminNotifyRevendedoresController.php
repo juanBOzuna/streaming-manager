@@ -4,26 +4,27 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
-	
-	use App\Models\Accounts;
+	use App\Models\Revendedores;
+	use App\Models\OrderDetail;
 	use App\Models\TypeAccount;
-	
-	class AdminRevendedoresController extends \crocodicstudio\crudbooster\controllers\CBController {
+	use App\Models\Screens;
+
+	class AdminNotifyRevendedoresController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "id";
+			$this->title_field = "name";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
-			$this->button_edit = true;
-			$this->button_delete = true;
-			$this->button_detail = true;
+			$this->button_add = false;
+			$this->button_edit = false;
+			$this->button_delete = false;
+			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
@@ -33,22 +34,98 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"ID","name"=>"id"];
-			$this->col[] = ["label"=>"Nombre","name"=>"name"];
-			$this->col[] = ["label"=>"Telefono","name"=>"telefono"];
+			$this->col[] = ["label"=>"Name","name"=>"name"];
+			$this->col[] = ["label" => "Telefono", "name" => "telefono"];
+			$this->col[] = ["label" => "No. Cuentas a expirar", "name" => "name", "callback" => function ($row) {
+				$revendedor = Revendedores::where('id', '=', $row->id)->first();
+				$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('is_venta_revendedor','=','1')->get();
+				// $details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','=',null)->get();
+				// $number_screens_expired = 0;
+				$number_accounts_expired=0;
+				// for ($i = 0; $i < 10; $i++) {
+				// 	if ($i == 2) {
+				// 		dd(\Carbon\Carbon::parse("")->month);
+				// 	}
+				// }
+	
+				// foreach ($details_of_exired as $key) {
+				// 	date_default_timezone_set('America/Bogota');
+				// 	$d = explode(" ", $key->finish_date);
+				// 	$fv = \Carbon\Carbon::parse($d[0]);
+				// 	$da = \Carbon\Carbon::parse("");
+				// 	$da2 = explode(" ", $da);
+				// 	$da = \Carbon\Carbon::parse($da2[0]);
+				// 	$da->addDays(1);
+				// 	//if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
+	
+				// 	//	dd("Vence manana" . " id=" . $key->id);
+				// 	//	$number_screens_expired++;
+				// 	//}
+				// 	//echo $fv ."  ".$da;
+	
+				// 	if($fv == $da){
+				// 		$number_screens_expired++;
+				// 	}
+				// }
+	
+				foreach ($details_of_exired as $key) {
+					date_default_timezone_set('America/Bogota');
+					$d = explode(" ", $key->finish_date);
+					$fv = \Carbon\Carbon::parse($d[0]);
+					$da = \Carbon\Carbon::parse("");
+					$da2 = explode(" ", $da);
+					$da = \Carbon\Carbon::parse($da2[0]);
+					$da->addDays(1);
+					//if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
+	
+					//	dd("Vence manana" . " id=" . $key->id);
+					//	$number_screens_expired++;
+					//}
+					//echo $fv ."  ".$da;
+	
+					if($fv == $da){
+						$number_accounts_expired++;
+					}
+				}
+	
+				$text = '';
+				// if ($number_screens_expired == 1) {
+				// 	$text = $number_screens_expired . " pantalla";
+				// } 
+	
+				// if($number_screens_expired > 1){
+				// 	$text= $number_screens_expired . " pantallas";
+				// }
+	
+				if ($number_accounts_expired == 1) {
+					// if($number_screens_expired > 1){
+					// 	$text .=' y '. $number_accounts_expired . " cuenta Completa";
+					// }else{
+						$text .=$number_accounts_expired . " cuenta Completa";
+					// }
+					
+				} 
+	
+				if($number_accounts_expired > 1){
+					// if($number_screens_expired > 1){
+					// 	$text .=' y '. $number_accounts_expired . " cuentas Completas";
+					// }else{
+						$text .=$number_accounts_expired . " cuentas Completas";
+					// }
+					
+				}
+	
+				if( $number_accounts_expired==0){
+					$text="NINGUNA PANTALLA";
+				}
+	
+				return $text;
+			}];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
-				$this->form[] = ["label" => "ID", "name" => "name", "callback" => function ($row) {
-					return $row->id;
-				}];
-				}
-			$this->form[] = ['label'=>'Nombre','name'=>'name','type'=>'text','validation'=>'required|string|min:3|max:70','width'=>'col-sm-10','placeholder'=>'You can only enter the letter only'];
-			$this->form[] = ['label'=>'Telefono','name'=>'telefono','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			
-			
+			// $this->form[] = ['label'=>'Name','name'=>'name','type'=>'text','validation'=>'required|string|min:3|max:70','width'=>'col-sm-10','placeholder'=>'You can only enter the letter only'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
@@ -154,68 +231,17 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
+	        $this->script_js = "
+			let list = document.querySelectorAll('tr');
+		list.forEach(function (trs) {
+				 trs.childNodes.forEach(function (tds) {
+					if (tds.innerText == 'NINGUNA PANTALLA') {
+						trs.remove();
+					}
+				 });
+		 });
 
-			if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
-				$urlPage = $_SERVER['REQUEST_URI'];
-				$porciones = explode("?", $urlPage);
-				$porciones = explode("/", $porciones[0]);
-				
-				//var_dump(request() 	);
-
-				// dd( $porciones[sizeof($porciones)-1]);
-
-				$accounts = Accounts::where('revendedor_id','=',$porciones[sizeof($porciones)-1])->get();
-				// dd($porciones[6]);
-
-				$trHtml = '';
-				$htmlForTable = '';
-				foreach ($accounts as $account) {
-					$type = TypeAccount::where('id','=',$account->type_account_id)->first();
-					$nameType=$type->name;
-					$trHtml .= '  <tr>
-				   <th scope="row">' . $account->id . '</th>
-	  			   <td>' . $nameType . ' </td>
-				   <td>' . $account->email . ' </td>
-				   <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
-				   </tr>';
-
-				  
-				}
-
-				$htmlForTable = '
-				<br>
-				<span><strong>  CUENTAS DE ESTE REVENDEDOR</strong></span>
-				<br>
-				<br>
-				<table class="table table-striped">
-				  <thead>
-					<tr>
-					  <th scope="col">ID</th>
-						<th scope="col">Tipo</th>
-					  <th scope="col">Cuenta</th>
-					</tr>
-				  </thead>
-				  <tbody>
-				  '.$trHtml.'
-				  </tbody>
-				</table>';
-
-				$this->script_js = "
-				let table = " . json_encode($htmlForTable) . "
-				console.log('Entro al js')
-				let area = document.getElementById('parent-form-area');
-				
-				area.innerHTML+= table ;
-   
-				//console.log(area);
-   
-			   ";
-				
-				
-
-			}
-
-	        //$this->script_js = NULL;
+			";
 
 
             /*

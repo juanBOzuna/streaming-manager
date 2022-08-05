@@ -4,6 +4,8 @@ use App\Models\CmsUsers;
 use App\Models\Customers;
 use App\Models\TypeAccount;
 use App\Models\Screens;
+use App\Models\Accounts;
+use App\Models\OrderDetail;
 use App\Models\User;
 use Carbon\Carbon;
 use Cassandra\Custom;
@@ -190,21 +192,36 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
 //            $screens[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'number'];
 
             $screens = Screens::where('client_id', '=', $porciones[sizeof($porciones) - 1])->where('is_sold', '=', '1')->get();
-
+            $accountsFull = OrderDetail::where('customer_id','=',$porciones[sizeof($porciones) - 1])->where('screen_id','=',null)->where('is_renewed','=',0)->get();
 
             $trHtml = '';
+            $trHtml2 = '';
 
             foreach ($screens as $screen) {
                 $type = TypeAccount::where('id','=',$screen->type_account_id)->first();
-		$nameType=$type->name;
+		        $nameType=$type->name;
                 $trHtml .= '  <tr>
                <th scope="row">' . $screen->id . '</th>
-  <td>' . $nameType . ' </td>
+               <td>' . $nameType . ' </td>
                <td>' . $screen->email . ' </td>
                <td>' . Carbon::parse($screen->date_expired)->format('Y-m-d H:i:s') . '</td>
                <td>' . $screen->code_screen . '</td>
-                <td>' . $screen->device . '</td>
+               <td>' . $screen->device . '</td>
                <td>' . $screen->ip . ' </td>
+               <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
+               </tr>';
+            }
+
+            foreach ($accountsFull as $detail) {
+                $accountSelected = Accounts::where('id','=',$detail->account_id)->first();
+                $type = TypeAccount::where('id','=',$accountSelected->type_account_id)->first();
+		        $nameType=$type->name;
+                $trHtml2 .= '  <tr>
+               <th scope="row">' . $accountSelected->id . '</th>
+               <td>' . $nameType . ' </td>
+               <td>' . $accountSelected->email . ' </td>
+               <td>' . Carbon::parse($detail->date_finish)->format('Y-m-d H:i:s') . '</td>
+               
                <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
                </tr>';
             }
@@ -212,7 +229,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
 
             $htmlForTable = '
                 <br>
-                <span><strong>  PANTALLAS DE ESTE CLIENTE</strong></span>
+                <span><strong>  PANTALLAS INDIVIDUALES DE ESTE CLIENTE</strong></span>
                 <br>
                 <br>
                 <table class="table table-striped">
@@ -232,11 +249,34 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                   </tbody>
                 </table>';
 
+                $htmlForTable2= '
+                <br>
+                <br>
+                <span><strong>  CUENTAS COMPLETAS DE ESTE CLIENTE</strong></span>
+                <br>
+                <br>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">ID</th>
+                      <th scope="col">Tipo</th>
+                      <th scope="col">Correo</th>
+                      <th scope="col">Vence</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ' . $trHtml2 . '
+                  </tbody>
+                </table>';
+
             $this->script_js = "
              let table = " . json_encode($htmlForTable) . "
+             let table2 = " . json_encode($htmlForTable2) . "
              console.log('Entro al js')
              let area = document.getElementById('parent-form-area');
              area.innerHTML+= table ;
+            //  let area = document.getElementById('parent-form-area');
+             area.innerHTML+= table2 ;
 
              function actualizar(){
                 alert();

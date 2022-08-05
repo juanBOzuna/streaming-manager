@@ -15,6 +15,7 @@ class Screens extends Model
         'account_id',
         'email',
         'client_id',
+        'revendedor_id',
         'name',
         'code_screen',
         'profile_number',
@@ -25,6 +26,7 @@ class Screens extends Model
         'device',
         'ip',
         'type_account_id',
+        'is_sold_revendedor',
         'is_account_expired',
         'type_account_id',
     ];
