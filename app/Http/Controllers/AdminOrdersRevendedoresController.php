@@ -87,7 +87,7 @@ use App\Models\TypeAccount;
 			if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getAdd") {
 
 				$this->form[] = ['label' => 'Revendedor', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,id'];
-				$this->form[] = ['label' => 'CLiente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
+				$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
 				$this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
 				$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
 			}
@@ -434,13 +434,18 @@ use App\Models\TypeAccount;
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
+			// echo $_REQUEST['customers_id2'];
+			// echo $_REQUEST['customers_id'];
+			// dd($_REQUEST['customers_id']!=0 && $_REQUEST['customers_id2']==0);
 			$validationIf =0;
-			if($postdata['customers_id']==0 && $postdata['customers_id2']==0 ){
+			// echo $postdata['customers_id2'];
+		
+			if($_REQUEST['customers_id']==0 && $_REQUEST['customers_id2']==0 ){
 				$validationIf=1;
 				\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "OJO, DEBE SELECCIONAR UN CLIENTE O UN REVENDEDOR ALMENOS", "warning");
 				
 			}
-			if($postdata['customers_id']==1 && $postdata['customers_id2']==1 ){
+			if($_REQUEST['customers_id']==1 && $_REQUEST['customers_id2']==1 ){
 				$validationIf=1;
 				\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "OJO, SI ESCOGE REVENDEDOR NO PUEDE ESCOGER CLIENTE, IGUAL EN VICEVERSA", "warning");
 				
@@ -448,9 +453,9 @@ use App\Models\TypeAccount;
 
 			if($validationIf==0){
 				date_default_timezone_set('America/Bogota');
-				$accounts = Accounts::where("id", "=", $postdata["account_id"])->first();
+				$accounts = Accounts::where("id", "=", $_REQUEST["account_id"])->first();
 		
-				// dd($postdata);
+				// dd($_REQUEST);
 		
 				$type = TypeAccount::where("id", "=", $accounts->type_account_id)->first();
 			
@@ -466,9 +471,9 @@ use App\Models\TypeAccount;
 					# code...\
 					$dateInstant = Carbon::parse('');
 				$screen->is_sold = 1;
-				if(!$postdata['customers_id']==0){
+				if(!$_REQUEST['customers_id']==0){
 					$screen->is_sold_revendedor = 1;
-					$screen->revendedor_id = $postdata["customers_id"];
+					$screen->revendedor_id = $_REQUEST["customers_id"];
 				}
 				$screen->date_sold =  strval($dateInstant);
 				$dateExpired = $dateInstant->addDays(30);
@@ -480,34 +485,34 @@ use App\Models\TypeAccount;
 				//$acc = Accounts::where('id', '=', $screen->account_id)->first();
 		
 				$accounts->screens_sold = $type->available_screens;
-				$accounts->revendedor_id = $postdata["customers_id"];
+				$accounts->revendedor_id = $_REQUEST["customers_id"];
 				$accounts->save();
 		
-				if($postdata['customers_id']!=0){
+				if($_REQUEST['customers_id']!=0){
 					$order = Order::create([
-						'customers_id' => $postdata["customers_id"],
+						'customers_id' => $_REQUEST["customers_id"],
 						'total_price' => $total_price,
 						'type_order'=>'Cuenta Completa',
 						'is_venta_revendedor'=>1
 					]);
 				}else{
 					$order = Order::create([
-						'customers_id' => $postdata["customers_id2"],
+						'customers_id' => $_REQUEST["customers_id2"],
 						'total_price' => $total_price,
 						'type_order'=>'Cuenta Completa',
 						'is_venta_revendedor'=>0
 					]);
 				}
 				$dateInstant = Carbon::parse('');
-				if($postdata['customers_id']!=0){
+				if($_REQUEST['customers_id']!=0){
 					$d =OrderDetail::create([
 						'orders_id' => $order->id,
 						'type_account_id' => $accounts->type_account_id,
-						'customer_id' => $postdata["customers_id"],
+						'customer_id' => $_REQUEST["customers_id"],
 						'is_venta_revendedor'=>1,
 						'type_order'=>Order::TYPE_FULL,
 						'account_id' => $accounts->id,
-						'membership_days' => $postdata["dias_membersia"],
+						'membership_days' => $_REQUEST["dias_membersia"],
 						'price_of_membership_days' => $total_price,
 						'finish_date' => (string)$dateInstant->format('Y-m-d H:i:s')
 					]);
@@ -515,11 +520,11 @@ use App\Models\TypeAccount;
 					$d =OrderDetail::create([
 						'orders_id' => $order->id,
 						'type_account_id' => $accounts->type_account_id,
-						'customer_id' => $postdata["customers_id2"],
+						'customer_id' => $_REQUEST["customers_id2"],
 						'is_venta_revendedor'=>0,
 						'type_order'=>Order::TYPE_FULL,
 						'account_id' => $accounts->id,
-						'membership_days' => $postdata["dias_membersia"],
+						'membership_days' => $_REQUEST["dias_membersia"],
 						'price_of_membership_days' => $total_price,
 						'finish_date' => (string)$dateInstant->format('Y-m-d H:i:s')
 					]);
