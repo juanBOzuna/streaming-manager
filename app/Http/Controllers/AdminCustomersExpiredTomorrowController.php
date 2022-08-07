@@ -8,6 +8,7 @@ use DB;
 use CRUDBooster;
 
 use App\Models\Customers;
+use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\TypeAccount;
 use App\Models\Screens;
@@ -45,7 +46,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		$this->col[] = ["label" => "No. Pantallas a expirar", "name" => "date_sold", "callback" => function ($row) {
 			$customer = Customers::where('id', '=', $row->id)->first();
 			$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','!=',null)->get();
-			$details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','=',null)->get();
+			$details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','=',null)->where('is_venta_revendedor','=',0)->get();
 			$number_screens_expired = 0;
 			$number_accounts_expired=0;
 			// for ($i = 0; $i < 10; $i++) {
@@ -359,7 +360,7 @@ $text="NINGUNA PANTALLA";
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-		$this->load_css = array();
+			$this->load_css[] = asset("/css/All.css");
 	}
 
 
@@ -509,12 +510,22 @@ $text="NINGUNA PANTALLA";
 		
 
 		foreach ($list_details_to_expired as $detail) {
-			$typeAccount = TypeAccount::where('id', '=', $detail->type_account_id)->first();
-			$screen = Screens::where('id', '=', $detail->screen_id)->first();
-			$porciones = explode(" ", $screen->name);
-			$nombre = $porciones[0] . "%20" . $porciones[1];
-
-			$datos .= '*' . $typeAccount->name . '*%20' . $screen->email . '%20*' . $nombre . '*%20%0A%0A';
+			if($detail->type_order == Order::TYPE_FULL){
+				$typeAccount = TypeAccount::where('id', '=', $detail->type_account_id)->first();
+				$account = Screens::where('id', '=', $detail->account_id)->first();
+				// $porciones = explode(" ", $screen->name);
+				// $nombre = $porciones[0] . "%20" . $porciones[1];
+	
+				$datos .= '*' . $typeAccount->name . '*%20' . $account->email . ' *_CUENTA COMPLETA_*. %20%0A%0A';
+			}else{
+				$typeAccount = TypeAccount::where('id', '=', $detail->type_account_id)->first();
+				$screen = Screens::where('id', '=', $detail->screen_id)->first();
+				$porciones = explode(" ", $screen->name);
+				$nombre = $porciones[0] . "%20" . $porciones[1];
+	
+				$datos .= '*' . $typeAccount->name . '*%20' . $screen->email . '%20*' . $nombre . '*%20%0A%0A';
+			}
+			
 		}
 
 		///\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
@@ -534,7 +545,7 @@ $text="NINGUNA PANTALLA";
 		// </script>
 		// ";
 
-		session(['linkWp' => '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*']);
+		session(['linkWp' => '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20CLIENTE,%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20*~CADUCARA~*%20esta%20noche.%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20PANTALLA%20debe%20mandarnos%20*COMPROBANTE*%20de%20pago%20en%20este%20dia.%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20*BLOQUEARA*%20su%20pantalla%20a%20partir%20de%20media%20noche.%0A%20Att:%20*Admin*']);
 		session(['telefonoCliente' => $telefono.""]);
 		session(['listDetail' => $list_details_to_expired]);
 		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER']."?isSuccess=1", "El cliente fue avisado exitosamente", "success");

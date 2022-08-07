@@ -112,20 +112,41 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			} else {
 				$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,telefono'];
 			}
+			if (CRUDBooster::getCurrentMethod() == "getDetail") {
+
+				$this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
+				$this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+
+
+				$columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
+				// $columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
+				$columns[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'number', 'required' => true];
+				// $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
+				$columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
+				$columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
+				$columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
+				$columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
+				$columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
+			}
+
+			$this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
 
 			//
-			//$this->form[] = ['label' => 'Revendedor', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,name','datatable_format' => 'name,\'  -  \',telefono'];
-			//$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name','datatable_format' => 'name,\'  -  \',number_phone'];
-			//// $this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
-			//$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+
 			//}
 			//// dd(\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod());
-			//if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getAdd") {
 			//
 			//$this->form[] = ['label' => 'Comprador', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,id'];
 			//$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
 			//$this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
 			//$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+		}
+
+		if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getAdd") {
+			$this->form[] = ['label' => 'Revendedor', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,id'];
+			$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
+			$this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
+			$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
 		}
 		//
 		//if (CRUDBooster::getCurrentMethod() == "getDetail") {
@@ -293,87 +314,121 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		}
 		$text2 .= '}';
 
+		if (CRUDBooster::getCurrentMethod() == "getDetail") {
+			$this->script_js = "
+            let tabla = document.querySelector('#table-order_details');
 
+            // console.log(tabla.childNodes[3].childNodes);
 
-		$this->script_js = "
-			let select2 = document.getElementById('account_id');
-			let list = " . json_encode($text) . ";
-			let jsonList = JSON.parse(list); 
+            // let trs=  ;
 
-			var res = [];
-            for(var i in jsonList){
-                res.push(jsonList[i]);
-			}
+            // for(let i =0 ; i<tabla.childNodes[3].childNodes.length){
+            //     console.log(item[i]);
+            // }
+            let i=0;
+            tabla.childNodes[3].childNodes.forEach(function (item) {
+               let=i++;
+               if(i%2==0){
+                // console.log(item.children[4].innerText);
+                if(item.children[4].innerText=='0'){
+                    item.children[4].innerText = 'No';
+                    // item.children[4].style.color = '#DD4B39';
+                    item.children[4].style.fontWeight = 'bold';
+                }else{
+                    item.children[1].childElementCount=1;
+                    item.children[4].innerText = 'Si';
+                    item.children[4].style.color = '#04AA6D';
+                    item.children[4].style.fontWeight = 'bold';
+                }
+                
+               }
+               
+             });
+            ";
+		} else {
 
-			var length = select2.options.length;
-			for (i = length-1; i >= 1; i--) { 
-				select2.options.remove(i);
-			 }
-
-			res.forEach(function (trs) {
-				// console.log(trs);
-				const option = document.createElement('option');
-				// const valor = 1;
-				option.value = trs.id;
-				option.text = trs.nombre;
-				select2.appendChild(option);
-			});
-
-
-			let select2Cus = document.getElementById('customers_id');
-			let listCus = " . json_encode($text2) . ";
-			let jsonListCus = JSON.parse(listCus); 
+			$this->script_js = "
+				let select2 = document.getElementById('account_id');
+				let list = " . json_encode($text) . ";
+				let jsonList = JSON.parse(list); 
 	
-			// console.log(select2Cus.options);
+				var res = [];
+				for(var i in jsonList){
+					res.push(jsonList[i]);
+				}
+	
+				var length = select2.options.length;
+				for (i = length-1; i >= 1; i--) { 
+					select2.options.remove(i);
+				 }
+	
+				res.forEach(function (trs) {
+					// console.log(trs);
+					const option = document.createElement('option');
+					// const valor = 1;
+					option.value = trs.id;
+					option.text = trs.nombre;
+					select2.appendChild(option);
+				});
+	
+	
+				let select2Cus = document.getElementById('customers_id');
+				let listCus = " . json_encode($text2) . ";
+				let jsonListCus = JSON.parse(listCus); 
+		
+				// console.log(select2Cus.options);
+	
+				var resCus = [];
+				for(var i in jsonListCus){
+					resCus.push(jsonListCus[i]);
+				}
+	
+				var length = select2Cus.options.length;
+				for (i = length-1; i >= 1; i--) { 
+					select2Cus.options.remove(i);
+				 }
+				 
+				resCus.forEach(function (trsCus) {
+					// console.log(trsCus);
+					const option = document.createElement('option');
+					// const valor = 1;
+					option.value = trsCus.id;
+					option.text = trsCus.nombre;
+					select2Cus.appendChild(option);
+				});
+	
+				let select2Cus2 = document.getElementById('customers_id2');
+				// console.log(select2Cus2);
+				let listCus2 = " . json_encode($text3) . ";
+				let jsonListCus2 = JSON.parse(listCus2); 
+				console.log(jsonListCus2);
+				// console.log(select2Cus2.options);
+	
+				var resCus2 = [];
+				for(var i in jsonListCus2){
+					resCus2.push(jsonListCus2[i]);
+				}
+	
+				var length = select2Cus2.options.length;
+				for (i = length-1; i >= 1; i--) { 
+					select2Cus2.options.remove(i);
+				 }
+				 
+				resCus2.forEach(function (trsCus) {
+					// console.log(trsCus);
+					const option = document.createElement('option');
+					// const valor = 1;
+					option.value = trsCus.id;
+					option.text = trsCus.nombre;
+					select2Cus2.appendChild(option);
+				});
+	
+	
+	
+				";
+		}
 
-			var resCus = [];
-            for(var i in jsonListCus){
-                resCus.push(jsonListCus[i]);
-			}
 
-			var length = select2Cus.options.length;
-			for (i = length-1; i >= 1; i--) { 
-				select2Cus.options.remove(i);
-			 }
-			 
-			resCus.forEach(function (trsCus) {
-				// console.log(trsCus);
-				const option = document.createElement('option');
-				// const valor = 1;
-				option.value = trsCus.id;
-				option.text = trsCus.nombre;
-				select2Cus.appendChild(option);
-			});
-
-			let select2Cus2 = document.getElementById('customers_id2');
-			// console.log(select2Cus2);
-			let listCus2 = " . json_encode($text3) . ";
-			let jsonListCus2 = JSON.parse(listCus2); 
-			console.log(jsonListCus2);
-			// console.log(select2Cus2.options);
-
-			var resCus2 = [];
-            for(var i in jsonListCus2){
-                resCus2.push(jsonListCus2[i]);
-			}
-
-			var length = select2Cus2.options.length;
-			for (i = length-1; i >= 1; i--) { 
-				select2Cus2.options.remove(i);
-			 }
-			 
-			resCus2.forEach(function (trsCus) {
-				// console.log(trsCus);
-				const option = document.createElement('option');
-				// const valor = 1;
-				option.value = trsCus.id;
-				option.text = trsCus.nombre;
-				select2Cus2.appendChild(option);
-			});
-
-
-
-			";
 
 
 		/*
@@ -432,7 +487,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-		$this->load_css = array();
+		$this->load_css[] = asset("/css/All.css");
 	}
 
 
@@ -461,8 +516,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	public function hook_query_index(&$query)
 	{
 		//Your code here
-		// $query->where('is_venta_revendedor','=','1');
-
+		$query->where('type_order', '=', Order::TYPE_FULL);
 	}
 
 	/*
@@ -529,13 +583,21 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				$dateExpired = $dateInstant->addDays(30);
 				$screen->date_expired = strval($dateExpired);
 				$screen->price_of_membership = $total_price;
+				if ($_REQUEST['customers_id'] != 0) {
+					$screen->client_id = ['customers_id'];
+				} else {
+					$screen->client_id = ['customers_id2'];
+				}
 				$screen->save();
 			}
 
 			//$acc = Accounts::where('id', '=', $screen->account_id)->first();
 
 			$accounts->screens_sold = $type->available_screens;
-			$accounts->revendedor_id = $_REQUEST["customers_id"];
+			if (!$_REQUEST['customers_id'] == 0) {
+				$accounts->revendedor_id = $_REQUEST["customers_id"];
+			}
+			$accounts->is_sold_ordinary=1;
 			$accounts->save();
 
 			if ($_REQUEST['customers_id'] != 0) {

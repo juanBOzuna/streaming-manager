@@ -6,7 +6,9 @@
 	use CRUDBooster;
 	
 	use App\Models\Accounts;
-	use App\Models\TypeAccount;
+use App\Models\OrderDetail;
+use App\Models\Order;
+use App\Models\TypeAccount;
 	
 	class AdminRevendedoresController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -170,12 +172,15 @@
 				$trHtml = '';
 				$htmlForTable = '';
 				foreach ($accounts as $account) {
+					$detail = OrderDetail::where('account_id','=',$account->id)->where('customer_id','=',$porciones[sizeof($porciones)-1])->where('is_renewed','=',0)->where('screen_id','=',null)->where('type_order','=',Order::TYPE_FULL)->first();
 					$type = TypeAccount::where('id','=',$account->type_account_id)->first();
 					$nameType=$type->name;
 					$trHtml .= '  <tr>
 				   <th scope="row">' . $account->id . '</th>
+	  			   <td>' . $detail->orders_id . ' </td>
 	  			   <td>' . $nameType . ' </td>
 				   <td>' . $account->email . ' </td>
+				   <td>' . $detail->finish_date . ' </td>
 				   <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
 				   </tr>';
 
@@ -191,9 +196,11 @@
 				  <thead>
 					<tr>
 					  <th scope="col">ID</th>
+					  <th scope="col">ORDEN</th>
 						<th scope="col">Tipo</th>
 					  <th scope="col">Cuenta</th>
-					</tr>
+					  <th scope="col">Vence</th>	
+					  </tr>
 				  </thead>
 				  <tbody>
 				  '.$trHtml.'
@@ -274,7 +281,7 @@
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-	        $this->load_css = array();
+			$this->load_css[] = asset("/css/All.css");
 	        
 	        
 	    }

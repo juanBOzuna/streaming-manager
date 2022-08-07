@@ -199,16 +199,16 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             tabla.childNodes[3].childNodes.forEach(function (item) {
                let=i++;
                if(i%2==0){
-                // console.log(item.children[7].innerText);
-                if(item.children[7].innerText=='0'){
-                    item.children[7].innerText = 'No';
-                    // item.children[7].style.color = '#DD4B39';
-                    item.children[7].style.fontWeight = 'bold';
+                // console.log(item.children[8].innerText);
+                if(item.children[8].innerText=='0'){
+                    item.children[8].innerText = 'No';
+                    // item.children[8].style.color = '#DD4B39';
+                    item.children[8].style.fontWeight = 'bold';
                 }else{
                     item.children[1].childElementCount=1;
-                    item.children[7].innerText = 'Si';
-                    item.children[7].style.color = '#04AA6D';
-                    item.children[7].style.fontWeight = 'bold';
+                    item.children[8].innerText = 'Si';
+                    item.children[8].style.color = '#04AA6D';
+                    item.children[8].style.fontWeight = 'bold';
                 }
                 
                }
@@ -409,7 +409,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $type_account = TypeAccount::where('id', '=', request()['venta-type_account_id'])->first();
             $typeAccountToTypeAccount[$index] = $type_account;
 
-            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->where('screens_sold','=',$type_account->available_screens)->get();
+            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->where('screens_sold','<',$type_account->available_screens)->get();
             
             $searchResult = $this->searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, request(), $this, $index);
             $searchToSearch[$index] = $searchResult;

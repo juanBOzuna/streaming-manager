@@ -53,6 +53,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         // $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,picture", "image" => true];
         $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,name"];
         $this->col[] = ["label" => "fecha de creacion", "name" => "created_at"];
+        $this->col[] = ["label" => "Pantallas Vendidas", "name" => "screens_sold"];
         $this->col[] = ["label" => "esta renovada?", "name" => "is_renewed", "callback" => function ($row) {
             if ($row->is_renewed == 0) {
                 return 'No';

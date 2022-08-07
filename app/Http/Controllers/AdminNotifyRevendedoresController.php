@@ -347,7 +347,7 @@ class AdminNotifyRevendedoresController extends \crocodicstudio\crudbooster\cont
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-		$this->load_css = array();
+			$this->load_css[] = asset("/css/All.css");
 	}
 
 

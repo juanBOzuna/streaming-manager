@@ -202,24 +202,35 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
         //       header.innerHTML+= table ;
         //     console.log(header);
         // console.log('s')
-        let list = document.querySelectorAll('tr');
-        // console.log(list.childNodes);
-        let index = 0;
-        let index2 = 0;
+        // let list = document.querySelectorAll('tr');
+        // // console.log(list.childNodes);
+        // let index = 0;
+        // let index2 = 0;
 
-        list.forEach(function (item) {
-            index++;
-            let ele = item.childNodes[13];
-            if(index %2 ==0){
-                if(ele.innerText=='VENDIDA'){                    
-                    item.style.backgroundColor = '#42AB49';
-                    item.style.color = 'white';
-                    item.style.fontWeight = 'bold';
-                }
-            }
+        // list.forEach(function (item) {
+        //     index++;
+        //     let ele = item.childNodes[13];
+        //     if(index %2 ==0){
+        //         if(ele.innerText=='VENDIDA'){                    
+        //             item.style.backgroundColor = '#42AB49';
+        //             item.style.color = 'white';
+        //             item.style.fontWeight = 'bold';
+        //         }
+        //     }
             
 
-        });
+        // });
+
+        let list = document.querySelectorAll('tr');
+		list.forEach(function (trs) {
+				 trs.childNodes.forEach(function (tds) {
+					if (tds.innerText == 'VENDIDA') {
+						trs.style.backgroundColor = '#a5eea0';
+                        // trs.style.color = 'white';
+                        trs.style.fontWeight = 'bold';
+					}
+				 });
+		 });
 
         // list.forEach(function (item) {
         //     index2 = 0;

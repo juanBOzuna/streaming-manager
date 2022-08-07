@@ -250,7 +250,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-		$this->load_css = array();
+			$this->load_css[] = asset("/css/All.css");
 	}
 
 
@@ -287,7 +287,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)->where('screen_id', '!=', null)->join('customers', 'order_details.customer_id', '=', 'customers.id')
+		$query->where('type_order','=',Order::TYPE_INDIVIDUAL)->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)->where('screen_id', '!=', null)->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
 			->join('screens', 'order_details.screen_id', 'screens.id')
 			->select('order_details.*',  'customers.name', 'customers.number_phone', 'accounts.email', 'screens.name', 'screens.date_sold', 'screens.date_expired')

@@ -5,6 +5,7 @@ use App\Models\Customers;
 use App\Models\TypeAccount;
 use App\Models\Screens;
 use App\Models\Accounts;
+use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\User;
 use Carbon\Carbon;
@@ -192,7 +193,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
 //            $screens[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'number'];
 
             $screens = Screens::where('client_id', '=', $porciones[sizeof($porciones) - 1])->where('is_sold', '=', '1')->get();
-            $accountsFull = OrderDetail::where('customer_id','=',$porciones[sizeof($porciones) - 1])->where('screen_id','=',null)->where('is_renewed','=',0)->get();
+            $accountsFull = OrderDetail::where('customer_id','=',$porciones[sizeof($porciones) - 1])->where('screen_id','=',null)->where('is_renewed','=',0)->where('is_venta_revendedor','=',0)->get();
 
             $trHtml = '';
             $trHtml2 = '';
@@ -200,7 +201,9 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
             foreach ($screens as $screen) {
                 $type = TypeAccount::where('id','=',$screen->type_account_id)->first();
 		        $nameType=$type->name;
+                $detail = OrderDetail::where('screen_id','=',$screen->id)->where('account_id','=',$screen->account_id)->where('customer_id','=',$porciones[sizeof($porciones)-1])->where('is_renewed','=',0)->where('screen_id','!=',null)->where('type_order','=',Order::TYPE_INDIVIDUAL)->first();
                 $trHtml .= '  <tr>
+               <th scope="row">' . $detail->orders_id . '</th>
                <th scope="row">' . $screen->id . '</th>
                <td>' . $nameType . ' </td>
                <td>' . $screen->email . ' </td>
@@ -216,7 +219,9 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                 $accountSelected = Accounts::where('id','=',$detail->account_id)->first();
                 $type = TypeAccount::where('id','=',$accountSelected->type_account_id)->first();
 		        $nameType=$type->name;
+                $detail = OrderDetail::where('account_id','=',$accountSelected->id)->where('customer_id','=',$porciones[sizeof($porciones)-1])->where('is_renewed','=',0)->where('screen_id','=',null)->where('type_order','=',Order::TYPE_FULL)->first();
                 $trHtml2 .= '  <tr>
+               <th scope="row">' . $detail->orders_id . '</th>
                <th scope="row">' . $accountSelected->id . '</th>
                <td>' . $nameType . ' </td>
                <td>' . $accountSelected->email . ' </td>
@@ -235,7 +240,8 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th scope="col">ID</th>
+                      <th scope="col">ORDEN</th>
+                      <th scope="col">ID pantalla</th>
 			<th scope="col">Tipo</th>
                       <th scope="col">Cuenta</th>
                       <th scope="col">Vence</th>
@@ -258,7 +264,8 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                 <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th scope="col">ID</th>
+                      <th scope="col">ORDEN</th>
+                      <th scope="col">ID cuenta</th>
                       <th scope="col">Tipo</th>
                       <th scope="col">Correo</th>
                       <th scope="col">Vence</th>

@@ -276,7 +276,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-		$this->load_css = array();
+			$this->load_css[] = asset("/css/All.css");
 	}
 
 
@@ -315,7 +315,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('order_details.is_renewed', '=', '0')->where('finish_date', '<', $dateSimpli)
+		$query->where('order_details.is_renewed', '=', '0')->where('finish_date', '<', $dateSimpli)->where('type_order','=',Order::TYPE_FULL)
 			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
