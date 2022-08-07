@@ -409,7 +409,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $type_account = TypeAccount::where('id', '=', request()['venta-type_account_id'])->first();
             $typeAccountToTypeAccount[$index] = $type_account;
 
-            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->where('is_venta_revendedor','=','0')->get();
+            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->where('screens_sold','=',$type_account->available_screens)->get();
             
             $searchResult = $this->searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, request(), $this, $index);
             $searchToSearch[$index] = $searchResult;
@@ -535,7 +535,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $order = Order::create([
             'customers_id' => $request['customers_id'],
-            'type_order'=>Oder::TYPE_INDIVIDUAL,
+            'type_order'=>Order::TYPE_INDIVIDUAL,
             'total_price' => 0
         ]);
 
@@ -560,7 +560,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     'type_account_id' => $typeAccount->id,
                     'customer_id' => $request['customers_id'],
                     'screen_id' => $screenSelected->id,
-                    'type_order'=>Oder::TYPE_INDIVIDUAL,
+                    'type_order'=>Order::TYPE_INDIVIDUAL,
                     'account_id' => $screenSelected->account_id,
                     'membership_days' => $request['venta-membership_days'][$index],
                     'price_of_membership_days' => intval($price_of_membership_days),

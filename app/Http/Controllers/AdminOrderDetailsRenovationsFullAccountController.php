@@ -315,7 +315,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)
+		$query->where('order_details.is_renewed', '=', '0')->where('finish_date', '<', $dateSimpli)
 			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
@@ -423,7 +423,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 		date_default_timezone_set('America/Bogota');
 		$dateInstant = Carbon::parse('');
 		$date_of_created_At = Carbon::parse('');
-		$screen = Screens::where('id', '=', $detail->screen_id)->first();
+		$account = Accounts::where('id', '=', $detail->account->id)->first();
 
 
 		if (isset($detail->parent_order_detail)) {
