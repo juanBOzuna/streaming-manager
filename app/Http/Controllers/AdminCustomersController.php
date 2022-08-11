@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Models\CmsUsers;
 use App\Models\Customers;
@@ -47,10 +49,9 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
         $this->col[] = ["label" => "Telefono", "name" => "number_phone"];
         $this->col[] = ["label" => "Revendedor", "name" => "revendedor_id", "callback" => function ($row) {
 
-            if ( $row->revendedor_id != null ) {
-                $cliente = CmsUsers::where('id','=',$row->revendedor_id)->first();
-                return  "#".$row->revendedor_id . " | ". $cliente->name;
-
+            if ($row->revendedor_id != null) {
+                $cliente = CmsUsers::where('id', '=', $row->revendedor_id)->first();
+                return  "#" . $row->revendedor_id . " | " . $cliente->name;
             } else {
                 return 'No tiene';
             }
@@ -62,12 +63,12 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
         $this->form[] = ['label' => 'Nombre', 'name' => 'name', 'type' => 'text', 'validation' => 'required|string|min:3|max:70', 'width' => 'col-sm-10', 'placeholder' => 'You can only enter the letter only'];
         $this->form[] = ['label' => 'Telefono', 'name' => 'number_phone', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
         // $this->form[] = ['label' => 'Revendedor', 'name' => 'number_phone', 'type' => 'text', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10',"callback" => function ($row) {
-//          if($row->revendedor_id==null){
-//            return 'No tiene';
-//          }else{
-//              return "Revendedor: ". $row->revendedor_id;
-//          }
-//        }];
+        //          if($row->revendedor_id==null){
+        //            return 'No tiene';
+        //          }else{
+        //              return "Revendedor: ". $row->revendedor_id;
+        //          }
+        //        }];
         # END FORM DO NOT REMOVE THIS LINE
 
         # OLD START FORM
@@ -171,37 +172,38 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
         | $this->script_js = "function() { ... }";
         |
         */
-//        if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
-//            $this->script_js = "
-//             console.log('Entro al js')
-//             let area = document.getElementById(parent-form-area);
-//             console.log(area);
-//            ";
-//        }
+        //        if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
+        //            $this->script_js = "
+        //             console.log('Entro al js')
+        //             let area = document.getElementById(parent-form-area);
+        //             console.log(area);
+        //            ";
+        //        }
 
 
         if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
             $urlPage = $_SERVER['REQUEST_URI'];
             $porciones = explode("?", $urlPage);
             $porciones = explode("/", $porciones[0]);
-//
-//            $screens[] = ['label' => 'Id', 'name' => 'id', 'type' => 'number'];
-//            $screens[] = ['label' => 'Cuenta', 'name' => 'email', 'type' => 'text'];
-//            $screens[] = ['label' => 'Vence', 'name' => 'date_expired'];
-//            $screens[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'number'];
-//            $screens[] = ['label' => 'Dispositvo', 'name' => 'device', 'type' => 'text'];
-//            $screens[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'number'];
+            //
+            //            $screens[] = ['label' => 'Id', 'name' => 'id', 'type' => 'number'];
+            //            $screens[] = ['label' => 'Cuenta', 'name' => 'email', 'type' => 'text'];
+            //            $screens[] = ['label' => 'Vence', 'name' => 'date_expired'];
+            //            $screens[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'number'];
+            //            $screens[] = ['label' => 'Dispositvo', 'name' => 'device', 'type' => 'text'];
+            //            $screens[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'number'];
 
             $screens = Screens::where('client_id', '=', $porciones[sizeof($porciones) - 1])->where('is_sold', '=', '1')->get();
-            $accountsFull = OrderDetail::where('customer_id','=',$porciones[sizeof($porciones) - 1])->where('screen_id','=',null)->where('is_renewed','=',0)->where('is_venta_revendedor','=',0)->get();
+            $accountsFull = OrderDetail::where('customer_id', '=', $porciones[sizeof($porciones) - 1])->where('screen_id', '=', null)->where('is_renewed', '=', 0)->where('is_venta_revendedor', '=', 0)->get();
 
             $trHtml = '';
             $trHtml2 = '';
 
             foreach ($screens as $screen) {
-                $type = TypeAccount::where('id','=',$screen->type_account_id)->first();
-		        $nameType=$type->name;
-                $detail = OrderDetail::where('screen_id','=',$screen->id)->where('account_id','=',$screen->account_id)->where('customer_id','=',$porciones[sizeof($porciones)-1])->where('is_renewed','=',0)->where('screen_id','!=',null)->where('type_order','=',Order::TYPE_INDIVIDUAL)->first();
+                $type = TypeAccount::where('id', '=', $screen->type_account_id)->first();
+                $nameType = $type->name;
+                $detail = OrderDetail::where('screen_id', '=', $screen->id)->where('account_id', '=', $screen->account_id)->where('customer_id', '=', $porciones[sizeof($porciones) - 1])->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->where('screen_id', '!=', null)->where('type_order', '!=', Order::TYPE_FULL)->first();
+                // dd(env('LINK_SYSTEM'));
                 $trHtml .= '  <tr>
                <th scope="row">' . $detail->orders_id . '</th>
                <th scope="row">' . $screen->id . '</th>
@@ -211,15 +213,16 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                <td>' . $screen->code_screen . '</td>
                <td>' . $screen->device . '</td>
                <td>' . $screen->ip . ' </td>
+              <td> <a href="' . env('LINK_SYSTEM') . 'screens/edit/' . $screen->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers" target="_blank" >Editar</a> </td>
                <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
                </tr>';
             }
 
             foreach ($accountsFull as $detail) {
-                $accountSelected = Accounts::where('id','=',$detail->account_id)->first();
-                $type = TypeAccount::where('id','=',$accountSelected->type_account_id)->first();
-		        $nameType=$type->name;
-                $detail = OrderDetail::where('account_id','=',$accountSelected->id)->where('customer_id','=',$porciones[sizeof($porciones)-1])->where('is_renewed','=',0)->where('screen_id','=',null)->where('type_order','=',Order::TYPE_FULL)->first();
+                $accountSelected = Accounts::where('id', '=', $detail->account_id)->first();
+                $type = TypeAccount::where('id', '=', $accountSelected->type_account_id)->first();
+                $nameType = $type->name;
+                $detail = OrderDetail::where('account_id', '=', $accountSelected->id)->where('customer_id', '=', $porciones[sizeof($porciones) - 1])->where('is_renewed', '=', 0)->where('screen_id', '=', null)->where('type_order', '=', Order::TYPE_FULL)->first();
                 $trHtml2 .= '  <tr>
                <th scope="row">' . $detail->orders_id . '</th>
                <th scope="row">' . $accountSelected->id . '</th>
@@ -248,6 +251,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                       <th scope="col">Pin</th>
                       <th scope="col">Dispositvo</th>
                       <th scope="col">IP</th>
+                       <th scope="col"> Editar </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -255,7 +259,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                   </tbody>
                 </table>';
 
-                $htmlForTable2= '
+            $htmlForTable2 = '
                 <br>
                 <br>
                 <span><strong>  CUENTAS COMPLETAS DE ESTE CLIENTE</strong></span>
@@ -398,8 +402,6 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
         |
         */
         $this->load_css[] = asset("/css/All.css");
-
-
     }
 
 
@@ -531,9 +533,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
 
     public function getSetStatus($id)
     {
-//        $asd = Accounts::where('id', '=', $id)->first();
-//        dd($asd);
+        //        $asd = Accounts::where('id', '=', $id)->first();
+        //        dd($asd);
     }
-
-
 }
