@@ -210,7 +210,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         |
         */
         $this->table_row_color = array();
-       // $this->table_row_color[] = ['condition' => "[is_expired] == '1'", "color" => "danger"];
+        // $this->table_row_color[] = ['condition' => "[is_expired] == '1'", "color" => "danger"];
 
 
         /*
@@ -471,7 +471,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $type = TypeAccount::where('id', '=', $cuenta->type_account_id)->first()->total_screens;
 
         for ($i = 1; $i <= $type; $i++) {
-          
+
             $screen = new Screens;
             $screen->profile_number =  $i;
             $screen->account_id = $id;
@@ -479,7 +479,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             $screen->is_sold = 0;
             $screen->price_of_membership = 0;
             $screen->type_account_id = $cuenta->type_account_id;
-            
+
             $screen->email = $cuenta->email;
             $screen->save();
         }
@@ -555,62 +555,156 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
     public function getSetDesactive($id)
     {
-
         $account = Accounts::where("id", "=", $id)->first();
-        $account->is_expired = 1;
-        $account->save();
+        $type = TypeAccount::where('id', '=', $account->type_account_id)->first();
+        $detail = OrderDetail::where('account_id', '=', $account->id)->where('type_order', '=', Order::TYPE_FULL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
 
+        if ($account->screens_sold == 0) {
+            $account->is_expired = 1;
+            $account->is_sold_ordinary = 0;
+            $account->revendedor_id = null;
+            $account->is_sold_extraordinary = 0;
+            $account->screens_sold = 0;
+            $account->save();
 
-        $renovations = [];
-        $to_renovation = [];
-        $screensOfAccount = Screens::where('account_id', '=', $id)->get();
-
-        foreach ($screensOfAccount as $item) {
-            $item->is_account_expired = 1;
-            $item->save();
+            \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
         }
 
-        foreach ($screensOfAccount as $screen) {
-            $screen->save();
-            if ($screen->client_id != null) {
-                // $customer = Customers::where('id','=',$screen->client_id)->first();
-                $screenToChange = Screens::where('is_sold', '=', '0')->where("is_account_expired", "=", "0")->first();
-                $order_detail = OrderDetail::where('customer_id', '=', $screen->client_id)->where('screen_id', '=', $screen->id)->orderBy('created_at', 'desc')->first();
+        if (isset($detail)) {
+            $renovations = [];
+            $to_renovation = [];
+            $screensOfAccount = Screens::where('account_id', '=', $id)->get();
+            $accReplace = Accounts::where('screens_sold', '=', 0)->where('is_expired', '=', 0)->first();
+            if (isset($accReplace)) {
+                foreach ($screensOfAccount as $item) {
+                    $item->is_account_expired = 1;
+                    $item->save();
+                }
 
-                // dd($order_detail);
+                $accReplace->is_sold_ordinary = $account->is_sold_ordinary;
+                $accReplace->is_sold_extraordinary = $account->is_sold_extraordinary;
+                $accReplace->screens_sold = $account->screens_sold;
+                if ($account->revendedor_id != null) {
+                    $accReplace->revendedor_id = $account->revendedor_id;
+                }
+                $accReplace->save();
 
-                $screenToChange->client_id = $screen->client_id;
-                $screenToChange->date_sold = $screen->date_sold;
-                $screenToChange->date_expired = $screen->date_expired;
-                $screenToChange->is_sold = $screen->is_sold;
-                $screenToChange->price_of_membership = $screen->price_of_membership;
-                $screenToChange->device = $screen->device;
-                $screenToChange->ip = $screen->ip;
-                $screenToChange->save();
+                $detail->account_id =  $accReplace->id;
+                $detail->save();
 
-                $screen->client_id = null;
-                $screen->date_sold = null;
-                $screen->date_expired = null;
-                $screen->is_sold = 0;
-                $screen->price_of_membership = 0;
-                $screen->device = null;
-                $screen->ip = null;
-                $screen->save();
-
-                $order_detail->screen_id = $screenToChange->id;
-                $order_detail->account_id = $screenToChange->account_id;
-                $order_detail->save();
-
-                // dd($order_detail);
-
-                $account->screens_sold = $account->screens_sold - 1;
+                $account->is_expired = 1;
+                $account->is_sold_ordinary = 0;
+                $account->revendedor_id = null;
+                $account->is_sold_extraordinary = 0;
+                $account->screens_sold = 0;
                 $account->save();
+
+                foreach ($screensOfAccount as $item) {
+                    $item->is_account_expired = 1;
+                    $item->save();
+                }
+
+                \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
+            } else {
+                \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "No tienes Suficientes pantallas disponibles", "warning");
+            }
+        } else {
+            $screens_to_change = 0;
+            $renovations = array();
+            $on_renovation = array();
+            $screensOfAccount = Screens::where('account_id', '=', $id)->get();
+            $validation_screens_free = 0;
+
+
+            foreach ($screensOfAccount as $screen) {
+                if ($screen->client_id != null || $screen->revendedor_id != null) {
+                    $screens_to_change++;
+                }
+            }
+            $screens_total_to_change = Screens::where('is_sold', '=', '0')->where("is_account_expired", "=", "0")->get();
+            foreach ($screens_total_to_change as $key) {
+                # code...
+                // $acc_screen_to_change_aux =Accounts::where('id','=',$key->id)->first();
+
+                $detail = OrderDetail::where('account_id', '=', $key->account_id)->where('type_order', '=', Order::TYPE_FULL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
+                if (!isset($detail)) {
+                    $validation_screens_free++;
+                    // array_push($renovations,$key);
+                }
+            }
+            // dd($validation_screens_free >= $screens_to_change);
+            if ($validation_screens_free >= $screens_to_change) {
+                foreach ($screensOfAccount as $item) {
+                    $item->is_account_expired = 1;
+                    $item->save();
+                }
+
+                foreach ($screensOfAccount as $screen) {
+                    // $screen->save();
+                    if ($screen->client_id != null) {
+
+                        $screenToChange = Screens::where('is_sold', '=', '0')->where("is_account_expired", "=", 0)->get();
+                        foreach ($screenToChange as $key) {
+                            # code...
+                            $detail = OrderDetail::where('account_id', '=', $key->account_id)->where('type_order', '=', Order::TYPE_INDIVIDUAL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
+                            if (!isset($detail)) {
+                                $order_detail = OrderDetail::where('customer_id', '=', $screen->client_id)->where('screen_id', '=', $screen->id)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
+                                // dd($order_detail);
+                                $key->client_id = $screen->client_id;
+                                $key->date_sold = $screen->date_sold;
+                                $key->date_expired = $screen->date_expired;
+                                $key->is_sold = $screen->is_sold;
+                                $key->code_screen = $screen->code_screen;
+                                $key->price_of_membership = $screen->price_of_membership;
+                                $key->device = $screen->device;
+                                $key->ip = $screen->ip;
+                                $key->save();
+
+                                $screen->client_id = null;
+                                $screen->date_sold = null;
+                                $screen->code_screen = null;
+                                $screen->date_expired = null;
+                                $screen->is_sold = 0;
+                                $screen->price_of_membership = 0;
+                                $screen->device = null;
+                                $screen->ip = null;
+                                $screen->save();
+
+                                $order_detail->screen_id = $key->id;
+                                $order_detail->account_id = $key->account_id;
+                                $order_detail->save();
+
+                                // dd($order_detail);
+
+                                $accReplace = Accounts::where('id', '=', $key->account_id)->first();
+                                $type = TypeAccount::where('id', '=', $accReplace->type_account_id)->first();
+                                if ($accReplace->screens_sold >=   ($type->available_screens - 1)) {
+                                    $accReplace->is_sold_ordinary = 1;
+                                }
+                                $accReplace->screens_sold = $accReplace->screens_sold + 1;
+                                $accReplace->save();
+
+
+                                $account->is_expired = 1;
+                                $account->is_sold_ordinary = 0;
+                                $account->revendedor_id = null;
+                                $account->is_sold_extraordinary = 0;
+                                $account->screens_sold = 0;
+                                $account->save();
+
+
+                                // $account->screens_sold = $account->screens_sold - 1;
+                                $account->save();
+                                break;
+                            }
+                        }
+                    }
+                }
+                \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
+            } else {
+                \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "No tienes Suficientes pantallas disponibles", "warning");
             }
         }
-
-        \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
-        //        $asd = Accounts::where('id', '=', $id)->first();
-        //        dd($asd);
     }
 
     public function getSetActive($id)

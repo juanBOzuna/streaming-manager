@@ -41,15 +41,42 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 
 		# START COLUMNS DO NOT REMOVE THIS LINE
 		$this->col = [];
-		$this->col[] = ["label" => "Cliente", "name" => "customers_id", "join" => "customers,number_phone"];
+		$this->col[] = ["label" => "Cliente", "name" => "customers_id", "join" => "customers,number_phone", "callback" => function ($row) {
+			$cliente = Customers::where('id', '=', $row->customers_id)->first();
+			return $cliente->name . ' | ' . $cliente->number_phone;
+		}];
+		$this->col[] = ["label" => "Pantalla", "name" => "customers_id", "join" => "customers,number_phone", "callback" => function ($row) {
+			$order_detail = OrderDetail::where('orders_id', '=', $row->id)->first();
+			$screen = Screens::where('id', '=', $order_detail->screen_id)->first();
+			$type = TypeAccount::where('id', '=', $screen->type_account_id)->first();
+			return $screen->id . ' | ' . $screen->email . ' | ' . $type->name;
+		}];
 		$this->col[] = ["label" => "Precio Total", "name" => "total_price"];
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
 		# START FORM DO NOT REMOVE THIS LINE
 		$this->form = [];
-		$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
-		$this->form[] = ['label' => 'Pantalla', 'name' => 'pantalla_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'screens,id'];
-		$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+		if (CRUDBooster::getCurrentMethod() == "getDetail") {
+			$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name'];
+			$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
+			$this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+
+			$columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
+			$columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
+			$columns[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'number', 'required' => true];
+			// $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
+			$columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
+			$columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
+			$columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
+			$columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
+			$columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
+
+			$this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
+		} else {
+			$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
+			$this->form[] = ['label' => 'Pantalla', 'name' => 'pantalla_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'screens,id'];
+			$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+		}
 		# END FORM DO NOT REMOVE THIS LINE
 
 		# OLD START FORM
@@ -157,38 +184,77 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	        */
 
 		$d = array();
-		$screens = Screens::where('is_sold', '=', '0')->where('is_sold_revendedor', '=', '0')->get();
-		$customers = Customers::get();
+		$screens_filtered = array();
+		$screens = Screens::where('is_sold', '=', '0')->where('is_account_expired', '=', 0)->get();
+		// foreach ($screens as $key) {
+		// 	# code...
+		// 	$detail = OrderDetail::where('account_id', '=', $key->account_id)->where('type_order', '=', Order::TYPE_FULL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
+		// 	if (!isset($detail)) {
+		// 		array_push($screens_filtered, $key);
+		// 	}
 
+		// }
+
+		// dd($screens_filtered);
+		$customers = Customers::get();
+		$i1 = 0;
 		$text = '{';
-		$i = 0;
+
+		$text_dd = '';
 		foreach ($screens as $key) {
+			$i1 += 1;
+			// $account =  Accounts::where('id', '=', $key->account_id)->first();
+			// if ($accouFnt->is_expired == 0) {
 			$other_screen = Screens::where('account_id', '=', $key->account_id)->where('is_sold', '=', 1)->first();
-			if(isset($other_screen)){
-				if ($i + 1 == sizeof($screens)) {
+			if (isset($other_screen)) {
+				if ($i1 == sizeof($screens)) {
 					$type = TypeAccount::where('id', '=', $key->type_account_id)->first()->name;
-					$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id  . " | " . $type . " | " . $key->email . '"}';
+					$text .= '"' . $i1 . '": {"id": ' . $key->id . ',"nombre": "' . $key->id  . " | " . $type . " | " . $key->email . '"}';
 				} else {
 					$type = TypeAccount::where('id', '=', $key->type_account_id)->first()->name;
-					$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id . " | " . $type . " | " . $key->email . '"},';
+					$text .= '"' . $i1 . '": {"id": ' . $key->id . ',"nombre": "' . $key->id . " | " . $type . " | " . $key->email . '"},';
 				}
-				$i++;
-			}else{
-				$order_detail = OrderDetail::where('screen_id','=',$other_screen->id)->where('is_renewed','=','0')->where('account_id','=',$other_screen->account_id)->where('is_discarded','=',0)->where('type_order','=',Order::TYPE_FULL)->first();
-				if(!isset($order_detail)){
-					if ($i + 1 == sizeof($screens)) {
+				// $1i++;
+			} else {
+				$order_detail = OrderDetail::where('screen_id', '=', $other_screen->id)->where('is_renewed', '=', '0')->where('account_id', '=', $other_screen->account_id)->where('is_discarded', '=', 0)->where('type_order', '=', Order::TYPE_FULL)->first();
+				if (!isset($order_detail)) {
+					if ($i1 == sizeof($screens)) {
 						$type = TypeAccount::where('id', '=', $key->type_account_id)->first()->name;
-						$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id  . " | " . $type . " | " . $key->email . '"}';
+						$text .= '"' . $i1 . '": {"id": ' . $key->id . ',"nombre": "' . $key->id  . " | " . $type . " | " . $key->email . '"}';
 					} else {
 						$type = TypeAccount::where('id', '=', $key->type_account_id)->first()->name;
-						$text .= '"' . $i . '": {"id": ' . $key->id . ',"nombre": "' . $key->id . " | " . $type . " | " . $key->email . '"},';
+						$text .= '"' . $i1 . '": {"id": ' . $key->id . ',"nombre": "' . $key->id . " | " . $type . " | " . $key->email . '"},';
 					}
-					$i++;
 				}
+				// $i++;
 			}
-			
+			// echo '</br>';
+			// var_dump($text);
+			// echo '</br>';
+			// var_dump($i1);
+			// echo '</br>';
+			// var_dump(sizeof($screens));
+			// echo '</br>';
+			// var_dump(($i1 )== (sizeof($screens)));
+			// echo '</br>';
+			// } else {
+			// 	echo '</br>';
+			// 	var_dump($text);
+			// 	echo '</br>';
+			// 	var_dump($i1);
+			// 	echo '</br>';
+			// 	var_dump(sizeof($screens));
+			// 	echo '</br>';
+			// 	var_dump(($i1 )== (sizeof($screens)));
+			// 	echo '</br>';
+			// }
 		}
+		// echo sizeof($screens);
+		// dd($i1);
+		// dd($text_dd);
 		$text .= '}';
+
+		// dd($text);
 
 		$text2 = '{';
 		$i = 0;
@@ -351,7 +417,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	public function hook_query_index(&$query)
 	{
 		//Your code here
-		$query->where('is_venta_revendedor', '=', '0');
+		$query->where('is_venta_revendedor', '=', '0')->where('type_order', '=', Order::ONLY_SCREEN);
 	}
 
 	/*
@@ -385,7 +451,12 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		$dateInstant = Carbon::parse('');
 		// dd($dateInstant);
 
+
+		$number_cliente =  strrev(substr(strrev(strval(Customers::where('id', '=', $postdata["customers_id"])->first()->number_phone)), 0, 4));
+		// $c =  strrev(substr(strrev(strval($cliente)), 0, 4));
+
 		$screen->is_sold = 1;
+		$screen->code_screen = $number_cliente;
 		$screen->client_id = $postdata["customers_id"];
 		$screen->date_sold =  strval($dateInstant);
 		$dateExpired = $dateInstant->addDays($postdata['dias_membersia']);
@@ -401,7 +472,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		$order = Order::create([
 			'customers_id' => $postdata["customers_id"],
 			'total_price' => $total_price,
-			'type_order' => 'Pantalla Individual',
+			'type_order' => Order::ONLY_SCREEN,
 		]);
 
 		OrderDetail::create([
@@ -410,13 +481,13 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			'customer_id' => $postdata["customers_id"],
 			'screen_id' => $postdata["pantalla_id"],
 			'account_id' => $screen->account_id,
-			'type_order' => 'Pantalla Individual',
+			'type_order' => Order::ONLY_SCREEN,
 			'membership_days' => $postdata["dias_membersia"],
 			'price_of_membership_days' => $total_price,
 			'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s')
 		]);
 		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
-	}
+	}	
 
 	/*
 	    | ----------------------------------------------------------------------
@@ -467,6 +538,38 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	    */
 	public function hook_before_delete($id)
 	{
+		$details = OrderDetail::where('orders_id', '=', $id)->get();
+
+		// dd($details);
+
+		foreach ($details as $key) {
+			# code...
+			$screen = Screens::where('id', '=', $key->screen_id)->update([
+				'client_id' => null,
+				'date_sold' => null,
+				'code_screen' => null,
+				'date_expired' => null,
+				'date_sold' => null,
+				'price_of_membership' => 0,
+				'date_expired' => null,
+				'is_sold' => 0,
+				'device' => null,
+				'ip' => null
+			]);
+
+			$account_of_screen =  Accounts::where('id', '=', $key->account_id)->first();
+			// dd($account_of_screen);
+			$account_of_screen->screens_sold = ($account_of_screen->screens_sold - 1);
+			$account_of_screen->save();
+			// Screens::where('id', $screen)
+
+			$key->delete();
+		}
+		$order = Order::where('id', '=', $id)->delete();
+		// $order->delete();
+		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
+
+
 		//Your code here
 
 	}
@@ -481,7 +584,9 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	public function hook_after_delete($id)
 	{
 		//Your code here
+		// $order = Order::where('id', '=', $id)->first();
 
+		// dd('asd');
 	}
 
 

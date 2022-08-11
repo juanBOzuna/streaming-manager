@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
+    protected $table = "orders";
     const TYPE_INDIVIDUAL = 'Pantalla Individual';
     const TYPE_FULL = 'Cuenta Completa';
-    protected $table = "orders";
+    const ONLY_SCREEN = 'Solo pantalla';
+   
 
     protected $fillable = [
 

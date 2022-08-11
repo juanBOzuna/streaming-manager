@@ -35,7 +35,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		$this->button_action_style = "button_icon";
 		$this->button_add = true;
 		$this->button_edit = true;
-		$this->button_delete = true;
+		$this->button_delete = false;
 		$this->button_detail = true;
 		$this->button_show = true;
 		$this->button_filter = true;
@@ -270,7 +270,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	        */
 
 		$d = array();
-		$accounts = Accounts::where('screens_sold', '=', '0')->get();
+		$accounts = Accounts::where('screens_sold', '=', '0')->where('is_expired', '=', 0)->get();
 		$revendedores = Revendedores::get();
 		$clientes = Customers::get();
 
@@ -545,12 +545,14 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		// dd($_REQUEST['customers_id']!=0 && $_REQUEST['customers_id2']==0);
 		$validationIf = 0;
 		// echo $postdata['customers_id2'];
+		// dd($_REQUEST['customers_id'] != 0 && $_REQUEST['customers_id2'] != 0);
+		// dd($_REQUEST);
 
 		if ($_REQUEST['customers_id'] == 0 && $_REQUEST['customers_id2'] == 0) {
 			$validationIf = 1;
 			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "OJO, DEBE SELECCIONAR UN CLIENTE O UN REVENDEDOR ALMENOS", "warning");
 		}
-		if ($_REQUEST['customers_id'] == 1 && $_REQUEST['customers_id2'] == 1) {
+		if ($_REQUEST['customers_id'] != 0 && $_REQUEST['customers_id2'] != 0) {
 			$validationIf = 1;
 			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "OJO, SI ESCOGE REVENDEDOR NO PUEDE ESCOGER CLIENTE, IGUAL EN VICEVERSA", "warning");
 		}
@@ -558,35 +560,32 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		if ($validationIf == 0) {
 			date_default_timezone_set('America/Bogota');
 			$accounts = Accounts::where("id", "=", $_REQUEST["account_id"])->first();
-
-			// dd($_REQUEST);
-
 			$type = TypeAccount::where("id", "=", $accounts->type_account_id)->first();
-
 			$total_price = doubleval($type->price_full);
-
-			// dd($dateInstant);
-
-			// dd($dateInstant->addDays(30));
-
+			$telefono = '';
 			$screens = Screens::where('account_id', '=', $accounts->id)->get();
-			// dd($screens);
+			if (!$_REQUEST['customers_id'] == 0) {
+				$telefono = strrev(substr(strrev(strval(Revendedores::where('id', '=', $_REQUEST['customers_id'])->first()->telefono)), 0, 4));
+			}else{
+				$telefono =strrev(substr(strrev(strval(Customers::where('id', '=', $_REQUEST['customers_id2'])->first()->telefono)), 0, 4));
+			}
 			foreach ($screens as $screen) {
 				# code...\
 				$dateInstant = Carbon::parse('');
 				$screen->is_sold = 1;
-				if (!$_REQUEST['customers_id'] == 0) {
-					$screen->is_sold_revendedor = 1;
-					$screen->revendedor_id = $_REQUEST["customers_id"];
-				}
+				// if (!$_REQUEST['customers_id'] == 0) {
+				// }
 				$screen->date_sold =  strval($dateInstant);
-				$dateExpired = $dateInstant->addDays(30);
+				$dateExpired = $dateInstant->addDays($_REQUEST['dias_membersia']);
 				$screen->date_expired = strval($dateExpired);
 				$screen->price_of_membership = $total_price;
+				$screen->code_screen = intval($telefono);
 				if ($_REQUEST['customers_id'] != 0) {
-					$screen->client_id = ['customers_id'];
+					$screen->client_id = $_REQUEST['customers_id'];
+					$screen->is_sold_revendedor = 1;
+					$screen->revendedor_id = $_REQUEST["customers_id"];
 				} else {
-					$screen->client_id = ['customers_id2'];
+					$screen->client_id = $_REQUEST['customers_id2'];
 				}
 				$screen->save();
 			}
@@ -597,7 +596,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			if (!$_REQUEST['customers_id'] == 0) {
 				$accounts->revendedor_id = $_REQUEST["customers_id"];
 			}
-			$accounts->is_sold_ordinary=1;
+			$accounts->is_sold_ordinary = 1;
 			$accounts->save();
 
 			if ($_REQUEST['customers_id'] != 0) {
@@ -616,7 +615,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				]);
 			}
 			$dateInstant = Carbon::parse('');
-			$dateInstant->addDays(30);
+			$dateInstant->addDays($_REQUEST["dias_membersia"]);
 			if ($_REQUEST['customers_id'] != 0) {
 				$d = OrderDetail::create([
 					'orders_id' => $order->id,
@@ -644,7 +643,6 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			}
 
 			// $screensAux = Screens::where('account_id','=', $detail->account_id)->get();
-
 			// foreach ($screensAux as $screenAux) {
 			// 	# code...
 			// 	$screenAux->date_sold = (string)$date_of_created_At->format('Y-m-d H:i:s');

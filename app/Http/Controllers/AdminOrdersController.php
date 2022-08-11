@@ -56,7 +56,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $columns = [];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
-             $columns[] = ['label' => 'Tipo de venta', 'name' => 'type_order', 'type' => 'number', 'required' => true];
+            $columns[] = ['label' => 'Tipo de venta', 'name' => 'type_order', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'required' => true];
         }
 
@@ -65,7 +65,6 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
             $this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
             $this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
-
 
             $columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
@@ -359,8 +358,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     public function hook_query_index(&$query)
     {
         //Your code here
-        $query->where('is_venta_revendedor','=','0');
-
+        $query->where('is_venta_revendedor', '=', '0')->where('type_order', '=', Order::TYPE_INDIVIDUAL);
     }
 
     /*
@@ -409,9 +407,10 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $type_account = TypeAccount::where('id', '=', request()['venta-type_account_id'])->first();
             $typeAccountToTypeAccount[$index] = $type_account;
 
-            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_active', '=', '0')->where('screens_sold','<',$type_account->available_screens)->get();
-            
+            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_expired', '=', 0)->where('screens_sold', '<', $type_account->available_screens)->get();
+
             $searchResult = $this->searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, request(), $this, $index);
+
             $searchToSearch[$index] = $searchResult;
             //   dd($searchResult['pantallas']);
 
@@ -495,18 +494,38 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $details = OrderDetail::where('orders_id', '=', $id)->get();
 
-        foreach ($details as $detail) {
-            $screen = Screens::where('id', '=', $detail->screen_id)->update([
+        // dd($details);
+
+        foreach ($details as $key) {
+            # code...
+            $screen = Screens::where('id', '=', $key->screen_id)->update([
                 'client_id' => null,
                 'date_sold' => null,
+                'code_screen' => null,
+                'date_expired' => null,
+                'date_sold' => null,
+                'price_of_membership' => 0,
                 'date_expired' => null,
                 'is_sold' => 0,
                 'device' => null,
                 'ip' => null
             ]);
 
-            $detail->delete();
+            $account_of_screen =  Accounts::where('id', '=', $key->account_id)->first();
+            // dd($account_of_screen);
+            $account_of_screen->screens_sold = ($account_of_screen->screens_sold - 1);
+            $account_of_screen->save();
+            // Screens::where('id', $screen)
+
+            $key->delete();
         }
+        $order = Order::where('id', '=', $id)->delete();
+        // $order->delete();
+        // $order = Order::where('id', '=', $id)->delete();
+        // $order->delete();
+        \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
+
+
         //Your code here
 
     }
@@ -535,7 +554,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $order = Order::create([
             'customers_id' => $request['customers_id'],
-            'type_order'=>Order::TYPE_INDIVIDUAL,
+            'type_order' => Order::TYPE_INDIVIDUAL,
             'total_price' => 0
         ]);
 
@@ -560,7 +579,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     'type_account_id' => $typeAccount->id,
                     'customer_id' => $request['customers_id'],
                     'screen_id' => $screenSelected->id,
-                    'type_order'=>Order::TYPE_INDIVIDUAL,
+                    'type_order' => Order::TYPE_INDIVIDUAL,
                     'account_id' => $screenSelected->account_id,
                     'membership_days' => $request['venta-membership_days'][$index],
                     'price_of_membership_days' => intval($price_of_membership_days),
@@ -602,8 +621,9 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     {
         //dd();
         $validation = true;
-        $cliente = Customers::where('id','=',request()['customers_id'])->first()->number_phone;
-        $c=  strrev(substr(strrev( strval($cliente)), 0, 4))  ;
+        $cliente = Customers::where('id', '=', request()['customers_id'])->first()->number_phone;
+        $c =  strrev(substr(strrev(strval($cliente)), 0, 4));
+
         while ($validation) {
             if (sizeof($arrayAccounts) == sizeof($accountsCompleted) || sizeof($listScreens) == intval(request()['venta-number_screens'][$index])) {
                 $validation = false;
@@ -629,7 +649,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                                         if (array_search($screen->id, $listScreens) == false && !($screen->profile_number >= ($type_account->available_screens + 2))) {
                                             Screens::where('id', $screen->id)->update([
                                                 'is_sold' => 1,
-                                                'code_screen'=>$c
+                                                'code_screen' => $c
                                             ]);
                                             $accountEdit = Accounts::where('id', $account->id)->first();
                                             $accountEdit->screens_sold = ($accountEdit->screens_sold + 1);
@@ -685,8 +705,10 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             Screens::where('id', $screen)->update([
                 'client_id' => null,
                 'date_sold' => null,
-                'code_screen'=>null,
+                'code_screen' => null,
                 'date_expired' => null,
+                'price_of_membership' => 0,
+                'date_sold' => null,
                 'is_sold' => 0,
                 'device' => null,
                 'ip' => null
