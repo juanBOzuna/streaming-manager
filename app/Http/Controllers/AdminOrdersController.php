@@ -624,6 +624,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         $cliente = Customers::where('id', '=', request()['customers_id'])->first()->number_phone;
         $c =  strrev(substr(strrev(strval($cliente)), 0, 4));
 
+
+
         while ($validation) {
             if (sizeof($arrayAccounts) == sizeof($accountsCompleted) || sizeof($listScreens) == intval(request()['venta-number_screens'][$index])) {
                 $validation = false;
@@ -636,7 +638,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                         foreach ($screens as $screen) {
                             if (sizeof($listScreens) != intval(request()['venta-number_screens'][$index])) {
                                 // if ($screen->profile_number == $type_account->available_screens) {
-                                //     Accounts::where('id', $account->id)->update([
+                                    //     Accounts::where('id', $account->id)->update([
                                 //         'is_sold_ordinary' => 1
                                 //     ]);
                                 // }

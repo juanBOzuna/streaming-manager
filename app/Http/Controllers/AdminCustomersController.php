@@ -202,21 +202,28 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
             foreach ($screens as $screen) {
                 $type = TypeAccount::where('id', '=', $screen->type_account_id)->first();
                 $nameType = $type->name;
-                $detail = OrderDetail::where('screen_id', '=', $screen->id)->where('account_id', '=', $screen->account_id)->where('customer_id', '=', $porciones[sizeof($porciones) - 1])->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->where('screen_id', '!=', null)->where('type_order', '!=', Order::TYPE_FULL)->first();
+                $detail = OrderDetail::where('screen_id', '=', $screen->id)->where('account_id', '=', $screen->account_id)->where('customer_id', '=', $porciones[sizeof($porciones) - 1])->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->where('screen_id', '!=', null)->where('type_order', '!=', Order::TYPE_INDIVIDUAL)->first();
                 // dd(env('LINK_SYSTEM'));
-                $trHtml .= '  <tr>
-               <th scope="row">' . $detail->orders_id . '</th>
-               <th scope="row">' . $screen->id . '</th>
-               <td>' . $nameType . ' </td>
-               <td>' . $screen->email . ' </td>
-               <td>' . Carbon::parse($screen->date_expired)->format('Y-m-d H:i:s') . '</td>
-               <td>' . $screen->code_screen . '</td>
-               <td>' . $screen->device . '</td>
-               <td>' . $screen->ip . ' </td>
-               <!-- <td> <a class="btn btn-xs btn-success btn-edit" title="Edit Data" href="' . env('LINK_SYSTEM') . 'screens/edit/' . $screen->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers" target="_blank" ><i class="fa fa-pencil"></i></a></td> -->
-                <td> <a href=>Editar</a> </td>
-               <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
-               </tr>';
+                if(!isset($detail)){
+                    $detail = OrderDetail::where('screen_id', '=', $screen->id)->where('account_id', '=', $screen->account_id)->where('customer_id', '=', $porciones[sizeof($porciones) - 1])->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->where('screen_id', '!=', null)->where('type_order', '!=', Order::ONLY_SCREEN)->first();
+
+                }
+                if(isset($detail)){
+
+                    $trHtml .= '  <tr>
+                   <th scope="row">' . $detail->orders_id . '</th>
+                   <th scope="row">' . $screen->id . '</th>
+                   <td>' . $nameType . ' </td>
+                   <td>' . $screen->email . ' </td>
+                   <td>' . Carbon::parse($screen->date_expired)->format('Y-m-d H:i:s') . '</td>
+                   <td>' . $screen->code_screen . '</td>
+                   <td>' . $screen->device . '</td>
+                   <td>' . $screen->ip . ' </td>
+                   <!-- <td> <a class="btn btn-xs btn-success btn-edit" title="Edit Data" href="' . env('LINK_SYSTEM') . 'screens/edit/' . $screen->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers" target="_blank" ><i class="fa fa-pencil"></i></a></td> -->
+                   <td> <a href="' . env('LINK_SYSTEM') . 'screens/edit/' . $screen->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers" target="_blank">Editar</a> </td>
+                   <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
+                   </tr>';
+                }
             }
 
             foreach ($accountsFull as $detail) {

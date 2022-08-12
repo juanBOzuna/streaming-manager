@@ -46,11 +46,12 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 		# START COLUMNS DO NOT REMOVE THIS LINE
 		$this->col = [];
-		$this->col[] = ["label" => "Vendido a", "name" => "customers_id", "callback" => function ($row) {
+		$this->col[] = ["label" => "Vendido a", "name" => "is_venta_revendedor", "callback" => function ($row) {
 
 			$customer = null;
 			$type = '';
-			if ($row->is_venta_revendedor == 1) {
+		//	var_dump($row->is_venta_revendedor==0 );
+			if ($row->is_venta_revendedor == 0) {
 				$customer = Customers::where('id', '=', $row->customers_id)->first();
 				$type = 'CLIENTE';
 			} else {
@@ -63,7 +64,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 			$customer = null;
 			$type = '';
-			if ($row->is_venta_revendedor == 1) {
+			if ($row->is_venta_revendedor == 0) {
 				$customer = Customers::where('id', '=', $row->customers_id)->first();
 				$type = $customer->name;
 			} else {
@@ -76,7 +77,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 			$customer = null;
 			$telefono = 0;
-			if ($row->is_venta_revendedor == 1) {
+			if ($row->is_venta_revendedor == 0) {
 				$customer = Customers::where('id', '=', $row->customers_id)->first();
 				$telefono = $customer->number_phone;
 			} else {
@@ -99,22 +100,22 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			$urlPage = $_SERVER['REQUEST_URI'];
 			$porciones = explode("?", $urlPage);
 			$porciones = explode("/", $porciones[0]);
-
+			
 			$order = Order::where('id', '=', $porciones[sizeof($porciones) - 1])->first();
 
 			if ($order->is_venta_revendedor == 0) {
-				$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name', 'datatable_format' => 'name,\'  -  \',number_phone'];
+				$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name', 'datatable_format' => 'name,\'  -  \',number_phone'];
 			} else {
 				$this->form[] = ['label' => 'Revendedor', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,name', 'datatable_format' => 'name,\'  -  \',telefono'];
 			}
 			if ($order->is_venta_revendedor == 0) {
-				$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id2', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
+				$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
 			} else {
 				$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,telefono'];
 			}
 			if (CRUDBooster::getCurrentMethod() == "getDetail") {
 
-				$this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
+				//$this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
 				$this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
 
@@ -539,10 +540,14 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	    */
 	public function hook_before_add(&$postdata)
 	{
+	//	dd($_REQUEST['customers_id2']);
+		//dd(Customers::where('id', '=', intval($_REQUEST['customers_id2']))->first()->number_phone);
+		//dd($telefono =strrev(substr(strrev(strval(Customers::where('id', '=', $_REQUEST['customers_id2'])->first()->telefono)), 0, 4)));
 		//Your code here
 		// echo $_REQUEST['customers_id2'];
 		// echo $_REQUEST['customers_id'];
 		// dd($_REQUEST['customers_id']!=0 && $_REQUEST['customers_id2']==0);
+		
 		$validationIf = 0;
 		// echo $postdata['customers_id2'];
 		// dd($_REQUEST['customers_id'] != 0 && $_REQUEST['customers_id2'] != 0);
@@ -567,7 +572,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			if (!$_REQUEST['customers_id'] == 0) {
 				$telefono = strrev(substr(strrev(strval(Revendedores::where('id', '=', $_REQUEST['customers_id'])->first()->telefono)), 0, 4));
 			}else{
-				$telefono =strrev(substr(strrev(strval(Customers::where('id', '=', $_REQUEST['customers_id2'])->first()->telefono)), 0, 4));
+				$telefono =strrev(substr(strrev(strval(Customers::where('id', '=', $_REQUEST['customers_id2'])->first()->number_phone)), 0, 4));
 			}
 			foreach ($screens as $screen) {
 				# code...\
@@ -650,6 +655,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			// $screenAux->save();
 			// }
 			// dd($d);
+			
 			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
 		}
 	}
@@ -717,6 +723,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	public function hook_after_delete($id)
 	{
 		//Your code here
+		
 
 	}
 
