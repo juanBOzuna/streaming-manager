@@ -483,8 +483,6 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 			// }
 
 			HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta renovada exitosamente.", "success");
-			// echo $detail->finish_date;
-			// dd($detail_create);
 		}
 	}
 
