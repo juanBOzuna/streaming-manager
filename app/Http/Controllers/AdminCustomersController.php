@@ -91,7 +91,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
             $screens[] = ['label' => 'Id', 'name' => 'id', 'type' => 'number'];
             $screens[] = ['label' => 'Cuenta', 'name' => 'email', 'type' => 'text'];
             $screens[] = ['label' => 'Vence', 'name' => 'date_expired'];
-            $screens[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'number'];
+            $screens[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'text'];
             $screens[] = ['label' => 'Dispositvo', 'name' => 'device', 'type' => 'text'];
             $screens[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'number'];
 

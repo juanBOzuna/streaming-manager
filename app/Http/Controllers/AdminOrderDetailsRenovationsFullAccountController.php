@@ -553,6 +553,6 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 			]);
 		}
 		HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta desechada exitosamente.", "success");
-		dd($id);
+		// dd($id);
 	}
 }

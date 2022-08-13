@@ -94,7 +94,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             $screens = [];
             $screens[] = ['label' => 'Id', 'name' => 'id', 'type' => 'text'];
             $screens[] = ['label' => 'Nombre', 'name' => 'name', 'type' => 'text'];
-            $screens[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'number'];
+            $screens[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'text'];
             $screens[] = ['label' => 'Fecha de venta', 'name' => 'date_sold'];
             $screens[] = ['label' => 'Fecha de Vencimiento', 'name' => 'date_expired'];
             $screens[] = ['label' => 'Cliente #', 'name' => 'client_id'];
@@ -230,19 +230,15 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $screens_availables_info = [];
 
         $i = 0;
+
         foreach (TypeAccount::get() as $key) {
             # code...
-            $pVendidas =  Screens::where('type_account_id', '=', $key->id)->where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->count();
-            $cuentas  = Accounts::where('type_account_id', '=', $key->id)->where('is_expired', '=', '0')->count();
-            $disccount = ($key->total_screens - $key->available_screens) * $cuentas;
-            $total_p = $cuentas * $key->total_screens;
-            $total_p = (($total_p - $pVendidas) - $cuentas) - ($disccount - $cuentas);
 
+            $total = Screens::where('type_account_id', '=', $key->id)->where('profile_number', '>', 1)->where('profile_number', '<', ($key->available_screens + 2))->where('is_sold', '=', 0)->count();
             $screens_availables_info[$i] = [
                 'name' => $key->name,
-                'screens' => $total_p
+                'screens' => $total
             ];
-
             $i++;
         }
 

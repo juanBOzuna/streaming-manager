@@ -26,6 +26,7 @@ class Screens extends Model
         'device',
         'ip',
         'type_account_id',
+        'type_device_id',
         'is_sold_revendedor',
         'is_account_expired',
         'type_account_id',

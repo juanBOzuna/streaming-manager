@@ -19,7 +19,7 @@ class CreateScreensTable extends Migration
             $table->string("email");
             $table->string("client_id")->nullable();
             $table->string("name")->default("sin nombre");
-            $table->integer("code_screen")->nullable();
+            $table->string("code_screen")->nullable();
             $table->integer('profile_number');
             $table->boolean("is_sold")->default(0);
             $table->timestamp("date_sold")->nullable();

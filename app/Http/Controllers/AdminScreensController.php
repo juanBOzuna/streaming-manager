@@ -60,16 +60,18 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
 
         # START FORM DO NOT REMOVE THIS LINE
         $this->form = [];
-        $this->form[] = ['label' => 'Cuenta #', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
-        $this->form[] = ['label' => 'Cliente', 'name' => 'client_id', 'type' => 'select2', 'validation' => 'min:0|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
+        $this->form[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'width' => 'col-sm-10', 'readonly' => true, 'placeholder' => 'Escribe el nombre de la pantalla'];
+        $this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,email'];
+        $this->form[] = ['label' => 'Cliente', 'name' => 'client_id', 'type' => 'select2', 'validation' => 'min:0|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name'];
         $this->form[] = ['label' => 'Tipo de cuenta', 'name' => 'type_account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'type_account,name'];
-        $this->form[] = ['label' => 'Nombre', 'name' => 'name', 'type' => 'text', 'validation' => 'required|string|min:3|max:70', 'width' => 'col-sm-10', 'placeholder' => 'You can only enter the letter only'];
+        $this->form[] = ['label' => 'Nombre', 'name' => 'name', 'type' => 'text', 'validation' => 'required|string|min:3|max:70', 'width' => 'col-sm-10', 'placeholder' => 'Escribe el nombre de la pantalla'];
         $this->form[] = ['label' => 'Fecha de venta', 'name' => 'date_sold', 'type' => 'text', 'width' => 'col-sm-10'];
         $this->form[] = ['label' => 'Fecha de expiracion', 'name' => 'date_expired', 'type' => 'text', 'width' => 'col-sm-10'];
         //$this->form[] = ['label'=>'Esta vendida?','name'=>'is_sold','type'=>'radio','validation'=>'required|integer','width'=>'col-sm-10','dataenum'=>'Array'];
         //$this->form[] = ['label'=>'Pin','name'=>'pin','type'=>'number','validation'=>'min:3|max:32','width'=>'col-sm-10','help'=>'Minimum 5 characters. Please leave empty if you did not change the password.'];
-        $this->form[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'number', 'validation' => 'required', 'width' => 'col-sm-10', 'readonly' => true];
-        $this->form[] = ['label' => 'Dispositivo', 'name' => 'device', 'type' => 'text', 'width' => 'col-sm-9'];
+        $this->form[] = ['label' => 'Pin', 'name' => 'code_screen', 'type' => 'text', 'validation' => 'required', 'width' => 'col-sm-10', 'readonly' => true];
+        $this->form[] = ['label' => 'Tipo de dispositivo', 'name' => 'type_device_id', 'type' => 'select2', 'width' => 'col-sm-9', 'datatable' => 'type_devices,name'];
+        $this->form[] = ['label' => 'Nombre del equipo', 'name' => 'device', 'type' => 'text', 'width' => 'col-sm-9'];
         $this->form[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'text', 'width' => 'col-sm-9'];
 
         if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {

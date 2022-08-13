@@ -8,7 +8,9 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Screens;
 use App\Models\TypeAccount;
+use App\Models\TypeDevice;
 use Carbon\Carbon;
+use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
 use Session;
 use Request;
 use DB;
@@ -57,7 +59,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		# START FORM DO NOT REMOVE THIS LINE
 		$this->form = [];
 		if (CRUDBooster::getCurrentMethod() == "getDetail") {
-			$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name'];
+			$this->form[] = ['label' => 'ID cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
+			$this->form[] = ['label' => 'Nombre cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name'];
 			$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
 			$this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
@@ -183,19 +186,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	        |
 	        */
 
-		$d = array();
-		$screens_filtered = array();
 		$screens = Screens::where('is_sold', '=', '0')->where('is_account_expired', '=', 0)->get();
-		// foreach ($screens as $key) {
-		// 	# code...
-		// 	$detail = OrderDetail::where('account_id', '=', $key->account_id)->where('type_order', '=', Order::TYPE_FULL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
-		// 	if (!isset($detail)) {
-		// 		array_push($screens_filtered, $key);
-		// 	}
 
-		// }
-
-		// dd($screens_filtered);
 		$customers = Customers::get();
 		$i1 = 0;
 		$text = '{';
@@ -228,34 +220,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 				}
 				// $i++;
 			}
-			// echo '</br>';
-			// var_dump($text);
-			// echo '</br>';
-			// var_dump($i1);
-			// echo '</br>';
-			// var_dump(sizeof($screens));
-			// echo '</br>';
-			// var_dump(($i1 )== (sizeof($screens)));
-			// echo '</br>';
-			// } else {
-			// 	echo '</br>';
-			// 	var_dump($text);
-			// 	echo '</br>';
-			// 	var_dump($i1);
-			// 	echo '</br>';
-			// 	var_dump(sizeof($screens));
-			// 	echo '</br>';
-			// 	var_dump(($i1 )== (sizeof($screens)));
-			// 	echo '</br>';
-			// }
 		}
-		// echo sizeof($screens);
-		// dd($i1);
-		// dd($text_dd);
 		$text .= '}';
-
-		// dd($text);
-
 		$text2 = '{';
 		$i = 0;
 		foreach ($customers as $cus) {
@@ -267,9 +233,6 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			$i++;
 		}
 		$text2 .= '}';
-
-		// dd($text);
-
 		$this->script_js = "
 			let select2 = document.getElementById('pantalla_id');
 			let list = " . json_encode($text) . ";
@@ -328,6 +291,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			btns[3].innerText = 'Volver';
 			btns[3].innerHTML = '<i class=\"fa fa-chevron-circle-left\"></i> Volver';
 			
+			  
+           
 
 			";
 
@@ -340,6 +305,150 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
+
+		if (CRUDBooster::getCurrentMethod() == "getDetail") {
+
+
+			$urlPage = $_SERVER['REQUEST_URI'];
+			$porciones = explode("?", $urlPage);
+			$porciones = explode("/", $porciones[0]);
+			$order = Order::where('id', '=', $porciones[sizeof($porciones) - 1])->first();
+			$detail = OrderDetail::where('orders_id', '=', $order->id)->first();
+			$account = Accounts::where('id', '=', $detail->account_id)->first();
+			$type = TypeAccount::where('id', '=', $account->type_account_id)->first();
+			$email = $account->email;
+			$screen = Screens::where('id', '=', $detail->screen_id)->first();
+			$screensText = 'Pantalla%20' . $screen->profile_number . '%20pin%20' . $screen->code_screen . '%0A';
+			if (isset(explode(" ", $screen->name)[2])) {
+				$screensText .= explode(" ", $screen->name)[2] . '%20%20%0A';
+			}
+			// dd($screen->type_device_id);
+			if ($screen->type_device_id != null) {
+				$typeDevice = TypeDevice::where('id', '=', $screen->type_device_id)->first();
+				$screensText .= $typeDevice->name . '%20' . $typeDevice->emoji . '%20' . $screen->device . '%0A%0A';
+			} else {
+				$screensText .= '%0A%0A';
+			}
+			// dd(explode(" ", $screensText));
+			$telefono_send_sms = Customers::where('id', '=', $detail->customer_id)->first()->number_phone;
+			// $telefono_send_sms = $customer->number_phone;
+			$url_send = '*' . $type->name . '*' . '%0A%0AOk%20listo%20Vendida%20por%2030%20dias%20mas%20de%20garanti,ba%0A%0A' . $email . '%20%0A%0A' . $screensText . 'Y%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20dias';
+
+			$host = env('LINK_SYSTEM');
+			$link_customer_viewer = $host . "customers/detail/" . $detail->customer_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers";
+
+			// echo $url_send;	
+			// dd($url_send);
+
+			$this->script_js = "
+				document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+				<a  href='https://api.whatsapp.com/send?phone=" . $telefono_send_sms . "&text=" . $url_send . "' class='float' target='_blank'>
+				<i class='fa fa-whatsapp my-float'></i>
+				</a>`+document.querySelector('#content_section').innerHTML;
+				document.querySelector('#content_section').innerHTML+= `
+			   <style type='text/css'>
+					.float{
+						position:fixed;
+						width:55px;
+						height:55px;
+						bottom:35px;
+						right:35px;
+						background-color:#25d366;
+						color:#FFF;
+						border-radius:45px;
+						text-align:center;
+					font-size:25px;
+						box-shadow: 2px 2px 3px #999;
+					z-index:100;
+					}
+					.float:hover {
+						text-decoration: none;
+						color: #25d366;
+					background-color:#fff;
+					}
+					
+					.my-float{
+						margin-top:16px;
+					}
+			   </style>
+				`;
+
+
+
+
+				document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+				<a  href='" . $link_customer_viewer . "' class='float2' target='_blank'>
+				<i class='fa fa-user my-float2'></i>
+				</a>`+document.querySelector('#content_section').innerHTML;
+				document.querySelector('#content_section').innerHTML+= `
+			   <style type='text/css'>
+					.float2{
+						position:fixed;
+						width:55px;
+						height:55px;
+						bottom:35px;
+						right:100px;
+						background-color:red;
+						color:#FFF;
+						border-radius:45px;
+						text-align:center;
+					font-size:25px;
+						box-shadow: 2px 2px 3px #999;
+					z-index:100;
+					}
+					.float2:hover {
+						text-decoration: none;
+						color: #25d366;
+					background-color:#fff;
+					}
+					
+					.my-float2{
+						margin-top:16px;
+					}
+			   </style>
+				`;
+				";
+		}
+
+		if (HelpersCRUDBooster::getCurrentMethod() == 'getAdd') {
+			if (session('is_success') != null) {
+				$this->script_js = "
+					 document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+				<a  href='" . session('link') . "' class='float-search' target='_blank'>
+				<i class='fa fa-search my-float-searc'></i>
+				</a>`+document.querySelector('#content_section').innerHTML;
+				document.querySelector('#content_section').innerHTML+= `
+			   <style type='text/css'>
+					.float-search{
+						position:fixed;
+						width:55px;
+						height:55px;
+						bottom:35px;
+						right:35px;
+						background-color:#25d366;
+						color:#FFF;
+						border-radius:45px;
+						text-align:center;
+					font-size:25px;
+						box-shadow: 2px 2px 3px #999;
+					z-index:100;
+					}
+					.float-search:hover {
+						text-decoration: none;
+						color: #25d366;
+					background-color:#fff;
+					}
+					
+					.my-float-searc{
+						margin-top:16px;
+					}
+			   </style>
+				`;
+					";
+
+				session(['is_success' => null]);
+			}
+		}
 		$this->pre_index_html = null;
 
 
@@ -456,7 +565,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		// $c =  strrev(substr(strrev(strval($cliente)), 0, 4));
 
 		$screen->is_sold = 1;
-		$screen->code_screen = $number_cliente;
+		$screen->code_screen = strval($number_cliente);
 		$screen->client_id = $postdata["customers_id"];
 		$screen->date_sold =  strval($dateInstant);
 		$dateExpired = $dateInstant->addDays($postdata['dias_membersia']);
@@ -466,8 +575,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 
 		$acc = Accounts::where('id', '=', $screen->account_id)->first();
 
-		$type = TypeAccount::where('id', '=', $acc->type_account_id);
-		if (($acc->screens_sold = 1) >= $type->available_screens) {
+		$type = TypeAccount::where('id', '=', $acc->type_account_id)->first();
+		if (($acc->screens_sold + 1) >= $type->available_screens) {
 			$acc->is_sold_ordinary = 1;
 		} else {
 			$acc->is_sold_ordinary = 0;
@@ -496,6 +605,11 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			'price_of_membership_days' => $total_price,
 			'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s')
 		]);
+
+		$host = env('LINK_SYSTEM');
+		session(['is_success' => 1]);
+		session(['link' => $host . "ordersIndividual/detail/" . $order->id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Forders&parent_id=&parent_field="]);
+
 		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
 	}
 

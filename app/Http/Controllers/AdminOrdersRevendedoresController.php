@@ -18,6 +18,7 @@ use App\Models\Customers;
 use Carbon\Carbon;
 
 use App\Models\TypeAccount;
+use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
 
 class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\controllers\CBController
 {
@@ -35,7 +36,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		$this->button_action_style = "button_icon";
 		$this->button_add = true;
 		$this->button_edit = true;
-		$this->button_delete = false;
+		$this->button_delete = true;
 		$this->button_detail = true;
 		$this->button_show = true;
 		$this->button_filter = true;
@@ -120,9 +121,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 				$columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
-				// $columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
-				$columns[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'number', 'required' => true];
-				// $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
+				$columns[] = ['label' => 'Cuenta', 'name' => 'account_id'];
 				$columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
 				$columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
 				$columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
@@ -316,6 +315,45 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		$text2 .= '}';
 
 		if (CRUDBooster::getCurrentMethod() == "getDetail") {
+
+			$urlPage = $_SERVER['REQUEST_URI'];
+			$porciones = explode("?", $urlPage);
+			$porciones = explode("/", $porciones[0]);
+			// $order = Order::where('id', '=', $porciones[sizeof($porciones) - 1])->first();
+			$detail = OrderDetail::where('orders_id', '=', $porciones[sizeof($porciones) - 1])->first();
+
+			$account = Accounts::where('id', '=', $detail->account_id)->first();
+			$type = TypeAccount::where('id', '=', $account->type_account_id)->first();
+			$email = $account->email;
+
+			$screensText = '';
+			foreach (Screens::where('account_id', '=', $account->id)->get() as $key) {
+				# code...
+				// $number = $key->profile_number > 9 ? $key->profile_number : '0' . $key->profile_number;
+				$screensText .= 'Pantalla%20' . $key->profile_number . '%20pin%20' . $key->code_screen . '%0A';
+			}
+
+			$telefono_send_sms  = 0;
+			if ($detail->is_venta_revendedor == 0) {
+				$customer = Customers::where('id', '=', $detail->customer_id)->first();
+				$telefono_send_sms = $customer->number_phone;
+			} else {
+				$customer = Revendedores::where('id', '=', $detail->customers_id)->first();
+				$telefono_send_sms = $customer->telefono;
+			}
+
+
+			$url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Alquilada%20%20por%2030%20días%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20Mosercon9757%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
+
+			$host = env('LINK_SYSTEM');
+			// $host = env('LINK_SYSTEM');
+			$link_customer_viewer = "";
+			if ($detail->is_venta_revendedor == 0) {
+				$link_customer_viewer = $host . "customers/detail/" . $detail->customer_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers";
+			} else {
+				$link_customer_viewer = $host . "revendedores/detail/" . $detail->customer_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Frevendedores";
+			}
+
 			$this->script_js = "
             let tabla = document.querySelector('#table-order_details');
 
@@ -345,6 +383,72 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
                }
                
              });
+
+			 document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+			 <a  href='https://api.whatsapp.com/send?phone=" . $telefono_send_sms . "&text=" . $url_send_sms . ".' class='float' target='_blank'>
+			 <i class='fa fa-whatsapp my-float'></i>
+			 </a>`+document.querySelector('#content_section').innerHTML;
+			 document.querySelector('#content_section').innerHTML+= `
+			<style type='text/css'>
+				 .float{
+					 position:fixed;
+					 width:55px;
+					 height:55px;
+					 bottom:35px;
+					 right:35px;
+					 background-color:#25d366;
+					 color:#FFF;
+					 border-radius:45px;
+					 text-align:center;
+				 font-size:25px;
+					 box-shadow: 2px 2px 3px #999;
+				 z-index:100;
+				 }
+				 .float:hover {
+					 text-decoration: none;
+					 color: #25d366;
+				 background-color:#fff;
+				 }
+				 
+				 .my-float{
+					 margin-top:16px;
+				 }
+			</style>
+			 `;
+
+
+
+			 document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+				<a  href='" . $link_customer_viewer . "' class='float2' target='_blank'>
+				<i class='fa fa-user my-float2'></i>
+				</a>`+document.querySelector('#content_section').innerHTML;
+				document.querySelector('#content_section').innerHTML+= `
+			   <style type='text/css'>
+					.float2{
+						position:fixed;
+						width:55px;
+						height:55px;
+						bottom:35px;
+						right:100px;
+						background-color:red;x
+						color:#FFF;
+						border-radius:45px;
+						text-align:center;
+					font-size:25px;
+						box-shadow: 2px 2px 3px #999;
+					z-index:100;
+					}
+					.float2:hover {
+						text-decoration: none;
+						color: #25d366;
+					background-color:#fff;
+					}
+					
+					.my-float2{
+						margin-top:16px;
+					}
+			   </style>
+				`;
             ";
 		} else {
 
@@ -440,6 +544,52 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
+
+		// if (CRUDBooster::getCurrentMethod() == "getDetail") {
+		// 	$this->script_js = "
+
+		// 			";
+		// }
+
+		if (CRUDBooster::getCurrentMethod() == 'getAdd') {
+			if (session('is_success') != null) {
+				$this->script_js = "
+						 document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+					<a  href='" . session('link') . "' class='float-search' target='_blank'>
+					<i class='fa fa-search my-float-searc'></i>
+					</a>`+document.querySelector('#content_section').innerHTML;
+					document.querySelector('#content_section').innerHTML+= `
+				   <style type='text/css'>
+						.float-search{
+							position:fixed;
+							width:55px;
+							height:55px;
+							bottom:35px;
+							right:35px;
+							background-color:#25d366;
+							color:#FFF;
+							border-radius:45px;
+							text-align:center;
+						font-size:25px;
+							box-shadow: 2px 2px 3px #999;
+						z-index:100;
+						}
+						.float-search:hover {
+							text-decoration: none;
+							color: #25d366;
+						background-color:#fff;
+						}
+						
+						.my-float-searc{
+							margin-top:16px;
+						}
+				   </style>
+					`;
+						";
+
+				session(['is_success' => null]);
+			}
+		}
 		$this->pre_index_html = null;
 
 
@@ -584,7 +734,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				$dateExpired = $dateInstant->addDays($_REQUEST['dias_membersia']);
 				$screen->date_expired = strval($dateExpired);
 				$screen->price_of_membership = $total_price;
-				$screen->code_screen = intval($telefono);
+				$screen->code_screen = strval($telefono);
 				if ($_REQUEST['customers_id'] != 0) {
 					$screen->client_id = $_REQUEST['customers_id'];
 					$screen->is_sold_revendedor = 1;
@@ -656,6 +806,12 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			// }
 			// dd($d);
 
+			$host = env('LINK_SYSTEM');
+			session(['is_success' => 1]);
+			session(['link' => $host . "orders_revendedores/detail/" . $order->id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Forders_revendedores&parent_id=&parent_field="]);
+
+			// \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
+
 			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
 		}
 	}
@@ -711,6 +867,43 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	{
 		//Your code here
 
+		$orders = Order::where('id', '=', $id)->first();
+		$order_detail = OrderDetail::where('orders_id', '=', $orders->id)->first();
+		$screen = Screens::where('account_id',  $order_detail->account_id)->get();
+
+		// dd($orders);
+
+		foreach ($screen as $key) {
+			# code...
+			$screen = Screens::where('id',  $key->id)->update([
+				'client_id' => null,
+				'code_screen' => null,
+				'date_expired' => null,
+				'price_of_membership' => 0,
+				'date_sold' => null,
+				'is_sold_revendedor' => 0,
+				'revendedor_id' => null,
+				'is_sold' => 0,
+				'device' => null,
+				'ip' => null
+
+			]);
+		}
+
+		// $screen = Screens::where('id',  $order_detail->screen_id)->first();
+		$account_of_screen =  Accounts::where('id', '=', $order_detail->account_id)->first();
+		$account_of_screen->screens_sold = 0;
+		$account_of_screen->revendedor_id = null;
+		$account_of_screen->is_sold_ordinary = 0;
+		$account_of_screen->save();
+
+		$orders->delete();
+		$order_detail->delete();
+		HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta desechada exitosamente.", "success");
+		// dd($id);
+
+
+
 	}
 
 	/* 
@@ -723,7 +916,6 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	public function hook_after_delete($id)
 	{
 		//Your code here
-
 
 	}
 
