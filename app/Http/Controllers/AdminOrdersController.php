@@ -47,6 +47,15 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         $this->col[] = ["label" => "Cliente", "name" => "customers_id", "join" => "customers,name"];
         $this->col[] = ["label" => "Telefono", "name" => "customers_id", "join" => "customers,number_phone"];
         $this->col[] = ["label" => "Precio Total", "name" => "total_price"];
+        $this->col[] = ["label" => "Estado", "name" => "is_discarded_all", "callback" => function ($row) {
+            if ($row->is_discarded_all == 0) {
+                return 'Normal';
+            } else {
+                return 'Descartada Totalmente';
+            }
+        }];
+        $this->col[] = ["label" => "Pantallas Descartadas", "name" => "number_screens_discarded"];
+        // $this->col[] = ["label" => "Pantallas Descartadas", "name" => "number_screens_discarded"];
         # END COLUMNS DO NOT REMOVE THIS LINE
 
         # START FORM DO NOT REMOVE THIS LINE
@@ -56,6 +65,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $columns = [];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
+            // dd($_REQUEST);
             $columns[] = ['label' => 'Tipo de venta', 'name' => 'type_order', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'ID', 'name' => 'id', 'type' => 'number', 'required' => true];
         }
@@ -162,6 +172,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         |
         */
         $this->table_row_color = array();
+        // $this->table_row_color =['condition'=>"['is_discarded'] == '1'","color"=>"success"];
+        $this->table_row_color[] = ['condition' => "[is_discarded_all] == '1'", "color" => "danger"];
 
 
         /*
@@ -187,7 +199,6 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $this->script_js = "
             let tabla = document.querySelector('#table-order_details');
 
-            console.log(tabla.childNodes[3].childNodes);
 
             // let trs=  ;
 
@@ -213,64 +224,47 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                }
                
              });
+
+             panel = document.querySelector('.panel-heading');
+             panel.innerHTML+='
+            
+           
+             ';
+             console.log( panel);
             ";
         } else {
-            $pNetflixVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '1')->count();
-            $typeAcc = TypeAccount::where('id', '=', '1')->first();
-            $cuentas  = Accounts::where('type_account_id', '=', '1')->where('is_expired', '=', '0')->count();
-            $disccount = ($typeAcc->total_screens - $typeAcc->available_screens) * $cuentas;
-            $total_p = $cuentas * $typeAcc->total_screens;
-            $total_p = (($total_p - $pNetflixVendidas) - $cuentas) - ($disccount - $cuentas);
+            $js_screens = " var screens = new Array();";
 
-
-            //
-
-            $pDisneyVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '3')->count();
-            $typeAccD = TypeAccount::where('id', '=', '1')->first();
-            $cuentasD  = Accounts::where('type_account_id', '=', '3')->where('is_expired', '=', '0')->count();
-            $disccountD = ($typeAccD->total_screens - $typeAccD->available_screens) * $cuentasD;
-            $total_pD = $cuentasD * $typeAccD->total_screens;
-            $total_pD = (($total_pD - $pDisneyVendidas) - $cuentasD) - ($disccountD - $cuentasD);
-
-            //
-
-            $pAmazonVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '2')->count();
-            $typeAccAM = TypeAccount::where('id', '=', '1')->first();
-            $cuentasAM  = Accounts::where('type_account_id', '=', '2')->where('is_expired', '=', '0')->count();
-            $disccountAM = ($typeAccAM->total_screens - $typeAccAM->available_screens) * $cuentasAM;
-            $total_pAm = $cuentasAM * $typeAccAM->total_screens;
-            $total_pAm = (($total_pAm - $pAmazonVendidas) - $cuentasAM) - ($disccountAM - $cuentasAM);
-
-
+            $i = 0;
+            foreach (TypeAccount::get() as $key) {
+                # code...
+                $pVendidas =  Screens::where('type_account_id', '=', $key->id)->where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->count();
+                $cuentas  = Accounts::where('type_account_id', '=', $key->id)->where('is_expired', '=', '0')->count();
+                $disccount = ($key->total_screens - $key->available_screens) * $cuentas;
+                $total_p = $cuentas * $key->total_screens;
+                $total_p = (($total_p - $pVendidas) - $cuentas) - ($disccount - $cuentas);
+                $js_screens .= '
+                screens[' . $i . '] ={"name":"' . $key->name . '","screens":' . $total_p . ',"type_id":' . $key->id . '};
+                ';
+                $i++;
+            }
 
             $this->script_js = "
+                " . $js_screens . "
+                let boton = document.getElementById('btn-add-table-venta');
+                boton.onmouseover = function(){
+                    let selectwe = document.querySelector('.input-id');
+                    let inputNumberScreens = document.querySelector('#ventanumber_screens');
 
-        let netflixLimit =" . json_encode($total_p) . ";
-        let amazonLimit =" . json_encode($total_pAm) . ";
-        let disneyLimit =" . json_encode($total_pD) . ";
-
-        console.log('asdasdsada');
-        let boton = document.getElementById('btn-add-table-venta');
-        // let
-        // let select = document.getElementByClassName('form-control input-label');
-    //    alert(netflixLimit);
-        
-        // console.log(selectwe.value);
-
-        boton.onmouseover = function(){
-            let selectwe = document.querySelector('.input-id');
-            let inputNumberScreens = document.querySelector('#ventanumber_screens');
-            if(selectwe.value == 1 && inputNumberScreens.value>netflixLimit ){
-                alert('No hay suficientes pantallas para lo que quieres vender (Netflix) , revisa y crea nuevas pantallas!');
-            }
-            if(selectwe.value == 2 && inputNumberScreens.value>amazonLimit ){
-                alert('No hay suficientes pantallas para lo que quieres vender (Amazon) , revisa y crea nuevas pantallas!');
-            }
-            if(selectwe.value == 3 && inputNumberScreens.value>disneyLimit ){
-                alert('No hay suficientes pantallas para lo que quieres vender (Disney) , revisa y crea nuevas pantallas!');
-            }
-        }
-        ";
+                    for(var clave in screens) {
+                        if(selectwe.value == screens[clave]['type_id']  ){
+                            if(inputNumberScreens.value>screens[clave]['screens'] ){
+                                alert('No hay suficientes pantallas para lo que quieres vender ('+screens[clave]['name']+') , revisa y crea nuevas pantallas!');
+                            }
+                        }
+                    }
+                }
+            ";
         }
 
 
@@ -285,8 +279,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         | $this->pre_index_html = "<p>test</p>";
         |
         */
-        $this->pre_index_html = null;
 
+        $this->pre_index_html = null;
 
         /*
         | ----------------------------------------------------------------------
@@ -381,65 +375,77 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     */
     public function hook_before_add(&$postdata)
     {
+        $types = $this->ordenate_types();
+        // dd();
+        $index_types = 0;
+        foreach ($types as $item) {
+            $accounts_completed = 0;
+            $id_account_selected = 0;
+            $index_screens_gain = 0;
+            $accountsVerified = $this->get_accounts_general($types[$index_types]['type_account_id']);
+            // dd($accountsVerified);
+            // dd(sizeof($types[$index_types]['screens_gain']));
+            $iEcho = 0;
+            $iEcho2 = 0;
+            while ($types[$index_types]['number_screens_gain'] != $types[$index_types]['number_screens'] || $accounts_completed == $accountsVerified['total']) {
+                # code...
+                $iEcho++;
+
+                $accounts = Accounts::where('type_account_id', '=', $types[$index_types]['type_account_id'])
+                    ->where('is_sold_ordinary', '=', 0)
+                    ->where('id', '>', $id_account_selected)
+                    ->where('is_sold_extraordinary', '=', 0)
+                    ->where('revendedor_id', '=', null)
+                    ->where('is_expired', '=', 0)
+                    ->first();
+
+                if (!isset($accounts)) {
+                    $id_account_selected = 0;
+                } else {
+                    // if ($iEcho == 6) {
+
+                    // }
+                    $id_account_selected = $accounts->id;
+                    $type = TypeAccount::where('id', '=', $accounts->type_account_id)->first();
+                    $screenConsult = Screens::where('account_id', '=', $accounts->id)->where('is_sold', '=', 0)->where('profile_number', '>', 1)->where('profile_number', '<', ($type->available_screens + 2))->orderBy('profile_number', 'asc');
+                    if (sizeof($types[$index_types]['screens_gain']) != 0) {
+                        foreach ($types as $itemAux) {
+                            if ($itemAux['type_account_id'] == $item['type_account_id']) {
+                                foreach ($itemAux['screens_gain'] as $key) {
+                                    # code...
+                                    $screenConsult->where('id', '!=', $key['screen_id']);
+                                }
+                            }
+                        }
+                    }
+                    $screen = $screenConsult->first();
 
 
-        //        $dateInstant = Carbon::parse('');
-        //        $dateExpired = $dateInstant->addDays(5);
-        //
-        //        dd((string)$dateExpired->format('Y-m-d H:i:s'));
+                    if (null != $screen) {
+                        $types[$index_types]['number_screens_gain'] = ($types[$index_types]['number_screens_gain'] + 1);
+                        $types[$index_types]['screens_gain'][$index_screens_gain] = [
+                            'screen_id' => $screen->id,
+                            'account_id' => $screen->account_id
+                        ];
 
-        $listToList = [];
-        $typeAccountToTypeAccount = [];
-        $searchToSearch = [];
+                        if ($screen->profile_number >= ($type->available_screens + 2)) {
+                            $accounts_completed++;
+                        }
+                        $index_screens_gain++;
+                    }
 
-        $containsError = 0;
-        $errorsInSearch = "";
-
-        $index = 0;
-
-
-        // dd(request());
-
-        foreach (request()['venta-type_account_id'] as $item) {
-            $accountsCompleted = [];
-            $listScreens = [];
-
-            $type_account = TypeAccount::where('id', '=', request()['venta-type_account_id'])->first();
-            $typeAccountToTypeAccount[$index] = $type_account;
-
-            $arrayAccounts = Accounts::where('type_account_id', '=', $item)->where('is_sold_ordinary', '=', '0')->where('is_expired', '=', 0)->where('screens_sold', '<', $type_account->available_screens)->get();
-
-            $searchResult = $this->searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, request(), $this, $index);
-
-            $searchToSearch[$index] = $searchResult;
-            //   dd($searchResult['pantallas']);
-
-            if (sizeof($searchResult['pantallas']) != intval(request()['venta-number_screens'][$index])) {
-                $this->clearScreens($searchResult['pantallas']);
-                $containsError++;
-                $errorsInSearch .= "\n No hay suficientes pantallas de " . $type_account->name;
-                // CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Error al crear la orden, No hay pantallas suficientes", "waning");
-            } else {
-                $listToList[$index] = $searchResult['pantallas'];
+                    // if ($iEcho == 6) {
+                    //     var_dump($types[$index_types]['number_screens_gain']);
+                    //     dd($types[$index_types]['number_screens_gain'] != ($types[$index_types]['number_screens'] - 1));
+                    // }
+                }
             }
-            $index++;
+            $index_types++;
         }
 
-        if ($containsError == sizeof(request()['venta-number_screens'])) {
-            CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Error al crear la orden, No hay ninguna pantalla disponible", "warning");
-        }
+        $this->construct_order($types);
 
-        //$typeAccountToTypeAccount
-        //$listToList
-        //$searchToSearch
-        //$containsError
-        //request()
-
-        $this->generateOrder($typeAccountToTypeAccount, $listToList, $searchToSearch, $containsError, $errorsInSearch, request());
-
-
-        // dd($containsError);
-        //Your code here
+        // dd($types);
     }
 
     /*
@@ -523,6 +529,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         // $order->delete();
         // $order = Order::where('id', '=', $id)->delete();
         // $order->delete();
+
         \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
 
 
@@ -543,11 +550,78 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
     }
 
-    //$typeAccountToTypeAccount
-    //$listToList
-    //$searchToSearch
-    //$containsError
-    //request()
+    public static function construct_order($list_types)
+    {
+        // $host =  env('LINK_SYSTEM');
+        // header("Location: $host/orders/edit/$order->id");
+        $total = 0;
+        foreach ($list_types as $key) {
+            # code...
+            $total += $key['price_of_membership_days'];
+        }
+        // dd($total);
+        $customer_id = request()['customers_id'];
+        $order = Order::create([
+            'customers_id' => $customer_id,
+            'type_order' => Order::TYPE_INDIVIDUAL,
+            'total_price' => intval($total)
+        ]);
+        // dd($list_types);
+        foreach ($list_types as $key) {
+            # code...
+            date_default_timezone_set('America/Bogota');
+            $dateInstant = Carbon::parse('');
+            $dateExpired = $dateInstant->addDays($key['membership_days']);
+
+            foreach ($key['screens_gain'] as $screenClaimed) {
+                # code...
+                $screenSelected = Screens::where('id', $screenClaimed['screen_id'])->first();
+                $account = Accounts::where('id', '=', $screenSelected->account_id)->first();
+                $price = ($key['price_of_membership_days'] / $key['number_screens']);
+
+                OrderDetail::create([
+                    'orders_id' => $order->id,
+                    'type_account_id' => $key['type_account_id'],
+                    'customer_id' => $customer_id,
+                    'screen_id' => $screenClaimed['screen_id'],
+                    'type_order' => Order::TYPE_INDIVIDUAL,
+                    'account_id' => $screenClaimed['account_id'],
+                    'membership_days' => $key['membership_days'],
+                    'price_of_membership_days' =>  $price,
+                    'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s')
+                ]);
+
+                $screenSelected->update([
+                    'client_id' => $customer_id,
+                    'is_sold' => 1,
+                    'date_sold' => Carbon::parse('')->format('Y-m-d H:i:s'),
+                    'price_of_membership' =>  $price,
+                    'date_expired' => (string)$dateExpired->format('Y-m-d H:i:s')
+                ]);
+                $account->screens_sold = ($account->screens_sold + 1);
+                $account->save();
+            }
+        }
+
+
+        // echo "
+        // <script>
+        // window.location.href = " . env('LINK_SYSTEM') . "'orders/edit/" . $order->id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Forders&parent_id=&parent_field=';
+        // </script>
+        // ";
+
+        // $host =  env('LINK_SYSTEM');
+        // header("Location: $host/orders/edit/$order->id");
+        // session(['id' => "$order->id"]);
+        // echo "
+        // <script>
+        // window.location.href = " . env('LINK_SYSTEM') . "'orders/edit/" .  $order->id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Forders&parent_id=&parent_field=';
+        // </script>
+        // ";
+        $host = env('LINK_SYSTEM');
+        CRUDBooster::redirect($_SERVER['HTTP_REFERER'], 'Se creo el pedido exitosamente' . '</br> <td><a href="' . $host . 'orders/detail/' . $order->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Forders&parent_id=&parent_field=">Ver Pedido</a>  </td>', "success");
+    }
+
     public static function generateOrder($typeAccountToTypeAccount, $listToList, $searchToSearch, $errorsInSearch, $containsError, $request)
     {
         $total_price = 0;
@@ -588,6 +662,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
                 $screenSelected->update([
                     'client_id' => $request['customers_id'],
+                    'is_sold' => 1,
                     'date_sold' => Carbon::parse('')->format('Y-m-d H:i:s'),
                     'price_of_membership' => intval($price_of_membership_days),
                     'date_expired' => $dateExpired->format('Y-m-d H:i:s')
@@ -617,105 +692,76 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         }
     }
 
-    public static function searchScreen($arrayAccounts, $accountsCompleted, $type_account, $listScreens, $request, $thisContext, $index): array
+
+
+    // public static function clearScreens($listScreens)
+    // {
+    //     foreach ($listScreens as $screen) {
+    //         //            $screenAct = Screens::where('id', '=', $screen)->orderBy('profile_number', 'asc')->get();
+    //         // $acc = 
+    //         $scr = Screens::where('id', '=', $screen)->first();
+    //         $acc = Accounts::where('id', '=', $screen->account_id)->first();
+    //         if ($acc->screens_sold > 0) {
+    //             $type_account = TypeAccount::where('id', '=', $acc->type_account_id);
+    //             $acc->screens_sold = ($acc->screens_sold - 1);
+
+    //             if ($acc->screens_Sold >= $type_account->available_screens) {
+    //                 $acc->is_sold_ordinary = 1;
+    //             } else {
+    //                 $acc->is_sold_ordinary = 0;
+    //             }
+    //             $acc->save();
+    //         }
+
+
+    //         Screens::where('id', $screen)->update([
+    //             'client_id' => null,
+    //             'date_sold' => null,
+    //             'code_screen' => null,
+    //             'date_expired' => null,
+    //             'price_of_membership' => 0,
+    //             'date_sold' => null,
+    //             'is_sold' => 0,
+    //             'device' => null,
+    //             'ip' => null
+    //         ]);
+    //     }
+    // }
+
+    public static function ordenate_types()
     {
-        //dd();
-        $validation = true;
-        $cliente = Customers::where('id', '=', request()['customers_id'])->first()->number_phone;
-        $c =  strrev(substr(strrev(strval($cliente)), 0, 4));
-
-
-
-        while ($validation) {
-            if (sizeof($arrayAccounts) == sizeof($accountsCompleted) || sizeof($listScreens) == intval(request()['venta-number_screens'][$index])) {
-                $validation = false;
-                $resp = false;
-            } else {
-                foreach ($arrayAccounts as $account) {
-                    if (array_search($account->id, $accountsCompleted) == false) {
-                        $screens = Screens::where('account_id', '=', $account->id)->orderBy('profile_number', 'asc')->get();
-
-                        foreach ($screens as $screen) {
-                            if (sizeof($listScreens) != intval(request()['venta-number_screens'][$index])) {
-                                // if ($screen->profile_number == $type_account->available_screens) {
-                                    //     Accounts::where('id', $account->id)->update([
-                                //         'is_sold_ordinary' => 1
-                                //     ]);
-                                // }
-                                // if ($screen->profile_number != 1) {
-                                if ($screen->profile_number >= ($type_account->available_screens + 2)) {
-                                    array_push($accountsCompleted, $account->id);
-                                    break;
-                                } else {
-                                    if ($screen->is_sold == 0 && $screen->profile_number > 1) {
-                                        if (array_search($screen->id, $listScreens) == false && !($screen->profile_number >= ($type_account->available_screens + 2))) {
-                                            Screens::where('id', $screen->id)->update([
-                                                'is_sold' => 1,
-                                                'code_screen' => $c
-                                            ]);
-                                            $accountEdit = Accounts::where('id', $account->id)->first();
-                                            $accountEdit->screens_sold = ($accountEdit->screens_sold + 1);
-                                            $accountEdit->save();
-
-                                            array_push($listScreens, $screen->id);
-                                            if ($screen->profile_number == ($type_account->available_screens + 1)) {
-                                                Accounts::where('id', $account->id)->update([
-                                                    'is_sold_ordinary' => 1
-                                                ]);
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                // } else {
-                                //     break;
-                                // }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+        $types = [];
+        $types_index = 0;
+        foreach (request()['venta-type_account_id'] as $item) {
+            $type = TypeAccount::where('id', '=', $item)->first();
+            // dd($type)
+            $types[$types_index] = [
+                'index' => $types_index,
+                'type_account_id' => $item,
+                'membership_days' => request()['venta-membership_days'][($types_index)],
+                'number_screens' => request()['venta-number_screens'][($types_index)],
+                'price_of_membership_days' => ((intval(strval($type->price_day)) * intval(strval(request()['venta-membership_days'][($types_index)]))) * request()['venta-number_screens'][($types_index)]),
+                'number_screens_gain' => 0,
+                'screens_gain' => []
+            ];
+            $types_index++;
         }
-
-        return ['pantallas' => $listScreens];
-
-        // var_dump($listScreens);
+        return $types;
     }
 
-    public static function clearScreens($listScreens)
+    public static function get_accounts_general($id_type)
     {
-        foreach ($listScreens as $screen) {
-            //            $screenAct = Screens::where('id', '=', $screen)->orderBy('profile_number', 'asc')->get();
-            // $acc = 
-            $scr = Screens::where('id', '=', $screen)->first();
-            $acc = Accounts::where('id', '=', $screen->account_id)->first();
-            if ($acc->screens_sold > 0) {
-                $type_account = TypeAccount::where('id', '=', $acc->type_account_id);
-                $acc->screens_sold = ($acc->screens_sold - 1);
-
-                if ($acc->screens_Sold >= $type_account->available_screens) {
-                    $acc->is_sold_ordinary = 1;
-                } else {
-                    $acc->is_sold_ordinary = 0;
-                }
-                $acc->save();
-            }
-
-
-            Screens::where('id', $screen)->update([
-                'client_id' => null,
-                'date_sold' => null,
-                'code_screen' => null,
-                'date_expired' => null,
-                'price_of_membership' => 0,
-                'date_sold' => null,
-                'is_sold' => 0,
-                'device' => null,
-                'ip' => null
-            ]);
-        }
+        $accounts = Accounts::where('type_account_id', '=', $id_type)
+            ->where('is_sold_ordinary', '=', 0)
+            ->where('is_sold_extraordinary', '=', 0)
+            ->where('revendedor_id', '=', null)
+            ->where('is_expired', '=', 0)
+            ->get();
+        $type_name = TypeAccount::where('id', '=', $id_type)->first()->name;
+        return [
+            'type_name' => $type_name,
+            'total' => sizeof($accounts)
+        ];
     }
 
     //By the way, you can still create your own method in here... :)

@@ -19,6 +19,7 @@ use App\Models\Accounts;
 use App\Models\TypeAccount;
 use App\Models\Screens;
 use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CBController
 {
@@ -226,37 +227,32 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $ultimo_dia_mes = new DateTime();
         $ultimo_dia_mes->modify('last day of this month');
 
-        $pNetflixVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '1')->count();
-        $typeAcc = TypeAccount::where('id', '=', '1')->first();
-        $cuentas  = Accounts::where('type_account_id', '=', '1')->where('is_expired', '=', '0')->count();
-        $disccount = ($typeAcc->total_screens - $typeAcc->available_screens) * $cuentas;
-        $total_p = $cuentas * $typeAcc->total_screens;
-        $total_p = (($total_p - $pNetflixVendidas) - $cuentas) - ($disccount - $cuentas);
+        $screens_availables_info = [];
 
-        $pDisneyVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '3')->count();
-        $typeAccD = TypeAccount::where('id', '=', '1')->first();
-        $cuentasD  = Accounts::where('type_account_id', '=', '3')->where('is_expired', '=', '0')->count();
-        $disccountD = ($typeAccD->total_screens - $typeAccD->available_screens) * $cuentasD;
-        $total_pD = $cuentasD * $typeAccD->total_screens;
-        $total_pD = (($total_pD - $pDisneyVendidas) - $cuentasD) - ($disccountD - $cuentasD);
+        $i = 0;
+        foreach (TypeAccount::get() as $key) {
+            # code...
+            $pVendidas =  Screens::where('type_account_id', '=', $key->id)->where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->count();
+            $cuentas  = Accounts::where('type_account_id', '=', $key->id)->where('is_expired', '=', '0')->count();
+            $disccount = ($key->total_screens - $key->available_screens) * $cuentas;
+            $total_p = $cuentas * $key->total_screens;
+            $total_p = (($total_p - $pVendidas) - $cuentas) - ($disccount - $cuentas);
 
-        $pAmazonVendidas = Screens::where('is_sold', '=', '1')->where("is_account_expired", "=", "0")->where('type_account_id', '=', '2')->count();
-        $typeAccAM = TypeAccount::where('id', '=', '1')->first();
-        $cuentasAM  = Accounts::where('type_account_id', '=', '2')->where('is_expired', '=', '0')->count();
-        $disccountAM = ($typeAccAM->total_screens - $typeAccAM->available_screens) * $cuentasAM;
-        $total_pAm = $cuentasAM * $typeAccAM->total_screens;
-        $total_pAm = (($total_pAm - $pAmazonVendidas) - $cuentasAM) - ($disccountAM - $cuentasAM);
+            $screens_availables_info[$i] = [
+                'name' => $key->name,
+                'screens' => $total_p
+            ];
 
-
-
+            $i++;
+        }
 
         $this->index_statistic = array();
-        $this->index_statistic[] = ['label' => 'P. Netflix', 'count' => $total_p, 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
-        $this->index_statistic[] = ['label' => 'P. Amazon', 'count' => $total_pAm, 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
-        $this->index_statistic[] = ['label' => 'P. Disney', 'count' => $total_pD, 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
+        foreach ($screens_availables_info as $key) {
+            # code...
+            $this->index_statistic[] = ['label' => 'P. ' . $key['name'], 'count' => $key['screens'], 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url('' . env('LINK_SYSTEM') . "screens?filter_column%5Bscreens.id%5D%5Btype%5D=&filter_column%5Bscreens.id%5D%5Bsorting%5D=&filter_column%5Baccounts.id%5D%5Btype%5D=&filter_column%5Baccounts.id%5D%5Bsorting%5D=&filter_column%5Bcustomers.number_phone%5D%5Btype%5D=&filter_column%5Bcustomers.number_phone%5D%5Bsorting%5D=&filter_column%5Btype_account.name%5D%5Btype%5D=%3D&filter_column%5Btype_account.name%5D%5Bvalue%5D=" . $key['name'] . "&filter_column%5Btype_account.name%5D%5Bsorting%5D=&filter_column%5Bscreens.name%5D%5Btype%5D=&filter_column%5Bscreens.name%5D%5Bsorting%5D=&filter_column%5Bscreens.is_sold%5D%5Btype%5D=%3D&filter_column%5Bscreens.is_sold%5D%5Bvalue%5D=No&filter_column%5Bscreens.is_sold%5D%5Bsorting%5D=&filter_column%5Bscreens.date_expired%5D%5Btype%5D=&filter_column%5Bscreens.date_expired%5D%5Bsorting%5D=&filter_column%5Bscreens.price_of_membership%5D%5Btype%5D=&filter_column%5Bscreens.price_of_membership%5D%5Bsorting%5D=&filter_column%5Bscreens.device%5D%5Btype%5D=&filter_column%5Bscreens.device%5D%5Bsorting%5D=&filter_column%5Bscreens.ip%5D%5Btype%5D=&filter_column%5Bscreens.ip%5D%5Bsorting%5D=&lasturl=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens")];
+        }
+        // $this->index_statistic[] = ['label' => 'Total Data', 'count' => FacadesDB::table('screens')->count(), 'icon' => 'fa fa-check', 'color' => 'success'];
 
-
-        // $this->index_statistic[] = ['label' => 'Pantallas Netflix Vendidas mes ', 'count' => Screens::where('is_sold', '=', '1')->where('type_account_id', '=', '3')->lastMonth()->count(), 'icon' => 'fa fa-exclamation-triangle', 'color' => 'green', "link" => url("#")];
         /*
         | ----------------------------------------------------------------------
         | Add javascript at body

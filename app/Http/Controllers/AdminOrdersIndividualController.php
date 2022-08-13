@@ -466,7 +466,17 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 
 		$acc = Accounts::where('id', '=', $screen->account_id)->first();
 
+		$type = TypeAccount::where('id', '=', $acc->type_account_id);
+		if (($acc->screens_sold = 1) >= $type->available_screens) {
+			$acc->is_sold_ordinary = 1;
+		} else {
+			$acc->is_sold_ordinary = 0;
+		}
+
 		$acc->screens_sold = $acc->screens_sold + 1;
+		$acc->is_sold_ordinary = 1;
+		$acc->is_sold_extraordinary = 1;
+		// $acc->screens_sold = $acc->screens_sold + 1;
 		$acc->save();
 
 		$order = Order::create([
@@ -487,7 +497,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s')
 		]);
 		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
-	}	
+	}
 
 	/*
 	    | ----------------------------------------------------------------------

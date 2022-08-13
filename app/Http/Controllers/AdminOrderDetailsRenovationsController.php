@@ -250,7 +250,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-			$this->load_css[] = asset("/css/All.css");
+		$this->load_css[] = asset("/css/All.css");
 	}
 
 
@@ -287,7 +287,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('type_order','=',Order::TYPE_INDIVIDUAL)->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)->where('screen_id', '!=', null)->join('customers', 'order_details.customer_id', '=', 'customers.id')
+		$query->where('order_details.is_discarded', '=', '0')->where('order_details.is_renewed', '=', '0')->where('type_order', '=', Order::TYPE_INDIVIDUAL)->where('order_details.is_renewed', '=', '0')->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)->where('screen_id', '!=', null)->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
 			->join('screens', 'order_details.screen_id', 'screens.id')
 			->select('order_details.*',  'customers.name', 'customers.number_phone', 'accounts.email', 'screens.name', 'screens.date_sold', 'screens.date_expired')
@@ -490,6 +490,41 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 
 	public function getSetDesechar($id)
 	{
-		dd($id);
+		$order_detail = OrderDetail::where('id', '=', $id)->update([
+			'is_discarded' => 1
+		]);
+		$order_detail = OrderDetail::where('id', '=', $id)->first();
+		$orders = Order::where('id', '=', $order_detail->orders_id)->first();
+		$orders->is_discarded = 1;
+		$orders->number_screens_discarded = ($orders->number_screens_discarded + 1);
+		$orders->save();
+		// $screen = Screens::where('id', '=', $order_detail->screen_id);
+		$screen = Screens::where('id',  $order_detail->screen_id)->update([
+			'client_id' => null,
+			'code_screen' => null,
+			'date_expired' => null,
+			'price_of_membership' => 0,
+			'date_sold' => null,
+			'is_sold' => 0,
+			'device' => null,
+			'ip' => null
+
+		]);
+		$screen = Screens::where('id',  $order_detail->screen_id)->first();
+		$account_of_screen =  Accounts::where('id', '=', $screen->account_id)->first();
+		$account_of_screen->screens_sold = ($account_of_screen->screens_sold - 1);
+		$account_of_screen->save();
+
+		$order_details = OrderDetail::where('orders_id', '=', $order_detail->orders_id)->where('is_discarded', '=', 0)->get();
+		if (!sizeof($order_details)) {
+			$orders = Order::where('id', '=', $order_detail->orders_id)->update([
+				'is_discarded_all' => 1
+			]);
+		}
+		HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta desechada exitosamente.", "success");
+		// $order_detail->is_discarded=1;
+		// $order
+
+		// dd($id);
 	}
 }

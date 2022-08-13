@@ -14,6 +14,7 @@ use App\Models\Revendedores;
 use App\Models\OrderDetail;
 use App\Models\Screens;
 use App\Models\Accounts;
+use App\Models\TypeAccount;
 use Carbon\Carbon;
 use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
 use DB;
@@ -77,8 +78,6 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 		}];
 		$this->col[] = ["label" => "Orden", "name" => "order_details.orders_id"];
 		$this->col[] = ["label" => "Correo", "name" => "accounts.email"];
-		// $this->col[] = ["label" => "Pantalla #", "name" => "screens.name"];
-		// $this->col[] = ["label" => "Fecha de COMPRA", "name" => "screens.date_sold"];
 		$this->col[] = ["label" => "Fecha de VENCIMIENTO", "name" => "order_details.finish_date"];
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
@@ -276,7 +275,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-			$this->load_css[] = asset("/css/All.css");
+		$this->load_css[] = asset("/css/All.css");
 	}
 
 
@@ -315,7 +314,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('order_details.is_renewed', '=', '0')->where('finish_date', '<', $dateSimpli)->where('type_order','=',Order::TYPE_FULL)
+		$query->where('order_details.is_renewed', '=', '0')->where('finish_date', '<', $dateSimpli)->where('type_order', '=', Order::TYPE_FULL)
 			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			// ->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
@@ -437,7 +436,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 				$dateExpired = $dateInstant->addDays($detail->membership_days);
 			}
 
-			 OrderDetail::create([
+			OrderDetail::create([
 				'orders_id' => $detail->orders_id,
 				'type_account_id' => $detail->type_account_id,
 				'customer_id' => $detail->customer_id,
@@ -509,6 +508,51 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 	}
 	public function getSetDesechar($id)
 	{
+		$order_detail = OrderDetail::where('id', '=', $id)->update([
+			'is_discarded' => 1
+		]);
+		$order_detail = OrderDetail::where('id', '=', $id)->first();
+		$type_account = TypeAccount::where('id', '=', $order_detail->type_account_id)->first();
+
+		$orders = Order::where('id', '=', $order_detail->orders_id)->first();
+		$orders->is_discarded = 1;
+		$orders->number_screens_discarded = $type_account->total_screens;
+		$orders->save();
+		// $screen = Screens::where('id', '=', $order_detail->screen_id);
+
+		$screen = Screens::where('account_id',  $order_detail->account_id)->get();
+
+		foreach ($screen as $key) {
+			# code...
+			$screen = Screens::where('id',  $key->id)->update([
+				'client_id' => null,
+				'code_screen' => null,
+				'date_expired' => null,
+				'price_of_membership' => 0,
+				'date_sold' => null,
+				'is_sold_revendedor' => 0,
+				'revendedor_id' => null,
+				'is_sold' => 0,
+				'device' => null,
+				'ip' => null
+
+			]);
+		}
+
+		// $screen = Screens::where('id',  $order_detail->screen_id)->first();
+		$account_of_screen =  Accounts::where('id', '=', $order_detail->account_id)->first();
+		$account_of_screen->screens_sold = 0;
+		$account_of_screen->revendedor_id = null;
+		$account_of_screen->is_sold_ordinary = 0;
+		$account_of_screen->save();
+
+		$order_details = OrderDetail::where('orders_id', '=', $order_detail->orders_id)->where('is_discarded', '=', 0)->get();
+		if (!sizeof($order_details)) {
+			$orders = Order::where('id', '=', $order_detail->orders_id)->update([
+				'is_discarded_all' => 1
+			]);
+		}
+		HelpersCRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Venta desechada exitosamente.", "success");
 		dd($id);
 	}
 }

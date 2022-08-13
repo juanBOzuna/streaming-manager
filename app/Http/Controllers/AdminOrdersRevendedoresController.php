@@ -50,7 +50,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 			$customer = null;
 			$type = '';
-		//	var_dump($row->is_venta_revendedor==0 );
+			//	var_dump($row->is_venta_revendedor==0 );
 			if ($row->is_venta_revendedor == 0) {
 				$customer = Customers::where('id', '=', $row->customers_id)->first();
 				$type = 'CLIENTE';
@@ -100,7 +100,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			$urlPage = $_SERVER['REQUEST_URI'];
 			$porciones = explode("?", $urlPage);
 			$porciones = explode("/", $porciones[0]);
-			
+
 			$order = Order::where('id', '=', $porciones[sizeof($porciones) - 1])->first();
 
 			if ($order->is_venta_revendedor == 0) {
@@ -540,14 +540,14 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	    */
 	public function hook_before_add(&$postdata)
 	{
-	//	dd($_REQUEST['customers_id2']);
+		//	dd($_REQUEST['customers_id2']);
 		//dd(Customers::where('id', '=', intval($_REQUEST['customers_id2']))->first()->number_phone);
 		//dd($telefono =strrev(substr(strrev(strval(Customers::where('id', '=', $_REQUEST['customers_id2'])->first()->telefono)), 0, 4)));
 		//Your code here
 		// echo $_REQUEST['customers_id2'];
 		// echo $_REQUEST['customers_id'];
 		// dd($_REQUEST['customers_id']!=0 && $_REQUEST['customers_id2']==0);
-		
+
 		$validationIf = 0;
 		// echo $postdata['customers_id2'];
 		// dd($_REQUEST['customers_id'] != 0 && $_REQUEST['customers_id2'] != 0);
@@ -571,8 +571,8 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			$screens = Screens::where('account_id', '=', $accounts->id)->get();
 			if (!$_REQUEST['customers_id'] == 0) {
 				$telefono = strrev(substr(strrev(strval(Revendedores::where('id', '=', $_REQUEST['customers_id'])->first()->telefono)), 0, 4));
-			}else{
-				$telefono =strrev(substr(strrev(strval(Customers::where('id', '=', $_REQUEST['customers_id2'])->first()->number_phone)), 0, 4));
+			} else {
+				$telefono = strrev(substr(strrev(strval(Customers::where('id', '=', $_REQUEST['customers_id2'])->first()->number_phone)), 0, 4));
 			}
 			foreach ($screens as $screen) {
 				# code...\
@@ -655,7 +655,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			// $screenAux->save();
 			// }
 			// dd($d);
-			
+
 			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente", "success");
 		}
 	}
@@ -723,7 +723,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	public function hook_after_delete($id)
 	{
 		//Your code here
-		
+
 
 	}
 

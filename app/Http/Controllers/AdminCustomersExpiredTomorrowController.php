@@ -45,10 +45,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		$this->col[] = ["label" => "Telefono", "name" => "number_phone"];
 		$this->col[] = ["label" => "No. Pantallas a expirar", "name" => "date_sold", "callback" => function ($row) {
 			$customer = Customers::where('id', '=', $row->id)->first();
-			$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','!=',null)->get();
-			$details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id','=',null)->where('is_venta_revendedor','=',0)->get();
+			$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id', '!=', null)->get();
+			$details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id', '=', null)->where('is_venta_revendedor', '=', 0)->get();
 			$number_screens_expired = 0;
-			$number_accounts_expired=0;
+			$number_accounts_expired = 0;
 			// for ($i = 0; $i < 10; $i++) {
 			// 	if ($i == 2) {
 			// 		dd(\Carbon\Carbon::parse("")->month);
@@ -70,7 +70,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				//}
 				//echo $fv ."  ".$da;
 
-				if($fv == $da){
+				if ($fv == $da) {
 					$number_screens_expired++;
 				}
 			}
@@ -90,7 +90,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				//}
 				//echo $fv ."  ".$da;
 
-				if($fv == $da){
+				if ($fv == $da) {
 					$number_accounts_expired++;
 				}
 			}
@@ -98,32 +98,30 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 			$text = '';
 			if ($number_screens_expired == 1) {
 				$text = $number_screens_expired . " pantalla";
-			} 
+			}
 
-			if($number_screens_expired > 1){
-				$text= $number_screens_expired . " pantallas";
+			if ($number_screens_expired > 1) {
+				$text = $number_screens_expired . " pantallas";
 			}
 
 			if ($number_accounts_expired == 1) {
-				if($number_screens_expired > 1){
-					$text .=' y '. $number_accounts_expired . " cuenta Completa";
-				}else{
-					$text .=$number_accounts_expired . " cuenta Completa";
+				if ($number_screens_expired > 1) {
+					$text .= ' y ' . $number_accounts_expired . " cuenta Completa";
+				} else {
+					$text .= $number_accounts_expired . " cuenta Completa";
 				}
-				
-			} 
-
-			if($number_accounts_expired > 1){
-				if($number_screens_expired > 1){
-					$text .=' y '. $number_accounts_expired . " cuentas Completas";
-				}else{
-					$text .=$number_accounts_expired . " cuentas Completas";
-				}
-				
 			}
 
-			if($number_screens_expired==0 && $number_accounts_expired==0){
-$text="NINGUNA PANTALLA";
+			if ($number_accounts_expired > 1) {
+				if ($number_screens_expired > 1) {
+					$text .= ' y ' . $number_accounts_expired . " cuentas Completas";
+				} else {
+					$text .= $number_accounts_expired . " cuentas Completas";
+				}
+			}
+
+			if ($number_screens_expired == 0 && $number_accounts_expired == 0) {
+				$text = "NINGUNA PANTALLA";
 			}
 
 			return $text;
@@ -275,12 +273,12 @@ $text="NINGUNA PANTALLA";
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
-			if(null!=$_REQUEST["isSuccess"]){
-				//session(['linkWp' => NULL	]);
-				$telefono = session("telefonoCliente");
-				$datos = session('linkWp');
-				
-					 echo "
+		if (null != $_REQUEST["isSuccess"]) {
+			//session(['linkWp' => NULL	]);
+			$telefono = session("telefonoCliente");
+			$datos = session('linkWp');
+
+			echo "
 					<script>
 					let datos = " . json_encode($datos) . "
 					let telefono = " . json_encode($telefono) . "
@@ -292,26 +290,25 @@ $text="NINGUNA PANTALLA";
 
 					</script>
 					";
-			}
+		}
 
-			if(null!=$_REQUEST["isSendSms"]){
-				echo"
+		if (null != $_REQUEST["isSendSms"]) {
+			echo "
 				<script>
 				window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow?sendMessageSuccesfull=1';
 				</script>
 				";
-			}
+		}
 
-			if(null!= $_REQUEST["sendMessageSuccesfull"]){
-				
+		if (null != $_REQUEST["sendMessageSuccesfull"]) {
+
 			foreach (session('listDetail') as $detail) {
 				$order_dt = OrderDetail::where('id', '=', $detail->id)->first();
 				$order_dt->is_notified = 1;
 				$order_dt->save();
 			}
 			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect("http://streaming-manager.test/admin/customers_expired_tomorrow", "El cliente fue avisado exitosamente", "success");
-			
-			}
+		}
 		$this->pre_index_html = null;
 
 
@@ -360,7 +357,7 @@ $text="NINGUNA PANTALLA";
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
-			$this->load_css[] = asset("/css/All.css");
+		$this->load_css[] = asset("/css/All.css");
 	}
 
 
@@ -496,41 +493,40 @@ $text="NINGUNA PANTALLA";
 		foreach ($details as $detail) {
 			date_default_timezone_set('America/Bogota');
 			$d = explode(" ", $detail->finish_date);
-				$fv = \Carbon\Carbon::parse($d[0]);
-				$da = \Carbon\Carbon::parse("");
-				$da2 = explode(" ", $da);
-				$da = \Carbon\Carbon::parse($da2[0]);
-				$da->addDays(1);
-				
-			if($fv == $da){
-			array_push($list_details_to_expired, $detail);
+			$fv = \Carbon\Carbon::parse($d[0]);
+			$da = \Carbon\Carbon::parse("");
+			$da2 = explode(" ", $da);
+			$da = \Carbon\Carbon::parse($da2[0]);
+			$da->addDays(1);
+
+			if ($fv == $da) {
+				array_push($list_details_to_expired, $detail);
 				$number_screens++;
 			}
 		}
-		
+
 
 		foreach ($list_details_to_expired as $detail) {
-			if($detail->type_order == Order::TYPE_FULL){
+			if ($detail->type_order == Order::TYPE_FULL) {
 				$typeAccount = TypeAccount::where('id', '=', $detail->type_account_id)->first();
 				$account = Screens::where('id', '=', $detail->account_id)->first();
 				// $porciones = explode(" ", $screen->name);
 				// $nombre = $porciones[0] . "%20" . $porciones[1];
-	
+
 				$datos .= '*' . $typeAccount->name . '*%20' . $account->email . ' *_CUENTA COMPLETA_*. %20%0A%0A';
-			}else{
+			} else {
 				$typeAccount = TypeAccount::where('id', '=', $detail->type_account_id)->first();
 				$screen = Screens::where('id', '=', $detail->screen_id)->first();
 				$porciones = explode(" ", $screen->name);
 				$nombre = $porciones[0] . "%20" . $porciones[1];
-	
+
 				$datos .= '*' . $typeAccount->name . '*%20' . $screen->email . '%20*' . $nombre . '*%20%0A%0A';
 			}
-			
 		}
 
 		///\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
 		$telefono =  $customer->number_phone;
-		
+
 
 		// echo "
 		// <script>
@@ -546,10 +542,8 @@ $text="NINGUNA PANTALLA";
 		// ";
 
 		session(['linkWp' => '*COMUNICADO%20MOSERCON*%0A%0AEstimado%20CLIENTE,%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20*~CADUCARA~*%20esta%20noche.%0A%0A' . $datos . 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20PANTALLA%20debe%20mandarnos%20*COMPROBANTE*%20de%20pago%20en%20este%20dia.%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20*BLOQUEARA*%20su%20pantalla%20a%20partir%20de%20media%20noche.%0A%20Att:%20*Admin*']);
-		session(['telefonoCliente' => $telefono.""]);
+		session(['telefonoCliente' => $telefono . ""]);
 		session(['listDetail' => $list_details_to_expired]);
-		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER']."?isSuccess=1", "El cliente fue avisado exitosamente", "success");
-
-		
-}
+		\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'] . "?isSuccess=1", "El cliente fue avisado exitosamente", "success");
+	}
 }
