@@ -12,6 +12,8 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Accounts;
 use App\Models\Screens;
+
+use App\Models\Usuarios;
 use App\Models\Customers;
 // use App\Models\Revendedores;
 
@@ -47,6 +49,12 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 		# START COLUMNS DO NOT REMOVE THIS LINE
 		$this->col = [];
+		$this->col[] = ["label" => "ID", "name" => "id"];
+		$this->col[] = ["label" => "Cuenta", "name" => "id", "callback" => function ($row) {
+			$order_detail=OrderDetail::where('orders_id','=',$row->id)->first();
+			$cuenta = Accounts::where('id','=',$order_detail->account_id)->first();
+			return $cuenta->email;
+		}];
 		$this->col[] = ["label" => "Vendido a", "name" => "is_venta_revendedor", "callback" => function ($row) {
 
 			$customer = null;
@@ -87,7 +95,10 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			}
 			return $telefono;
 		}];
+		$this->col[] = ["label" => "Fecha Venta", "name" => "created_at"];
 		$this->col[] = ["label" => "Precio Total", "name" => "total_price"];
+		
+		
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
 		# START FORM DO NOT REMOVE THIS LINE
@@ -333,17 +344,24 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				$screensText .= 'Pantalla%20' . $key->profile_number . '%20pin%20' . $key->code_screen . '%0A';
 			}
 
-			$telefono_send_sms  = 0;
+			$telefono_send_sms = null;
 			if ($detail->is_venta_revendedor == 0) {
 				$customer = Customers::where('id', '=', $detail->customer_id)->first();
+					if($customer->revendedor_id !=null){
+						$telefono_send_sms = Usuarios::where('id','=',$customer->revendedor_id)->first()->number_phone;
+					}else{
+						$telefono_send_sms = $customer->number_phone;
+					}
 				$telefono_send_sms = $customer->number_phone;
 			} else {
-				$customer = Revendedores::where('id', '=', $detail->customers_id)->first();
+				$customer = Revendedores::where('id', '=', $detail->customer_id)->first();
+				//dd($customer );
 				$telefono_send_sms = $customer->telefono;
 			}
+		
 
 
-			$url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Alquilada%20%20por%2030%20días%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20Mosercon9757%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
+			$url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Alquilada%20%20por%2030%20días%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20'.$account->key_pass.'%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
 
 			$host = env('LINK_SYSTEM');
 			// $host = env('LINK_SYSTEM');
@@ -886,7 +904,6 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				'is_sold' => 0,
 				'device' => null,
 				'ip' => null
-
 			]);
 		}
 

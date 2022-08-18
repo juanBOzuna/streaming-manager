@@ -7,6 +7,8 @@ use App\Models\Customers;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Screens;
+
+use App\Models\Usuarios;
 use App\Models\TypeAccount;
 use App\Models\TypeDevice;
 use Carbon\Carbon;
@@ -53,6 +55,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			$type = TypeAccount::where('id', '=', $screen->type_account_id)->first();
 			return $screen->id . ' | ' . $screen->email . ' | ' . $type->name;
 		}];
+		$this->col[] = ["label" => "Fecha Venta", "name" => "created_at"];
 		$this->col[] = ["label" => "Precio Total", "name" => "total_price"];
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
@@ -330,9 +333,17 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 				$screensText .= '%0A%0A';
 			}
 			// dd(explode(" ", $screensText));
-			$telefono_send_sms = Customers::where('id', '=', $detail->customer_id)->first()->number_phone;
+			$customer_of_order = Customers::where('id', '=', $detail->customer_id)->first();
+
+			$telefono_send_sms = null;
+
+            if($customer_of_order->revendedor_id !=null){
+                $telefono_send_sms = Usuarios::where('id','=',$customer_of_order->revendedor_id)->first()->number_phone;
+            }else{
+                $telefono_send_sms = $customer_of_order->number_phone;
+            }
 			// $telefono_send_sms = $customer->number_phone;
-			$url_send = '*' . $type->name . '*' . '%0A%0AOk%20listo%20Vendida%20por%2030%20dias%20mas%20de%20garanti,ba%0A%0A' . $email . '%20%0A%0A' . $screensText . 'Y%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20dias';
+			$url_send = '*' . $type->name . '*' . '%0A%0AOk%20listo%20Vendida%20por%2030%20dias%20mas%20de%20garantia%0A%0A' . $email . '%20%0A%0A' . $screensText . 'Nos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20dias';
 
 			$host = env('LINK_SYSTEM');
 			$link_customer_viewer = $host . "customers/detail/" . $detail->customer_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers";
@@ -576,15 +587,18 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		$acc = Accounts::where('id', '=', $screen->account_id)->first();
 
 		$type = TypeAccount::where('id', '=', $acc->type_account_id)->first();
-		if (($acc->screens_sold + 1) >= $type->available_screens) {
+		if (($acc->screens_sold+1) >= $type->available_screens) {
 			$acc->is_sold_ordinary = 1;
 		} else {
 			$acc->is_sold_ordinary = 0;
 		}
 
-		$acc->screens_sold = $acc->screens_sold + 1;
-		$acc->is_sold_ordinary = 1;
-		$acc->is_sold_extraordinary = 1;
+		$screen = Screens::where("id", "=", $postdata["pantalla_id"])->first();
+		if($screen->profile_number>1 && $screen->profile_number<($type->available_screens+2)){
+			$acc->screens_sold = $acc->screens_sold + 1;
+
+		}
+		
 		// $acc->screens_sold = $acc->screens_sold + 1;
 		$acc->save();
 
@@ -682,8 +696,18 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			]);
 
 			$account_of_screen =  Accounts::where('id', '=', $key->account_id)->first();
-			// dd($account_of_screen);
-			$account_of_screen->screens_sold = ($account_of_screen->screens_sold - 1);
+		
+			$type= TypeAccount::where('id','=',$account_of_screen->type_account_id)->first();
+			
+			$screen = Screens::where('id', '=', $key->screen_id)->first();
+			if($screen->profile_number>1&&$screen->profile_number<=$type->available_screens){
+				if (($account_of_screen->screens_sold-1)>= $type->available_screens) {
+					$account_of_screen->is_sold_ordinary = 0;
+				} else {
+					$account_of_screen->is_sold_ordinary = 1;
+				}
+				$account_of_screen->screens_sold = ($account_of_screen->screens_sold - 1);
+			}
 			$account_of_screen->save();
 			// Screens::where('id', $screen)
 

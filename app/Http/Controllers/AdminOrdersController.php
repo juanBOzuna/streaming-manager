@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Orders;
 use App\Models\Screens;
+use App\Models\Usuarios;
 use App\Models\TypeAccount;
 use App\Models\Customers;
 use App\Models\TypeDevice;
@@ -78,23 +79,100 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         $columns[] = ['label' => 'Tipo de Servicio', 'name' => 'type_account_id', 'type' => 'datamodal', 'datamodal_table' => 'type_account', 'datamodal_columns' => 'name', 'datamodal_select_to' => 'Nombre:name', 'required' => true];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
 
-            $this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
-            $this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
-            $columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'number', 'required' => true];
-            // $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
-            $columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
-            $columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
-            $columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
-            $columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
+                
+            $urlPage = $_SERVER['REQUEST_URI'];
+            $porciones = explode("?", $urlPage);
+            $porciones = explode("/", $porciones[0]);
+            $id= $porciones[sizeof($porciones) - 1];
+
+            $trHtml = '';
+
+            $orders_details = OrderDetail::where('orders_id','=',$id)->get();
+           foreach ($orders_details as $key) {
+            $customer = Customers::where('id','=',$key->customer_id)->first();
+            $cuenta_of_order_detail = Accounts::where('id','=',$key->account_id)->first();
+            $screen_of_order_detail = Screens::where('id','=',$key->screen_id)->first();
+            $tipo_pantalla = TypeAccount::where('id','=',$cuenta_of_order_detail->type_account_id)->first();
+
+            $is_renewed = $key->is_renewed ==0 ?'NO':'SI' ;
+            # code...
+            if($key->parent_order_detail==null){
+                $trHtml .= '  <tr  style="background-color: #a5eea0;" >  ';
+            }else{
+                $trHtml .= '  <tr>';
+            }
+            //dd( $trHtml);
+            $parent = $key->parent_order_detail ==null ?'PADRE':$key->parent_order_detail; 
+            $trHtml .= '
+            <th scope="row">id:' . $key->id . '</th>
+            <td>id:' .$cuenta_of_order_detail->id . '  |  '.$cuenta_of_order_detail->email.'  |  '. $tipo_pantalla->name.'</td>
+            <th scope="row">id:' .  $screen_of_order_detail->id . '  |  '.$screen_of_order_detail->name.' </th>
+            <td>' . $key->membership_days . ' </td>
+            <td>' .Carbon::parse($key->created_at)->format('Y-m-d H:i:s')    . ' </td>
+            <td>' . Carbon::parse($key->finish_date)->format('Y-m-d H:i:s')  . ' </td>
+            <td>'  .  $is_renewed . '</td>
+            <td>' . $key->number_renovations . '</td>
+            <td>' .  $parent . '</td>
+            <td> <a href="' . env('LINK_SYSTEM') . 'screens/edit/' .$screen_of_order_detail->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens" target="_blank">Editar</a> </td>
+            <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
+            </tr>';
+           }
+
+           $htmlForTable = '
+           <br>
+           <span><strong>  DETALLE DE VENTA (PANTALLAS VENDIDAS)</strong></span>
+           <br>
+           <br>
+           <table class="table table-striped">
+             <thead>
+               <tr>
+                 <th scope="col">ID</th>
+                 <th scope="col">CUENTA</th>
+                 <th scope="col">PANTALLA</th>
+                 <th scope="col">DIAS</th>
+                 <th scope="col">VENDIDA</th>
+                 <th scope="col">VENCE</th>
+                 <th scope="col">RENOVADA</th>
+                 <th scope="col">®️</th>
+                 <th scope="col">PADRE</th>
+                  <th scope="col"> Acciones </th>
+               </tr>
+             </thead>
+             <tbody>
+               ' . $trHtml . '
+             </tbody>
+           </table>';
+
+           //dd( $htmlForTable);
+
+           $this->script_js = "
+           console.log('ASD');
+           let table = " . json_encode($htmlForTable) . "
+           let area = document.getElementById('parent-form-area');
+         
+           area.innerHTML+= table ;
+           
+        //    let list = document.querySelectorAll('tr');
+        //    list.forEach(function (trs) {
+        //             trs.childNodes.forEach(function (tds) {
+        //                if (tds.innerText == 'VENDIDA') {
+        //                    trs.style.backgroundColor = '#a5eea0';
+        //                    // trs.style.color = 'white';
+        //                    trs.style.fontWeight = 'bold';
+        //                }
+        //             });
+        //     });
+           ";
+
+         
+
+          
         } else {
             $columns[] = ['label' => 'Numero de pantallas', 'name' => 'number_screens', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'Dias de membresia', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
+            $this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
         }
-        $this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
 
         # END FORM DO NOT REMOVE THIS LINE
 
@@ -226,7 +304,14 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     $details_text .= '%0A%0A%0A';
                 }
             }
-            $telefono_send_sms = Customers::where('id', '=', $order->customers_id)->first()->number_phone;
+            $cliente =Customers::where('id', '=', $order->customers_id)->first();
+            $telefono_send_sms = null;
+
+            if($cliente->revendedor_id !=null){
+                $telefono_send_sms = Usuarios::where('id','=',$cliente->revendedor_id)->first()->number_phone;
+            }else{
+                $telefono_send_sms = $cliente->number_phone;
+            }
 
             $link_sms = '*MOSERCON*%20*Streaming*%0A%0ATe%20activa%20las%20siguientes%20pantallas%20%0A%0A' . $details_text . '%0ANos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20días';
 
@@ -234,34 +319,31 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $host = env('LINK_SYSTEM');
             $link_customer_viewer = $host . "customers/detail/" . $order->customers_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers";
 
+                //sEGUNDA LOGICA
 
-            $this->script_js = "
+
+
+            $this->script_js .= "
             let tabla = document.querySelector('#table-order_details');
 
-
-            // let trs=  ;
-
-            // for(let i =0 ; i<tabla.childNodes[3].childNodes.length){
-            //     console.log(item[i]);
-            // }
-            let i=0;
-            tabla.childNodes[3].childNodes.forEach(function (item) {
-               let=i++;
-               if(i%2==0){
-                // console.log(item.children[8].innerText);
-                if(item.children[8].innerText=='0'){
-                    item.children[8].innerText = 'No';
-                    // item.children[8].style.color = '#DD4B39';
-                    item.children[8].style.fontWeight = 'bold';
-                }else{
-                    item.children[1].childElementCount=1;
-                    item.children[8].innerText = 'Si';
-                    item.children[8].style.color = '#04AA6D';
-                    item.children[8].style.fontWeight = 'bold';
-                }
+            // let i=0;
+            // tabla.childNodes[3].childNodes.forEach(function (item) {
+            //    let=i++;
+            //    if(i%2==0){
+            //     // console.log(item.children[8].innerText);
+            //     if(item.children[8].innerText=='0'){
+            //         item.children[8].innerText = 'No';
+            //         // item.children[8].style.color = '#DD4B39';
+            //         item.children[8].style.fontWeight = 'bold';
+            //     }else{
+            //         item.children[1].childElementCount=1;
+            //         item.children[8].innerText = 'Si';
+            //         item.children[8].style.color = '#04AA6D';
+            //         item.children[8].style.fontWeight = 'bold';
+            //     }
                 
-               }
-             });
+            //    }
+            //  });
             
             document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
             <a  href='https://api.whatsapp.com/send?phone=" . $telefono_send_sms . "&text=" . $link_sms . "' class='float' target='_blank'>
@@ -531,7 +613,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     ->where('revendedor_id', '=', null)
                     ->where('is_expired', '=', 0)
                     ->first();
-
+               // dd($accounts);
                 if (!isset($accounts)) {
                     $id_account_selected = 0;
                 } else {

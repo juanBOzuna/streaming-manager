@@ -15,6 +15,7 @@ class Usuarios extends Model
 
         'name',
         'photo',
+    'number_phone',
         'email',
         'password',
         'id_cms_privileges'

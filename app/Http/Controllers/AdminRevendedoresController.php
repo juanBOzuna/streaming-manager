@@ -181,6 +181,7 @@ use App\Models\TypeAccount;
 	  			   <td>' . $nameType . ' </td>
 				   <td>' . $account->email . ' </td>
 				   <td>' . $detail->finish_date . ' </td>
+				   <td> <a href="' . env('LINK_SYSTEM') . 'accounts/edit/' . $account->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Faccounts" target="_blank">Editar</a> </td>
 				   <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
 				   </tr>';
 
@@ -200,6 +201,7 @@ use App\Models\TypeAccount;
 						<th scope="col">Tipo</th>
 					  <th scope="col">Cuenta</th>
 					  <th scope="col">Vence</th>	
+					  <th scope="col">Acciones</th>	
 					  </tr>
 				  </thead>
 				  <tbody>

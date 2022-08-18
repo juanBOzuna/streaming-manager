@@ -20,22 +20,22 @@ class DatabaseSeeder extends Seeder
 
         # cms_menus
         $data = [
-            ["id" => "2", "name" => "Cuentas", "type" => "Route", "path" => "AdminAccountsControllerGetIndex", "color" => "normal", "icon" => "fa fa-youtube-play", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "1", "created_at" => "2021-10-18 18:41:13", "updated_at" => "2021-10-18 22:30:19"],
-            ["id" => "3", "name" => "Tipos de cuentas", "type" => "Route", "path" => "AdminTypeAccountControllerGetIndex", "color" => NULL, "icon" => "fa fa-key", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "14", "created_at" => "2021-10-18 18:43:09", "updated_at" => NULL],
-            ["id" => "4", "name" => "Recargas", "type" => "Route", "path" => "AdminRecargasControllerGetIndex", "color" => "normal", "icon" => "fa fa-phone", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "12", "created_at" => "2021-10-24 21:38:56", "updated_at" => "2021-10-24 22:47:20"],
-            ["id" => "5", "name" => "Tipo de recargas", "type" => "Route", "path" => "AdminTipoDeRecargasControllerGetIndex", "color" => NULL, "icon" => "fa fa-check", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "13", "created_at" => "2021-10-24 21:44:31", "updated_at" => NULL],
-            ["id" => "9", "name" => "Clientes", "type" => "Route", "path" => "AdminCustomersControllerGetIndex", "color" => "normal", "icon" => "fa fa-user", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "11", "created_at" => "2021-12-08 16:10:11", "updated_at" => "2022-05-15 23:04:20"],
-            ["id" => "10", "name" => "Ventas", "type" => "Route", "path" => "AdminOrdersControllerGetIndex", "color" => NULL, "icon" => "fa fa-shopping-bag", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "3", "created_at" => "2021-12-08 16:26:05", "updated_at" => NULL],
-            ["id" => "11", "name" => "Pantallas", "type" => "Route", "path" => "AdminScreensControllerGetIndex", "color" => NULL, "icon" => "fa fa-tv", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "2", "created_at" => "2021-12-27 04:13:41", "updated_at" => NULL],
-            ["id" => "14", "name" => "Ventas Individuales", "type" => "Route", "path" => "AdminOrdersIndividualControllerGetIndex", "color" => NULL, "icon" => "fa fa-shopping-bag", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "4", "created_at" => "2022-05-15 00:45:57", "updated_at" => NULL],
-            ["id" => "17", "name" => "Avisar Clientes", "type" => "Route", "path" => "AdminCustomersExpiredTomorrowControllerGetIndex", "color" => "normal", "icon" => "fa fa-bell", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "6", "created_at" => "2022-07-12 23:20:20", "updated_at" => "2022-08-05 18:39:43"],
-            ["id" => "18", "name" => "Usuarios", "type" => "Route", "path" => "AdminCmsUsersSystemControllerGetIndex", "color" => NULL, "icon" => "fa fa-user", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "15", "created_at" => "2022-07-14 16:09:58", "updated_at" => NULL],
-            ["id" => "19", "name" => "Renovar Pantallas", "type" => "Route", "path" => "AdminOrderDetailsRenovationsControllerGetIndex", "color" => "normal", "icon" => "fa fa-refresh", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "8", "created_at" => "2022-07-14 18:05:52", "updated_at" => "2022-08-05 20:19:45"],
-            ["id" => "20", "name" => "Revendedores", "type" => "Route", "path" => "AdminRevendedoresControllerGetIndex", "color" => "normal", "icon" => "fa fa-user", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "10", "created_at" => "2022-08-01 01:23:40", "updated_at" => "2022-08-05 17:42:09"],
-            ["id" => "21", "name" => "Venta cuenta completa", "type" => "Route", "path" => "AdminOrdersRevendedoresControllerGetIndex", "color" => NULL, "icon" => "fa fa-shopping-bag", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "5", "created_at" => "2022-08-01 01:50:28", "updated_at" => NULL],
-            ["id" => "22", "name" => "Avisar Revendedores", "type" => "Route", "path" => "AdminNotifyRevendedoresControllerGetIndex", "color" => NULL, "icon" => "fa fa-bell", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "7", "created_at" => "2022-08-05 19:42:57", "updated_at" => NULL],
-            ["id" => "23", "name" => "Renovar Cuentas completas", "type" => "Route", "path" => "AdminOrderDetailsRenovationsFullAccountControllerGetIndex", "color" => NULL, "icon" => "fa fa-refresh", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "9", "created_at" => "2022-08-05 20:21:28", "updated_at" => NULL],
-            ["id" => "24", "name" => "Tipos de Dispositivos", "type" => "Route", "path" => "AdminTypeDevicesControllerGetIndex", "color" => "normal", "icon" => "fa fa-desktop", "parent_id" => "0", "is_active" => "1", "is_dashboard" => "0", "id_cms_privileges" => "1", "sorting" => "16", "created_at" => "2022-08-13 17:07:32", "updated_at" => "2022-08-13 17:22:10"]
+            ["id" => "2","name" => "Cuentas","type" => "Route","path" => "AdminAccountsControllerGetIndex","color" => "normal","icon" => "fa fa-youtube-play","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "1","created_at" => "2021-10-18 18:41:13","updated_at" => "2021-10-18 22:30:19"],
+            ["id" => "3","name" => "Tipos de cuentas","type" => "Route","path" => "AdminTypeAccountControllerGetIndex","color" => NULL,"icon" => "fa fa-key","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "14","created_at" => "2021-10-18 18:43:09","updated_at" => NULL],
+            ["id" => "4","name" => "Recargas","type" => "Route","path" => "AdminRecargasControllerGetIndex","color" => "normal","icon" => "fa fa-phone","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "12","created_at" => "2021-10-24 21:38:56","updated_at" => "2021-10-24 22:47:20"],
+            ["id" => "5","name" => "Tipo de recargas","type" => "Route","path" => "AdminTipoDeRecargasControllerGetIndex","color" => NULL,"icon" => "fa fa-check","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "13","created_at" => "2021-10-24 21:44:31","updated_at" => NULL],
+            ["id" => "9","name" => "Clientes","type" => "Route","path" => "AdminCustomersControllerGetIndex","color" => "normal","icon" => "fa fa-user","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "11","created_at" => "2021-12-08 16:10:11","updated_at" => "2022-05-15 23:04:20"],
+            ["id" => "10","name" => "Ventas","type" => "Route","path" => "AdminOrdersControllerGetIndex","color" => NULL,"icon" => "fa fa-shopping-bag","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "3","created_at" => "2021-12-08 16:26:05","updated_at" => NULL],
+            ["id" => "11","name" => "Pantallas","type" => "Route","path" => "AdminScreensControllerGetIndex","color" => NULL,"icon" => "fa fa-tv","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "2","created_at" => "2021-12-27 04:13:41","updated_at" => NULL],
+            ["id" => "14","name" => "Ventas Individuales","type" => "Route","path" => "AdminOrdersIndividualControllerGetIndex","color" => NULL,"icon" => "fa fa-shopping-bag","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "4","created_at" => "2022-05-15 00:45:57","updated_at" => NULL],
+            ["id" => "17","name" => "Avisar Clientes","type" => "Route","path" => "AdminCustomersExpiredTomorrowControllerGetIndex","color" => "normal","icon" => "fa fa-bell","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "6","created_at" => "2022-07-12 23:20:20","updated_at" => "2022-08-05 18:39:43"],
+            ["id" => "18","name" => "Usuarios","type" => "Route","path" => "AdminCmsUsersSystemControllerGetIndex","color" => NULL,"icon" => "fa fa-user","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "15","created_at" => "2022-07-14 16:09:58","updated_at" => NULL],
+            ["id" => "19","name" => "Renovar Pantallas","type" => "Route","path" => "AdminOrderDetailsRenovationsControllerGetIndex","color" => "normal","icon" => "fa fa-refresh","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "8","created_at" => "2022-07-14 18:05:52","updated_at" => "2022-08-05 20:19:45"],
+            ["id" => "20","name" => "Revendedores","type" => "Route","path" => "AdminRevendedoresControllerGetIndex","color" => "normal","icon" => "fa fa-user","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "10","created_at" => "2022-08-01 01:23:40","updated_at" => "2022-08-05 17:42:09"],
+            ["id" => "21","name" => "Venta cuenta completa","type" => "Route","path" => "AdminOrdersRevendedoresControllerGetIndex","color" => NULL,"icon" => "fa fa-shopping-bag","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "5","created_at" => "2022-08-01 01:50:28","updated_at" => NULL],
+            ["id" => "22","name" => "Avisar Revendedores","type" => "Route","path" => "AdminNotifyRevendedoresControllerGetIndex","color" => NULL,"icon" => "fa fa-bell","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "7","created_at" => "2022-08-05 19:42:57","updated_at" => NULL],
+            ["id" => "23","name" => "Renovar Cuentas completas","type" => "Route","path" => "AdminOrderDetailsRenovationsFullAccountControllerGetIndex","color" => NULL,"icon" => "fa fa-refresh","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "9","created_at" => "2022-08-05 20:21:28","updated_at" => NULL],
+            ["id" => "24","name" => "Tipos de Dispositivos","type" => "Route","path" => "AdminTypeDevicesControllerGetIndex","color" => "normal","icon" => "fa fa-desktop","parent_id" => "0","is_active" => "1","is_dashboard" => "0","id_cms_privileges" => "1","sorting" => "16","created_at" => "2022-08-13 17:07:32","updated_at" => "2022-08-13 17:22:10"]
         ];
         foreach ($data as $k => $d) {
             if (DB::table('cms_menus')->where('name', $d['name'])->count()) {
@@ -50,35 +50,35 @@ class DatabaseSeeder extends Seeder
 
         # cms_menus_privileges
         $data = [
-            ["id" => "3", "id_cms_menus" => "3", "id_cms_privileges" => "1"],
-            ["id" => "4", "id_cms_menus" => "1", "id_cms_privileges" => "2"],
-            ["id" => "5", "id_cms_menus" => "1", "id_cms_privileges" => "1"],
-            ["id" => "6", "id_cms_menus" => "2", "id_cms_privileges" => "2"],
-            ["id" => "7", "id_cms_menus" => "2", "id_cms_privileges" => "1"],
-            ["id" => "9", "id_cms_menus" => "5", "id_cms_privileges" => "1"],
-            ["id" => "10", "id_cms_menus" => "4", "id_cms_privileges" => "2"],
-            ["id" => "11", "id_cms_menus" => "4", "id_cms_privileges" => "1"],
-            ["id" => "12", "id_cms_menus" => "6", "id_cms_privileges" => "1"],
-            ["id" => "13", "id_cms_menus" => "7", "id_cms_privileges" => "2"],
-            ["id" => "14", "id_cms_menus" => "7", "id_cms_privileges" => "1"],
-            ["id" => "15", "id_cms_menus" => "8", "id_cms_privileges" => "1"],
-            ["id" => "17", "id_cms_menus" => "10", "id_cms_privileges" => "1"],
-            ["id" => "18", "id_cms_menus" => "11", "id_cms_privileges" => "1"],
-            ["id" => "19", "id_cms_menus" => "12", "id_cms_privileges" => "1"],
-            ["id" => "20", "id_cms_menus" => "13", "id_cms_privileges" => "1"],
-            ["id" => "21", "id_cms_menus" => "14", "id_cms_privileges" => "1"],
-            ["id" => "26", "id_cms_menus" => "9", "id_cms_privileges" => "3"],
-            ["id" => "27", "id_cms_menus" => "9", "id_cms_privileges" => "1"],
-            ["id" => "28", "id_cms_menus" => "15", "id_cms_privileges" => "1"],
-            ["id" => "29", "id_cms_menus" => "16", "id_cms_privileges" => "1"],
-            ["id" => "32", "id_cms_menus" => "18", "id_cms_privileges" => "1"],
-            ["id" => "35", "id_cms_menus" => "21", "id_cms_privileges" => "1"],
-            ["id" => "36", "id_cms_menus" => "20", "id_cms_privileges" => "1"],
-            ["id" => "39", "id_cms_menus" => "17", "id_cms_privileges" => "1"],
-            ["id" => "40", "id_cms_menus" => "22", "id_cms_privileges" => "1"],
-            ["id" => "43", "id_cms_menus" => "19", "id_cms_privileges" => "1"],
-            ["id" => "44", "id_cms_menus" => "23", "id_cms_privileges" => "1"],
-            ["id" => "46", "id_cms_menus" => "24", "id_cms_privileges" => "1"]
+            ["id" => "3","id_cms_menus" => "3","id_cms_privileges" => "1"],
+  ["id" => "4","id_cms_menus" => "1","id_cms_privileges" => "2"],
+  ["id" => "5","id_cms_menus" => "1","id_cms_privileges" => "1"],
+  ["id" => "6","id_cms_menus" => "2","id_cms_privileges" => "2"],
+  ["id" => "7","id_cms_menus" => "2","id_cms_privileges" => "1"],
+  ["id" => "9","id_cms_menus" => "5","id_cms_privileges" => "1"],
+  ["id" => "10","id_cms_menus" => "4","id_cms_privileges" => "2"],
+  ["id" => "11","id_cms_menus" => "4","id_cms_privileges" => "1"],
+  ["id" => "12","id_cms_menus" => "6","id_cms_privileges" => "1"],
+  ["id" => "13","id_cms_menus" => "7","id_cms_privileges" => "2"],
+  ["id" => "14","id_cms_menus" => "7","id_cms_privileges" => "1"],
+  ["id" => "15","id_cms_menus" => "8","id_cms_privileges" => "1"],
+  ["id" => "17","id_cms_menus" => "10","id_cms_privileges" => "1"],
+  ["id" => "18","id_cms_menus" => "11","id_cms_privileges" => "1"],
+  ["id" => "19","id_cms_menus" => "12","id_cms_privileges" => "1"],
+  ["id" => "20","id_cms_menus" => "13","id_cms_privileges" => "1"],
+  ["id" => "21","id_cms_menus" => "14","id_cms_privileges" => "1"],
+  ["id" => "26","id_cms_menus" => "9","id_cms_privileges" => "3"],
+  ["id" => "27","id_cms_menus" => "9","id_cms_privileges" => "1"],
+  ["id" => "28","id_cms_menus" => "15","id_cms_privileges" => "1"],
+  ["id" => "29","id_cms_menus" => "16","id_cms_privileges" => "1"],
+  ["id" => "32","id_cms_menus" => "18","id_cms_privileges" => "1"],
+  ["id" => "35","id_cms_menus" => "21","id_cms_privileges" => "1"],
+  ["id" => "36","id_cms_menus" => "20","id_cms_privileges" => "1"],
+  ["id" => "39","id_cms_menus" => "17","id_cms_privileges" => "1"],
+  ["id" => "40","id_cms_menus" => "22","id_cms_privileges" => "1"],
+  ["id" => "43","id_cms_menus" => "19","id_cms_privileges" => "1"],
+  ["id" => "44","id_cms_menus" => "23","id_cms_privileges" => "1"],
+  ["id" => "46","id_cms_menus" => "24","id_cms_privileges" => "1"]
         ];
         foreach ($data as $k => $d) {
             if (DB::table('cms_menus_privileges')->where('id_cms_menus', $d['id_cms_menus'])->count()) {
@@ -105,22 +105,22 @@ class DatabaseSeeder extends Seeder
             // ["id" => "9","name" => "Statistic Builder","icon" => "fa fa-dashboard","path" => "statistic_builder","table_name" => "cms_statistics","controller" => "StatisticBuilderController","is_protected" => "1","is_active" => "1","created_at" => "2022-05-15 16:00:53","updated_at" => NULL,"deleted_at" => NULL],
             // ["id" => "10","name" => "API Generator","icon" => "fa fa-cloud-download","path" => "api_generator","table_name" => "","controller" => "ApiCustomController","is_protected" => "1","is_active" => "1","created_at" => "2022-05-15 16:00:53","updated_at" => NULL,"deleted_at" => NULL],
             // ["id" => "11","name" => "Log User Access","icon" => "fa fa-flag-o","path" => "logs","table_name" => "cms_logs","controller" => "LogsController","is_protected" => "1","is_active" => "1","created_at" => "2022-05-15 16:00:53","updated_at" => NULL,"deleted_at" => NULL],
-            ["id" => "13", "name" => "Cuentas", "icon" => "fa fa-youtube-play", "path" => "accounts", "table_name" => "accounts", "controller" => "AdminAccountsController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-10-18 18:41:13", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "14", "name" => "Tipos de cuentas", "icon" => "fa fa-key", "path" => "type_account", "table_name" => "type_account", "controller" => "AdminTypeAccountController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-10-18 18:43:09", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "15", "name" => "Recargas", "icon" => "fa fa-phone", "path" => "recargas", "table_name" => "recargas", "controller" => "AdminRecargasController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-10-24 21:38:56", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "16", "name" => "Tipo de recargas", "icon" => "fa fa-check", "path" => "tipo_de_recargas", "table_name" => "tipo_de_recargas", "controller" => "AdminTipoDeRecargasController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-10-24 21:44:31", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "19", "name" => "Clientes", "icon" => "fa fa-life-ring", "path" => "customers", "table_name" => "customers", "controller" => "AdminCustomersController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-12-08 16:10:11", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "20", "name" => "Ventas", "icon" => "fa fa-shopping-bag", "path" => "orders", "table_name" => "orders", "controller" => "AdminOrdersController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-12-08 16:26:05", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "21", "name" => "Pantallas", "icon" => "fa fa-tv", "path" => "screens", "table_name" => "screens", "controller" => "AdminScreensController", "is_protected" => "0", "is_active" => "0", "created_at" => "2021-12-27 04:13:41", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "24", "name" => "Ventas Individuales", "icon" => "fa fa-shopping-bag", "path" => "ordersIndividual", "table_name" => "orders", "controller" => "AdminOrdersIndividualController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-05-15 00:45:57", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "27", "name" => "vencimientos de mañana", "icon" => "fa fa-bell", "path" => "customers_expired_tomorrow", "table_name" => "customers", "controller" => "AdminCustomersExpiredTomorrowController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-07-12 23:20:20", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "28", "name" => "Usuarios", "icon" => "fa fa-user", "path" => "cms_users_system", "table_name" => "cms_users", "controller" => "AdminCmsUsersSystemController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-07-14 16:09:58", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "29", "name" => "Renovaciones", "icon" => "fa fa-refresh", "path" => "order_details_renovations", "table_name" => "order_details", "controller" => "AdminOrderDetailsRenovationsController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-07-14 18:05:52", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "30", "name" => "Revendedores", "icon" => "fa fa-money", "path" => "revendedores", "table_name" => "revendedores", "controller" => "AdminRevendedoresController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-08-01 01:23:40", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "31", "name" => "Venta cuenta completa", "icon" => "fa fa-shopping-bag", "path" => "orders_revendedores", "table_name" => "orders", "controller" => "AdminOrdersRevendedoresController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-08-01 01:50:28", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "32", "name" => "Avisar Revendedores", "icon" => "fa fa-bell", "path" => "notify_revendedores", "table_name" => "revendedores", "controller" => "AdminNotifyRevendedoresController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-08-05 19:42:57", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "33", "name" => "Renovar Cuentas completas", "icon" => "fa fa-refresh", "path" => "order_details_renovations_full_account", "table_name" => "order_details", "controller" => "AdminOrderDetailsRenovationsFullAccountController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-08-05 20:21:27", "updated_at" => NULL, "deleted_at" => NULL],
-            ["id" => "34", "name" => "Tipos de Dispositivos", "icon" => "fa fa-phone", "path" => "type_devices", "table_name" => "type_devices", "controller" => "AdminTypeDevicesController", "is_protected" => "0", "is_active" => "0", "created_at" => "2022-08-13 17:07:32", "updated_at" => NULL, "deleted_at" => NULL]
+            ["id" => "13","name" => "Cuentas","icon" => "fa fa-youtube-play","path" => "accounts","table_name" => "accounts","controller" => "AdminAccountsController","is_protected" => "0","is_active" => "0","created_at" => "2021-10-18 18:41:13","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "14","name" => "Tipos de cuentas","icon" => "fa fa-key","path" => "type_account","table_name" => "type_account","controller" => "AdminTypeAccountController","is_protected" => "0","is_active" => "0","created_at" => "2021-10-18 18:43:09","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "15","name" => "Recargas","icon" => "fa fa-phone","path" => "recargas","table_name" => "recargas","controller" => "AdminRecargasController","is_protected" => "0","is_active" => "0","created_at" => "2021-10-24 21:38:56","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "16","name" => "Tipo de recargas","icon" => "fa fa-check","path" => "tipo_de_recargas","table_name" => "tipo_de_recargas","controller" => "AdminTipoDeRecargasController","is_protected" => "0","is_active" => "0","created_at" => "2021-10-24 21:44:31","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "19","name" => "Clientes","icon" => "fa fa-life-ring","path" => "customers","table_name" => "customers","controller" => "AdminCustomersController","is_protected" => "0","is_active" => "0","created_at" => "2021-12-08 16:10:11","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "20","name" => "Ventas","icon" => "fa fa-shopping-bag","path" => "orders","table_name" => "orders","controller" => "AdminOrdersController","is_protected" => "0","is_active" => "0","created_at" => "2021-12-08 16:26:05","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "21","name" => "Pantallas","icon" => "fa fa-tv","path" => "screens","table_name" => "screens","controller" => "AdminScreensController","is_protected" => "0","is_active" => "0","created_at" => "2021-12-27 04:13:41","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "24","name" => "Ventas Individuales","icon" => "fa fa-shopping-bag","path" => "ordersIndividual","table_name" => "orders","controller" => "AdminOrdersIndividualController","is_protected" => "0","is_active" => "0","created_at" => "2022-05-15 00:45:57","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "27","name" => "vencimientos de mañana","icon" => "fa fa-bell","path" => "customers_expired_tomorrow","table_name" => "customers","controller" => "AdminCustomersExpiredTomorrowController","is_protected" => "0","is_active" => "0","created_at" => "2022-07-12 23:20:20","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "28","name" => "Usuarios","icon" => "fa fa-user","path" => "cms_users_system","table_name" => "cms_users","controller" => "AdminCmsUsersSystemController","is_protected" => "0","is_active" => "0","created_at" => "2022-07-14 16:09:58","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "29","name" => "Renovaciones","icon" => "fa fa-refresh","path" => "order_details_renovations","table_name" => "order_details","controller" => "AdminOrderDetailsRenovationsController","is_protected" => "0","is_active" => "0","created_at" => "2022-07-14 18:05:52","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "30","name" => "Revendedores","icon" => "fa fa-money","path" => "revendedores","table_name" => "revendedores","controller" => "AdminRevendedoresController","is_protected" => "0","is_active" => "0","created_at" => "2022-08-01 01:23:40","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "31","name" => "Venta cuenta completa","icon" => "fa fa-shopping-bag","path" => "orders_revendedores","table_name" => "orders","controller" => "AdminOrdersRevendedoresController","is_protected" => "0","is_active" => "0","created_at" => "2022-08-01 01:50:28","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "32","name" => "Avisar Revendedores","icon" => "fa fa-bell","path" => "notify_revendedores","table_name" => "revendedores","controller" => "AdminNotifyRevendedoresController","is_protected" => "0","is_active" => "0","created_at" => "2022-08-05 19:42:57","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "33","name" => "Renovar Cuentas completas","icon" => "fa fa-refresh","path" => "order_details_renovations_full_account","table_name" => "order_details","controller" => "AdminOrderDetailsRenovationsFullAccountController","is_protected" => "0","is_active" => "0","created_at" => "2022-08-05 20:21:27","updated_at" => NULL,"deleted_at" => NULL],
+            ["id" => "34","name" => "Tipos de Dispositivos","icon" => "fa fa-phone","path" => "type_devices","table_name" => "type_devices","controller" => "AdminTypeDevicesController","is_protected" => "0","is_active" => "0","created_at" => "2022-08-13 17:07:32","updated_at" => NULL,"deleted_at" => NULL]
         ];
 
         foreach ($data as $k => $d) {
@@ -222,7 +222,7 @@ class DatabaseSeeder extends Seeder
                 unset($data[$k]);
             }
         }
-        DB::table('cms_menus_privileges')->insert($data);
+        //DB::table('cms_menus_privileges')->insert($data);
         $this->command->info("Create cms_menus_privileges completed");
         # cms_moduls End
 
@@ -254,6 +254,12 @@ class DatabaseSeeder extends Seeder
         # type_devices
         $data = [
             // ["id" => "1","name" => "Super Administrator","is_superadmin" => "1","theme_color" => "skin-red","created_at" => "2022-05-15 16:00:53","updated_at" => NULL],
+            // ["id" => "1", "name" => "Tablet", "created_at" => "2022-08-13 17:11:52", "updated_at" => "2022-08-13 17:22:24"],//"emoji" => "📱"
+            // ["id" => "2", "name" => "TV", "created_at" => "2022-08-13 17:23:10", "updated_at" => "2022-08-13 17:23:29"],// "emoji" => "📺"
+            // ["id" => "3", "name" => "Telefono", "created_at" => "2022-08-13 17:23:42", "updated_at" => NULL],//"emoji" => "📱"]
+            // ["id" => "4", "name" => "Portatil", "created_at" => "2022-08-13 17:23:55", "updated_at" => "2022-08-13 18:30:15"],//"emoji" => "💻"]
+            // ["id" => "5", "name" => "Pc", "created_at" => "2022-08-13 17:24:08", "updated_at" => NULL]//"emoji" => "🖥"
+
             ["id" => "1", "name" => "Tablet", "created_at" => "2022-08-13 17:11:52", "updated_at" => "2022-08-13 17:22:24", "emoji" => "📱"],
             ["id" => "2", "name" => "TV", "created_at" => "2022-08-13 17:23:10", "updated_at" => "2022-08-13 17:23:29", "emoji" => "📺"],
             ["id" => "3", "name" => "Telefono", "created_at" => "2022-08-13 17:23:42", "updated_at" => NULL, "emoji" => "📱"],
