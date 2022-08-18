@@ -97,8 +97,8 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		}];
 		$this->col[] = ["label" => "Fecha Venta", "name" => "created_at"];
 		$this->col[] = ["label" => "Precio Total", "name" => "total_price"];
-		
-		
+
+
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
 		# START FORM DO NOT REMOVE THIS LINE
@@ -182,89 +182,89 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		//$this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
 		# OLD END FORM
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Sub Module
-	        | ----------------------------------------------------------------------     
-			| @label          = Label of action 
+	        | ----------------------------------------------------------------------
+			| @label          = Label of action
 			| @path           = Path of sub module
 			| @foreign_key 	  = foreign key of sub table/module
 			| @button_color   = Bootstrap Class (primary,success,warning,danger)
-			| @button_icon    = Font Awesome Class  
+			| @button_icon    = Font Awesome Class
 			| @parent_columns = Sparate with comma, e.g : name,created_at
-	        | 
+	        |
 	        */
 		$this->sub_module = array();
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Add More Action Button / Menu
-	        | ----------------------------------------------------------------------     
-	        | @label       = Label of action 
+	        | ----------------------------------------------------------------------
+	        | @label       = Label of action
 	        | @url         = Target URL, you can use field alias. e.g : [id], [name], [title], etc
 	        | @icon        = Font awesome class icon. e.g : fa fa-bars
-	        | @color 	   = Default is primary. (primary, warning, succecss, info)     
+	        | @color 	   = Default is primary. (primary, warning, succecss, info)
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
-	        | 
+	        |
 	        */
 		$this->addaction = array();
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Add More Button Selected
-	        | ----------------------------------------------------------------------     
-	        | @label       = Label of action 
+	        | ----------------------------------------------------------------------
+	        | @label       = Label of action
 	        | @icon 	   = Icon from fontawesome
-	        | @name 	   = Name of button 
-	        | Then about the action, you should code at actionButtonSelected method 
-	        | 
+	        | @name 	   = Name of button
+	        | Then about the action, you should code at actionButtonSelected method
+	        |
 	        */
 		$this->button_selected = array();
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Add alert message to this module at overheader
-	        | ----------------------------------------------------------------------     
-	        | @message = Text of message 
-	        | @type    = warning,success,danger,info        
-	        | 
+	        | ----------------------------------------------------------------------
+	        | @message = Text of message
+	        | @type    = warning,success,danger,info
+	        |
 	        */
 		$this->alert        = array();
 
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
-	        | Add more button to header button 
-	        | ----------------------------------------------------------------------     
-	        | @label = Name of button 
+		/*
+	        | ----------------------------------------------------------------------
+	        | Add more button to header button
+	        | ----------------------------------------------------------------------
+	        | @label = Name of button
 	        | @url   = URL Target
 	        | @icon  = Icon from Awesome.
-	        | 
+	        |
 	        */
 		$this->index_button = array();
 
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Customize Table Row Color
-	        | ----------------------------------------------------------------------     
+	        | ----------------------------------------------------------------------
 	        | @condition = If condition. You may use field alias. E.g : [id] == 1
-	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
-	        | 
+	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.
+	        |
 	        */
 		$this->table_row_color = array();
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | You may use this bellow array to add statistic at dashboard 
-	        | ---------------------------------------------------------------------- 
-	        | @label, @count, @icon, @color 
+	        | ----------------------------------------------------------------------
+	        | You may use this bellow array to add statistic at dashboard
+	        | ----------------------------------------------------------------------
+	        | @label, @count, @icon, @color
 	        |
 	        */
 		$this->index_statistic = array();
@@ -272,10 +272,10 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Add javascript at body 
-	        | ---------------------------------------------------------------------- 
-	        | javascript code in the variable 
+	        | ----------------------------------------------------------------------
+	        | Add javascript at body
+	        | ----------------------------------------------------------------------
+	        | javascript code in the variable
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
@@ -358,7 +358,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				//dd($customer );
 				$telefono_send_sms = $customer->telefono;
 			}
-		
+
 
 
 			$url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Alquilada%20%20por%2030%20días%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20'.$account->key_pass.'%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
@@ -371,6 +371,70 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			} else {
 				$link_customer_viewer = $host . "revendedores/detail/" . $detail->customer_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Frevendedores";
 			}
+
+
+            $urlPage = $_SERVER['REQUEST_URI'];
+            $porciones = explode("?", $urlPage);
+            $porciones = explode("/", $porciones[0]);
+            $id= $porciones[sizeof($porciones) - 1];
+
+            $trHtml = '';
+
+            $orders_details = OrderDetail::where('orders_id','=',$id)->get();
+           foreach ($orders_details as $key) {
+            $customer = Customers::where('id','=',$key->customer_id)->first();
+            $cuenta_of_order_detail = Accounts::where('id','=',$key->account_id)->first();
+            $screen_of_order_detail = Screens::where('id','=',$key->screen_id)->first();
+            $tipo_pantalla = TypeAccount::where('id','=',$cuenta_of_order_detail->type_account_id)->first();
+
+            $is_renewed = $key->is_renewed ==0 ?'NO':'SI' ;
+            # code...
+            if($key->parent_order_detail==null){
+                $trHtml .= '  <tr  style="background-color: #a5eea0;" >  ';
+            }else{
+                $trHtml .= '  <tr>';
+            }
+            //dd( $trHtml);
+            $parent = $key->parent_order_detail ==null ?'PADRE':$key->parent_order_detail;
+            $trHtml .= '
+            <th scope="row">id:' . $key->id . '</th>
+            <td>id:' .$cuenta_of_order_detail->id . '  |  '.$cuenta_of_order_detail->email.'  |  '. $tipo_pantalla->name.'</td>
+
+            <td>' . $key->membership_days . ' </td>
+            <td>' .Carbon::parse($key->created_at)->format('Y-m-d H:i:s')    . ' </td>
+            <td>' . Carbon::parse($key->finish_date)->format('Y-m-d H:i:s')  . ' </td>
+            <td>'  .  $is_renewed . '</td>
+            <td>' . $key->number_renovations . '</td>
+            <td>' .  $parent . '</td>
+            <td> <a href="' . env('LINK_SYSTEM') . 'accounts/edit/' .$screen_of_order_detail->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens" target="_blank">Editar</a> </td>
+            <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
+            </tr>';
+           }
+
+           $htmlForTable = '
+           <br>
+           <span><strong>  DETALLE DE VENTA (PANTALLAS VENDIDAS)</strong></span>
+           <br>
+           <br>
+           <table class="table table-striped">
+             <thead>
+               <tr>
+                 <th scope="col">ID</th>
+                 <th scope="col">CUENTA</th>
+                 <th scope="col">DIAS</th>
+                 <th scope="col">VENDIDA</th>
+                 <th scope="col">VENCE</th>
+                 <th scope="col">RENOVADA</th>
+                 <th scope="col">®️</th>
+                 <th scope="col">PADRE</th>
+                  <th scope="col"> Acciones </th>
+               </tr>
+             </thead>
+             <tbody>
+               ' . $trHtml . '
+             </tbody>
+           </table>';
+
 
 			$this->script_js = "
             let tabla = document.querySelector('#table-order_details');
@@ -397,9 +461,9 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
                     item.children[4].style.color = '#04AA6D';
                     item.children[4].style.fontWeight = 'bold';
                 }
-                
+
                }
-               
+
              });
 
 			 document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
@@ -427,7 +491,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 					 color: #25d366;
 				 background-color:#fff;
 				 }
-				 
+
 				 .my-float{
 					 margin-top:16px;
 				 }
@@ -461,7 +525,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 						color: #25d366;
 					background-color:#fff;
 					}
-					
+
 					.my-float2{
 						margin-top:16px;
 					}
@@ -473,18 +537,18 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			$this->script_js = "
 				let select2 = document.getElementById('account_id');
 				let list = " . json_encode($text) . ";
-				let jsonList = JSON.parse(list); 
-	
+				let jsonList = JSON.parse(list);
+
 				var res = [];
 				for(var i in jsonList){
 					res.push(jsonList[i]);
 				}
-	
+
 				var length = select2.options.length;
-				for (i = length-1; i >= 1; i--) { 
+				for (i = length-1; i >= 1; i--) {
 					select2.options.remove(i);
 				 }
-	
+
 				res.forEach(function (trs) {
 					// console.log(trs);
 					const option = document.createElement('option');
@@ -493,24 +557,24 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 					option.text = trs.nombre;
 					select2.appendChild(option);
 				});
-	
-	
+
+
 				let select2Cus = document.getElementById('customers_id');
 				let listCus = " . json_encode($text2) . ";
-				let jsonListCus = JSON.parse(listCus); 
-		
+				let jsonListCus = JSON.parse(listCus);
+
 				// console.log(select2Cus.options);
-	
+
 				var resCus = [];
 				for(var i in jsonListCus){
 					resCus.push(jsonListCus[i]);
 				}
-	
+
 				var length = select2Cus.options.length;
-				for (i = length-1; i >= 1; i--) { 
+				for (i = length-1; i >= 1; i--) {
 					select2Cus.options.remove(i);
 				 }
-				 
+
 				resCus.forEach(function (trsCus) {
 					// console.log(trsCus);
 					const option = document.createElement('option');
@@ -519,24 +583,24 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 					option.text = trsCus.nombre;
 					select2Cus.appendChild(option);
 				});
-	
+
 				let select2Cus2 = document.getElementById('customers_id2');
 				// console.log(select2Cus2);
 				let listCus2 = " . json_encode($text3) . ";
-				let jsonListCus2 = JSON.parse(listCus2); 
+				let jsonListCus2 = JSON.parse(listCus2);
 				console.log(jsonListCus2);
 				// console.log(select2Cus2.options);
-	
+
 				var resCus2 = [];
 				for(var i in jsonListCus2){
 					resCus2.push(jsonListCus2[i]);
 				}
-	
+
 				var length = select2Cus2.options.length;
-				for (i = length-1; i >= 1; i--) { 
+				for (i = length-1; i >= 1; i--) {
 					select2Cus2.options.remove(i);
 				 }
-				 
+
 				resCus2.forEach(function (trsCus) {
 					// console.log(trsCus);
 					const option = document.createElement('option');
@@ -545,9 +609,9 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 					option.text = trsCus.nombre;
 					select2Cus2.appendChild(option);
 				});
-	
-	
-	
+
+
+
 				";
 		}
 
@@ -555,9 +619,9 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code before index table 
-	        | ---------------------------------------------------------------------- 
+	        | ----------------------------------------------------------------------
+	        | Include HTML Code before index table
+	        | ----------------------------------------------------------------------
 	        | html code to display it before index table
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
@@ -597,7 +661,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 							color: #25d366;
 						background-color:#fff;
 						}
-						
+
 						.my-float-searc{
 							margin-top:16px;
 						}
@@ -613,9 +677,9 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code after index table 
-	        | ---------------------------------------------------------------------- 
+	        | ----------------------------------------------------------------------
+	        | Include HTML Code after index table
+	        | ----------------------------------------------------------------------
 	        | html code to display it after index table
 	        | $this->post_index_html = "<p>test</p>";
 	        |
@@ -625,10 +689,10 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include Javascript File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your javascript each array 
+	        | ----------------------------------------------------------------------
+	        | Include Javascript File
+	        | ----------------------------------------------------------------------
+	        | URL of your javascript each array
 	        | $this->load_js[] = asset("myfile.js");
 	        |
 	        */
@@ -637,10 +701,10 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Add css style at body 
-	        | ---------------------------------------------------------------------- 
-	        | css code in the variable 
+	        | ----------------------------------------------------------------------
+	        | Add css style at body
+	        | ----------------------------------------------------------------------
+	        | css code in the variable
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
@@ -649,10 +713,10 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include css File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your css each array 
+	        | ----------------------------------------------------------------------
+	        | Include css File
+	        | ----------------------------------------------------------------------
+	        | URL of your css each array
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
@@ -661,9 +725,9 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 	/*
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | Hook for button selected
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | @id_selected = the id selected
 	    | @button_name = the name of button
 	    |
@@ -676,10 +740,10 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 	/*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate query of index result 
-	    | ---------------------------------------------------------------------- 
-	    | @query = current sql query 
+	    | ----------------------------------------------------------------------
+	    | Hook for manipulate query of index result
+	    | ----------------------------------------------------------------------
+	    | @query = current sql query
 	    |
 	    */
 	public function hook_query_index(&$query)
@@ -689,9 +753,9 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	}
 
 	/*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate row of index table html 
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
+	    | Hook for manipulate row of index table html
+	    | ----------------------------------------------------------------------
 	    |
 	    */
 	public function hook_row_index($column_index, &$column_value)
@@ -700,9 +764,9 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 	}
 
 	/*
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | Hook for manipulate data input before add data is execute
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | @arr
 	    |
 	    */
@@ -834,12 +898,12 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		}
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command after add public static function called 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
+	    | Hook for execute command after add public static function called
+	    | ----------------------------------------------------------------------
 	    | @id = last insert id
-	    | 
+	    |
 	    */
 	public function hook_after_add($id)
 	{
@@ -847,13 +911,13 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for manipulate data input before update data is execute
-	    | ---------------------------------------------------------------------- 
-	    | @postdata = input post data 
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @postdata = input post data
+	    | @id       = current id
+	    |
 	    */
 	public function hook_before_edit(&$postdata, $id)
 	{
@@ -861,25 +925,25 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for execute command after edit public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @id       = current id
+	    |
 	    */
 	public function hook_after_edit($id)
 	{
-		//Your code here 
+		//Your code here
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for execute command before delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @id       = current id
+	    |
 	    */
 	public function hook_before_delete($id)
 	{
@@ -923,12 +987,12 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for execute command after delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @id       = current id
+	    |
 	    */
 	public function hook_after_delete($id)
 	{
@@ -938,7 +1002,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 
-	//By the way, you can still create your own method in here... :) 
+	//By the way, you can still create your own method in here... :)
 
 
 }

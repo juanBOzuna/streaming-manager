@@ -62,22 +62,22 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		# START FORM DO NOT REMOVE THIS LINE
 		$this->form = [];
 		if (CRUDBooster::getCurrentMethod() == "getDetail") {
-			$this->form[] = ['label' => 'ID cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
-			$this->form[] = ['label' => 'Nombre cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name'];
-			$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
-			$this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+			// $this->form[] = ['label' => 'ID cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,id'];
+			// $this->form[] = ['label' => 'Nombre cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name'];
+			// $this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
+			// $this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
-			$columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
-			$columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
-			$columns[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'number', 'required' => true];
-			// $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
-			$columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
-			$columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
-			$columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
-			$columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
-			$columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
+			// $columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
+			// $columns[] = ['label' => 'Pantalla', 'name' => 'screen_id', 'type' => 'number', 'required' => true];
+			// $columns[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'number', 'required' => true];
+			// // $columns[] = ['label' => 'Precio', 'name' => 'price_of_membership_days', 'type' => 'money', 'required' => true];
+			// $columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
+			// $columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
+			// $columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
+			// $columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
+			// $columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
 
-			$this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
+			// $this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
 		} else {
 			$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
 			$this->form[] = ['label' => 'Pantalla', 'name' => 'pantalla_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'screens,id'];
@@ -239,8 +239,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		$this->script_js = "
 			let select2 = document.getElementById('pantalla_id');
 			let list = " . json_encode($text) . ";
-			let jsonList = JSON.parse(list); 
-	
+			let jsonList = JSON.parse(list);
+
 
 			var res = [];
             for(var i in jsonList){
@@ -248,7 +248,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			}
 
 			var length = select2.options.length;
-			for (i = length-1; i >= 1; i--) { 
+			for (i = length-1; i >= 1; i--) {
 				select2.options.remove(i);
 			 }
 
@@ -264,8 +264,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 
 			let select2Cus = document.getElementById('customers_id');
 			let listCus = " . json_encode($text2) . ";
-			let jsonListCus = JSON.parse(listCus); 
-	
+			let jsonListCus = JSON.parse(listCus);
+
 			// console.log(select2Cus.options);
 
 			var resCus = [];
@@ -274,10 +274,10 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			}
 
 			var length = select2Cus.options.length;
-			for (i = length-1; i >= 1; i--) { 
+			for (i = length-1; i >= 1; i--) {
 				select2Cus.options.remove(i);
 			 }
-			 
+
 			resCus.forEach(function (trsCus) {
 				// console.log(trsCus);
 				const option = document.createElement('option');
@@ -293,9 +293,9 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			btns[5].defaultValue = 'Guardar';
 			btns[3].innerText = 'Volver';
 			btns[3].innerHTML = '<i class=\"fa fa-chevron-circle-left\"></i> Volver';
-			
-			  
-           
+
+
+
 
 			";
 
@@ -348,8 +348,77 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			$host = env('LINK_SYSTEM');
 			$link_customer_viewer = $host . "customers/detail/" . $detail->customer_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers";
 
-			// echo $url_send;	
+			// echo $url_send;
 			// dd($url_send);
+
+
+
+
+
+            $urlPage = $_SERVER['REQUEST_URI'];
+            $porciones = explode("?", $urlPage);
+            $porciones = explode("/", $porciones[0]);
+            $id= $porciones[sizeof($porciones) - 1];
+
+            $trHtml = '';
+
+            $orders_details = OrderDetail::where('orders_id','=',$id)->get();
+           foreach ($orders_details as $key) {
+            $customer = Customers::where('id','=',$key->customer_id)->first();
+            $cuenta_of_order_detail = Accounts::where('id','=',$key->account_id)->first();
+            $screen_of_order_detail = Screens::where('id','=',$key->screen_id)->first();
+            $tipo_pantalla = TypeAccount::where('id','=',$cuenta_of_order_detail->type_account_id)->first();
+
+            $is_renewed = $key->is_renewed ==0 ?'NO':'SI' ;
+            # code...
+            if($key->parent_order_detail==null){
+                $trHtml .= '  <tr  style="background-color: #a5eea0;" >  ';
+            }else{
+                $trHtml .= '  <tr>';
+            }
+            //dd( $trHtml);
+            $parent = $key->parent_order_detail ==null ?'PADRE':$key->parent_order_detail;
+            $trHtml .= '
+            <th scope="row">id:' . $key->id . '</th>
+            <td>id:' .$cuenta_of_order_detail->id . '  |  '.$cuenta_of_order_detail->email.'  |  '. $tipo_pantalla->name.'</td>
+            <th scope="row">id:' .  $screen_of_order_detail->id . '  |  '.$screen_of_order_detail->name.' </th>
+            <td>' . $key->membership_days . ' </td>
+            <td>' .Carbon::parse($key->created_at)->format('Y-m-d H:i:s')    . ' </td>
+            <td>' . Carbon::parse($key->finish_date)->format('Y-m-d H:i:s')  . ' </td>
+            <td>'  .  $is_renewed . '</td>
+            <td>' . $key->number_renovations . '</td>
+            <td>' .  $parent . '</td>
+            <td> <a href="' . env('LINK_SYSTEM') . 'screens/edit/' .$screen_of_order_detail->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens" target="_blank">Editar</a> </td>
+            <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
+            </tr>';
+           }
+
+           $htmlForTable = '
+           <br>
+           <span><strong>  DETALLE DE VENTA (PANTALLAS VENDIDAS)</strong></span>
+           <br>
+           <br>
+           <table class="table table-striped">
+             <thead>
+               <tr>
+                 <th scope="col">ID</th>
+                 <th scope="col">CUENTA</th>
+                 <th scope="col">PANTALLA</th>
+                 <th scope="col">DIAS</th>
+                 <th scope="col">VENDIDA</th>
+                 <th scope="col">VENCE</th>
+                 <th scope="col">RENOVADA</th>
+                 <th scope="col">®️</th>
+                 <th scope="col">PADRE</th>
+                  <th scope="col"> Acciones </th>
+               </tr>
+             </thead>
+             <tbody>
+               ' . $trHtml . '
+             </tbody>
+           </table>';
+
+           //dd( $htmlForTable);
 
 			$this->script_js = "
 				document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
@@ -377,7 +446,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 						color: #25d366;
 					background-color:#fff;
 					}
-					
+
 					.my-float{
 						margin-top:16px;
 					}
@@ -412,13 +481,19 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 						color: #25d366;
 					background-color:#fff;
 					}
-					
+
 					.my-float2{
 						margin-top:16px;
 					}
 			   </style>
 				`;
+
+                let table = " . json_encode($htmlForTable) . "
+           let area = document.getElementById('parent-form-area');
+
+           area.innerHTML+= table ;
 				";
+
 		}
 
 		if (HelpersCRUDBooster::getCurrentMethod() == 'getAdd') {
@@ -449,7 +524,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 						color: #25d366;
 					background-color:#fff;
 					}
-					
+
 					.my-float-searc{
 						margin-top:16px;
 					}
@@ -598,7 +673,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			$acc->screens_sold = $acc->screens_sold + 1;
 
 		}
-		
+
 		// $acc->screens_sold = $acc->screens_sold + 1;
 		$acc->save();
 
@@ -696,9 +771,9 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			]);
 
 			$account_of_screen =  Accounts::where('id', '=', $key->account_id)->first();
-		
+
 			$type= TypeAccount::where('id','=',$account_of_screen->type_account_id)->first();
-			
+
 			$screen = Screens::where('id', '=', $key->screen_id)->first();
 			if($screen->profile_number>1&&$screen->profile_number<=$type->available_screens){
 				if (($account_of_screen->screens_sold-1)>= $type->available_screens) {

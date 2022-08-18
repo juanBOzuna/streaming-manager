@@ -45,8 +45,9 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		$this->col[] = ["label" => "Telefono", "name" => "number_phone"];
 		$this->col[] = ["label" => "No. Pantallas a expirar", "name" => "date_sold", "callback" => function ($row) {
 			$customer = Customers::where('id', '=', $row->id)->first();
-			$details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id', '!=', null)->get();
-			$details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('screen_id', '=', null)->where('is_venta_revendedor', '=', 0)->get();
+
+            $details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('is_renewed','=',0)->where('is_discarded','=',0)->where('screen_id', '!=', null)->get();
+			$details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('is_renewed','=',0)->where('is_discarded','=',0)->where('screen_id', '=', null)->where('is_venta_revendedor', '=', 0)->get();
 			$number_screens_expired = 0;
 			$number_accounts_expired = 0;
 			// for ($i = 0; $i < 10; $i++) {
@@ -63,12 +64,6 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				$da2 = explode(" ", $da);
 				$da = \Carbon\Carbon::parse($da2[0]);
 				$da->addDays(1);
-				//if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
-
-				//	dd("Vence manana" . " id=" . $key->id);
-				//	$number_screens_expired++;
-				//}
-				//echo $fv ."  ".$da;
 
 				if ($fv == $da) {
 					$number_screens_expired++;
@@ -83,13 +78,6 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				$da2 = explode(" ", $da);
 				$da = \Carbon\Carbon::parse($da2[0]);
 				$da->addDays(1);
-				//if ($fv->year == $da->year && $fv->month == $da->month  && ($fv->day - 1) == $da->day) {
-
-				//	dd("Vence manana" . " id=" . $key->id);
-				//	$number_screens_expired++;
-				//}
-				//echo $fv ."  ".$da;
-
 				if ($fv == $da) {
 					$number_accounts_expired++;
 				}
@@ -147,31 +135,31 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		//$this->form[] = ["label"=>"Revendedor Id","name"=>"revendedor_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"revendedor,id"];
 		# OLD END FORM
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Sub Module
-	        | ----------------------------------------------------------------------     
-			| @label          = Label of action 
+	        | ----------------------------------------------------------------------
+			| @label          = Label of action
 			| @path           = Path of sub module
 			| @foreign_key 	  = foreign key of sub table/module
 			| @button_color   = Bootstrap Class (primary,success,warning,danger)
-			| @button_icon    = Font Awesome Class  
+			| @button_icon    = Font Awesome Class
 			| @parent_columns = Sparate with comma, e.g : name,created_at
-	        | 
+	        |
 	        */
 		$this->sub_module = array();
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Add More Action Button / Menu
-	        | ----------------------------------------------------------------------     
-	        | @label       = Label of action 
+	        | ----------------------------------------------------------------------
+	        | @label       = Label of action
 	        | @url         = Target URL, you can use field alias. e.g : [id], [name], [title], etc
 	        | @icon        = Font awesome class icon. e.g : fa fa-bars
-	        | @color 	   = Default is primary. (primary, warning, succecss, info)     
+	        | @color 	   = Default is primary. (primary, warning, succecss, info)
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
-	        | 
+	        |
 	        */
 		$this->addaction = array();
 
@@ -181,62 +169,69 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 			'color' => 'success',
 			'icon' => 'fa fa-whatsapp'
 		];
+		$this->addaction[] = [
+			'label' => 'Avisado',
+			'url' => CRUDBooster::mainpath('set-avisado/[id]'),
+			'color' => 'success',
+			'icon' => 'fa fa-refresh',
+            // 'showIf' => "[is_expired]==1"
+		];
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Add More Button Selected
-	        | ----------------------------------------------------------------------     
-	        | @label       = Label of action 
+	        | ----------------------------------------------------------------------
+	        | @label       = Label of action
 	        | @icon 	   = Icon from fontawesome
-	        | @name 	   = Name of button 
-	        | Then about the action, you should code at actionButtonSelected method 
-	        | 
+	        | @name 	   = Name of button
+	        | Then about the action, you should code at actionButtonSelected method
+	        |
 	        */
 		$this->button_selected = array();
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Add alert message to this module at overheader
-	        | ----------------------------------------------------------------------     
-	        | @message = Text of message 
-	        | @type    = warning,success,danger,info        
-	        | 
+	        | ----------------------------------------------------------------------
+	        | @message = Text of message
+	        | @type    = warning,success,danger,info
+	        |
 	        */
 		$this->alert        = array();
 
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
-	        | Add more button to header button 
-	        | ----------------------------------------------------------------------     
-	        | @label = Name of button 
+		/*
+	        | ----------------------------------------------------------------------
+	        | Add more button to header button
+	        | ----------------------------------------------------------------------
+	        | @label = Name of button
 	        | @url   = URL Target
 	        | @icon  = Icon from Awesome.
-	        | 
+	        |
 	        */
 		$this->index_button = array();
 
 
 
-		/* 
-	        | ---------------------------------------------------------------------- 
+		/*
+	        | ----------------------------------------------------------------------
 	        | Customize Table Row Color
-	        | ----------------------------------------------------------------------     
+	        | ----------------------------------------------------------------------
 	        | @condition = If condition. You may use field alias. E.g : [id] == 1
-	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
-	        | 
+	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.
+	        |
 	        */
 		$this->table_row_color = array();
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | You may use this bellow array to add statistic at dashboard 
-	        | ---------------------------------------------------------------------- 
-	        | @label, @count, @icon, @color 
+	        | ----------------------------------------------------------------------
+	        | You may use this bellow array to add statistic at dashboard
+	        | ----------------------------------------------------------------------
+	        | @label, @count, @icon, @color
 	        |
 	        */
 		$this->index_statistic = array();
@@ -244,10 +239,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Add javascript at body 
-	        | ---------------------------------------------------------------------- 
-	        | javascript code in the variable 
+	        | ----------------------------------------------------------------------
+	        | Add javascript at body
+	        | ----------------------------------------------------------------------
+	        | javascript code in the variable
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
@@ -261,14 +256,14 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 				 });
 		 });
 
-		
+
 		";
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code before index table 
-	        | ---------------------------------------------------------------------- 
+	        | ----------------------------------------------------------------------
+	        | Include HTML Code before index table
+	        | ----------------------------------------------------------------------
 	        | html code to display it before index table
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
@@ -286,37 +281,18 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 					//window.localStorage.setItem('miGato2', 'Juan');
 					//alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
 					window.open('https://wa.me/'+telefono+'?text='+datos,'_blank');
-					window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow?isSendSms=1'
-
+					window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow'
 					</script>
 					";
-		}
-
-		if (null != $_REQUEST["isSendSms"]) {
-			echo "
-				<script>
-				window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow?sendMessageSuccesfull=1';
-				</script>
-				";
-		}
-
-		if (null != $_REQUEST["sendMessageSuccesfull"]) {
-
-			foreach (session('listDetail') as $detail) {
-				$order_dt = OrderDetail::where('id', '=', $detail->id)->first();
-				$order_dt->is_notified = 1;
-				$order_dt->save();
-			}
-			\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect("http://streaming-manager.test/admin/customers_expired_tomorrow", "El cliente fue avisado exitosamente", "success");
 		}
 		$this->pre_index_html = null;
 
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code after index table 
-	        | ---------------------------------------------------------------------- 
+	        | ----------------------------------------------------------------------
+	        | Include HTML Code after index table
+	        | ----------------------------------------------------------------------
 	        | html code to display it after index table
 	        | $this->post_index_html = "<p>test</p>";
 	        |
@@ -326,10 +302,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include Javascript File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your javascript each array 
+	        | ----------------------------------------------------------------------
+	        | Include Javascript File
+	        | ----------------------------------------------------------------------
+	        | URL of your javascript each array
 	        | $this->load_js[] = asset("myfile.js");
 	        |
 	        */
@@ -338,10 +314,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Add css style at body 
-	        | ---------------------------------------------------------------------- 
-	        | css code in the variable 
+	        | ----------------------------------------------------------------------
+	        | Add css style at body
+	        | ----------------------------------------------------------------------
+	        | css code in the variable
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
@@ -350,10 +326,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 		/*
-	        | ---------------------------------------------------------------------- 
-	        | Include css File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your css each array 
+	        | ----------------------------------------------------------------------
+	        | Include css File
+	        | ----------------------------------------------------------------------
+	        | URL of your css each array
 	        | $this->load_css[] = asset("myfile.css");
 	        |
 	        */
@@ -362,9 +338,9 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 	/*
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | Hook for button selected
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | @id_selected = the id selected
 	    | @button_name = the name of button
 	    |
@@ -377,10 +353,10 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 	/*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate query of index result 
-	    | ---------------------------------------------------------------------- 
-	    | @query = current sql query 
+	    | ----------------------------------------------------------------------
+	    | Hook for manipulate query of index result
+	    | ----------------------------------------------------------------------
+	    | @query = current sql query
 	    |
 	    */
 	public function hook_query_index(&$query)
@@ -390,9 +366,9 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	}
 
 	/*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate row of index table html 
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
+	    | Hook for manipulate row of index table html
+	    | ----------------------------------------------------------------------
 	    |
 	    */
 	public function hook_row_index($column_index, &$column_value)
@@ -401,9 +377,9 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	}
 
 	/*
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | Hook for manipulate data input before add data is execute
-	    | ---------------------------------------------------------------------- 
+	    | ----------------------------------------------------------------------
 	    | @arr
 	    |
 	    */
@@ -413,12 +389,12 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command after add public static function called 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
+	    | Hook for execute command after add public static function called
+	    | ----------------------------------------------------------------------
 	    | @id = last insert id
-	    | 
+	    |
 	    */
 	public function hook_after_add($id)
 	{
@@ -426,13 +402,13 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for manipulate data input before update data is execute
-	    | ---------------------------------------------------------------------- 
-	    | @postdata = input post data 
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @postdata = input post data
+	    | @id       = current id
+	    |
 	    */
 	public function hook_before_edit(&$postdata, $id)
 	{
@@ -440,25 +416,25 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for execute command after edit public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @id       = current id
+	    |
 	    */
 	public function hook_after_edit($id)
 	{
-		//Your code here 
+		//Your code here
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for execute command before delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @id       = current id
+	    |
 	    */
 	public function hook_before_delete($id)
 	{
@@ -466,12 +442,12 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 	}
 
-	/* 
-	    | ---------------------------------------------------------------------- 
+	/*
+	    | ----------------------------------------------------------------------
 	    | Hook for execute command after delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
+	    | ----------------------------------------------------------------------
+	    | @id       = current id
+	    |
 	    */
 	public function hook_after_delete($id)
 	{
@@ -481,12 +457,45 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
 
 
-	//By the way, you can still create your own method in here... :) 
+	//By the way, you can still create your own method in here... :)
+
+    public function getSetAvisado($id)
+	{
+        $customer = Customers::where('id', '=', $id)->first();
+		$details = OrderDetail::where('customer_id', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->where('is_notified', '=', '0')->get();
+		$list_details_to_expired = [];
+		$number_screens = 1;
+
+		foreach ($details as $detail) {
+			date_default_timezone_set('America/Bogota');
+			$d = explode(" ", $detail->finish_date);
+			$fv = \Carbon\Carbon::parse($d[0]);
+			$da = \Carbon\Carbon::parse("");
+			$da2 = explode(" ", $da);
+			$da = \Carbon\Carbon::parse($da2[0]);
+			$da->addDays(1);
+
+			if ($fv == $da) {
+				array_push($list_details_to_expired, $detail);
+				$number_screens++;
+			}
+		}
+
+
+		foreach ($list_details_to_expired as $detail) {
+
+                $order_dt = OrderDetail::where('id', '=', $detail->id)->first();
+                $order_dt->is_notified = 1;
+                $order_dt->save();
+
+            \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect("http://streaming-manager.test/admin/customers_expired_tomorrow", "El cliente fue avisado exitosamente", "success");
+		}
+    }
 	public function getSetWhatsapp($id)
 	{
 		$datos = "";
 		$customer = Customers::where('id', '=', $id)->first();
-		$details = OrderDetail::where('customer_id', '=', $id)->where('is_notified', '=', '0')->get();
+		$details = OrderDetail::where('customer_id', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->where('is_notified', '=', '0')->get();
 		$list_details_to_expired = [];
 		$number_screens = 1;
 

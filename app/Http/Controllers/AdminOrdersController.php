@@ -80,7 +80,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
 
 
-                
+
             $urlPage = $_SERVER['REQUEST_URI'];
             $porciones = explode("?", $urlPage);
             $porciones = explode("/", $porciones[0]);
@@ -103,7 +103,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                 $trHtml .= '  <tr>';
             }
             //dd( $trHtml);
-            $parent = $key->parent_order_detail ==null ?'PADRE':$key->parent_order_detail; 
+            $parent = $key->parent_order_detail ==null ?'PADRE':$key->parent_order_detail;
             $trHtml .= '
             <th scope="row">id:' . $key->id . '</th>
             <td>id:' .$cuenta_of_order_detail->id . '  |  '.$cuenta_of_order_detail->email.'  |  '. $tipo_pantalla->name.'</td>
@@ -150,9 +150,9 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
            console.log('ASD');
            let table = " . json_encode($htmlForTable) . "
            let area = document.getElementById('parent-form-area');
-         
+
            area.innerHTML+= table ;
-           
+
         //    let list = document.querySelectorAll('tr');
         //    list.forEach(function (trs) {
         //             trs.childNodes.forEach(function (tds) {
@@ -165,9 +165,9 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         //     });
            ";
 
-         
 
-          
+
+
         } else {
             $columns[] = ['label' => 'Numero de pantallas', 'name' => 'number_screens', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'Dias de membresia', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
@@ -341,10 +341,10 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             //         item.children[8].style.color = '#04AA6D';
             //         item.children[8].style.fontWeight = 'bold';
             //     }
-                
+
             //    }
             //  });
-            
+
             document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
             <a  href='https://api.whatsapp.com/send?phone=" . $telefono_send_sms . "&text=" . $link_sms . "' class='float' target='_blank'>
             <i class='fa fa-whatsapp my-float'></i>
@@ -370,7 +370,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     color: #25d366;
                 background-color:#fff;
                 }
-                
+
                 .my-float{
                     margin-top:16px;
                 }
@@ -403,7 +403,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 						color: #25d366;
 					background-color:#fff;
 					}
-					
+
 					.my-float2{
 						margin-top:16px;
 					}
@@ -488,7 +488,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     color: #25d366;
                 background-color:#fff;
                 }
-                
+
                 .my-float-searc{
                     margin-top:16px;
                 }
@@ -873,7 +873,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     // {
     //     foreach ($listScreens as $screen) {
     //         //            $screenAct = Screens::where('id', '=', $screen)->orderBy('profile_number', 'asc')->get();
-    //         // $acc = 
+    //         // $acc =
     //         $scr = Screens::where('id', '=', $screen)->first();
     //         $acc = Accounts::where('id', '=', $screen->account_id)->first();
     //         if ($acc->screens_sold > 0) {
