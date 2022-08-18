@@ -11,6 +11,7 @@ use App\Models\Revendedores;
 
 // use App\Models\Customers;
 // use App\Models\Order;
+use Illuminate\Support\Facades\Crypt;
 use App\Models\OrderDetail;
 use App\Models\Screens;
 use App\Models\Accounts;
@@ -606,7 +607,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 
 
 
-        $url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Renovada%20%20por%2030%20días%20mas%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20'.$account->email.'%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
+        $url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Renovada%20%20por%2030%20días%20mas%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20'.Crypt::decryptString($account->key_pass).'%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
         $host = env('LINK_SYSTEM');
         // $host = env('LINK_SYSTEM');
         $link_customer_viewer = "";

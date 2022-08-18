@@ -12,7 +12,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Accounts;
 use App\Models\Screens;
-
+use Illuminate\Support\Facades\Crypt;
 use App\Models\Usuarios;
 use App\Models\Customers;
 // use App\Models\Revendedores;
@@ -125,22 +125,22 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			} else {
 				$this->form[] = ['label' => 'Telefono', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'revendedores,telefono'];
 			}
-			if (CRUDBooster::getCurrentMethod() == "getDetail") {
+			// if (CRUDBooster::getCurrentMethod() == "getDetail") {
 
-				//$this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
-				$this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
+			// 	//$this->form[] = ["label" => "Telefono", "name" => "customers_id", 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
+			// 	$this->form[] = ['label' => 'Precio Total', 'name' => 'total_price', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];
 
 
-				$columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
-				$columns[] = ['label' => 'Cuenta', 'name' => 'account_id'];
-				$columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
-				$columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
-				$columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
-				$columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
-				$columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
-			}
+			// 	$columns[] = ['label' => 'Dias', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
+			// 	$columns[] = ['label' => 'Cuenta', 'name' => 'account_id'];
+			// 	$columns[] = ['label' => 'Vendida', 'name' => 'created_at', 'type' => 'text', 'required' => true];
+			// 	$columns[] = ['label' => 'Vence', 'name' => 'finish_date', 'type' => 'text', 'required' => true];
+			// 	$columns[] = ['label' => 'Esta renovada', 'name' => 'is_renewed', 'type' => 'number', 'required' => true];
+			// 	$columns[] = ['label' => 'Numero de renovaciones', 'name' => 'number_renovations', 'type' => 'number', 'required' => true];
+			// 	$columns[] = ['label' => 'Venta padre', 'name' => 'parent_order_detail', 'type' => 'number', 'required' => true];
+			// }
 
-			$this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
+			// $this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
 
 			//
 
@@ -361,7 +361,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 
 
-			$url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Alquilada%20%20por%2030%20días%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20'.$account->key_pass.'%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
+			$url_send_sms = '*' . $type->name . '*%20%0ACuenta%20completa%20%0A%0AOk%20listo%20Alquilada%20%20por%2030%20días%20de%20garantía%20%0A%0A' . $email . '%0A%0AContraseña%20'. Crypt::decryptString($account->key_pass).'%0A%0ACuenta%20completa%20con%20Pines%0A%0A' . $screensText . '%0ANos%20confirmas%20que%20todo%20aya%20salido%20bien%0A%0AY%20recuerde%20cumplir%20las%20reglas%20para%20que%20la%20garantía%20sea%20efectiva%20por%2030%20días%0A*No*%20*cambiar*%20*la*%20*contraseña*%20*ni*%20*cancelar*%20*membresía*%0A*Ni*%20*agregar*%20*números*%20*telefónico*%20*si*%20*Netflix*%20*se*%20*lo*%20*pide*%20%0A%0ATener%20la%20responsabilidad%20con%20quien%20comparta%20esta%20cuenta%20para%20que%20cumpla%20también%20con%20las%20reglas%0A%0AAl%20no%20cumplir%20las%20reglas%20recojemos%20la%20cuenta%20y%20no%20se%20hace%20devolución%20de%20dinero';
 
 			$host = env('LINK_SYSTEM');
 			// $host = env('LINK_SYSTEM');
@@ -384,7 +384,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
            foreach ($orders_details as $key) {
             $customer = Customers::where('id','=',$key->customer_id)->first();
             $cuenta_of_order_detail = Accounts::where('id','=',$key->account_id)->first();
-            $screen_of_order_detail = Screens::where('id','=',$key->screen_id)->first();
+            //$screen_of_order_detail = Screens::where('id','=',$key->screen_id)->first();
             $tipo_pantalla = TypeAccount::where('id','=',$cuenta_of_order_detail->type_account_id)->first();
 
             $is_renewed = $key->is_renewed ==0 ?'NO':'SI' ;
@@ -406,14 +406,14 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
             <td>'  .  $is_renewed . '</td>
             <td>' . $key->number_renovations . '</td>
             <td>' .  $parent . '</td>
-            <td> <a href="' . env('LINK_SYSTEM') . 'accounts/edit/' .$screen_of_order_detail->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens" target="_blank">Editar</a> </td>
+            <td> <a href="' . env('LINK_SYSTEM') . 'accounts/edit/' .$cuenta_of_order_detail->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Faccounts" target="_blank">Editar</a> </td>
             <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
             </tr>';
            }
 
            $htmlForTable = '
            <br>
-           <span><strong>  DETALLE DE VENTA (PANTALLAS VENDIDAS)</strong></span>
+           <span><strong>  DETALLE DE VENTA (CUENTAS VENDIDAS)</strong></span>
            <br>
            <br>
            <table class="table table-striped">
@@ -434,9 +434,16 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
                ' . $trHtml . '
              </tbody>
            </table>';
-
+        //    dd($htmlForTable);
 
 			$this->script_js = "
+
+            let table = " . json_encode($htmlForTable) . "
+            let area = document.getElementById('parent-form-area');
+
+            area.innerHTML+= table ;
+
+
             let tabla = document.querySelector('#table-order_details');
 
             // console.log(tabla.childNodes[3].childNodes);
@@ -512,8 +519,8 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 						height:55px;
 						bottom:35px;
 						right:100px;
-						background-color:red;x
-						color:#FFF;
+						background-color:red;
+						color:#FFFFFF;
 						border-radius:45px;
 						text-align:center;
 					font-size:25px;
@@ -531,6 +538,8 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 					}
 			   </style>
 				`;
+
+
             ";
 		} else {
 

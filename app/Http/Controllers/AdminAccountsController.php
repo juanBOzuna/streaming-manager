@@ -13,6 +13,7 @@ use Request;
 use DB;
 use CRUDBooster;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
 
 use Illuminate\Support\Arr;
 use App\Models\Accounts;
@@ -50,7 +51,9 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $this->col = [];
         $this->col[] = ["label" => "Id", "name" => "id"];
         $this->col[] = ["label" => "Correo", "name" => "email"];
-        $this->col[] = ["label" => "Clave", "name" => "key_pass"];
+        $this->col[] = ["label" => "Clave", "name" => "key_pass", "callback" => function ($row) {
+            return 'Clave Encriptada';
+        }];
         // $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,picture", "image" => true];
         $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,name"];
         $this->col[] = ["label" => "fecha de creacion", "name" => "created_at"];
@@ -84,7 +87,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         # START FORM DO NOT REMOVE THIS LINE
         $this->form = [];
         $this->form[] = ['label' => 'Correo', 'name' => 'email', 'type' => 'email', 'validation' => 'required|min:1|max:255|email', 'width' => 'col-sm-10', 'placeholder' => 'Please enter a valid email address'];
-        $this->form[] = ['label' => 'Clave', 'name' => 'key_pass', 'type' => 'text', 'validation' => 'min:3|max:32', 'width' => 'col-sm-10'];
+        $this->form[] = ['label' => 'Clave', 'name' => 'key_pass', 'type' => 'text', 'validation' => 'min:3', 'width' => 'col-sm-10'];
         $this->form[] = ['label' => 'Tipo de cuenta', 'name' => 'type_account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'type_account,name'];
 
         if (HelpersCRUDBooster::getCurrentMethod() == "getDetail") {
@@ -291,7 +294,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                item.style.color = '#FFFFFF';
 
                             }
-                            
+
 
                             if (item.innerText == 'ESTABLE') {
 
@@ -309,7 +312,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                             item2.style.color = '#FFFFFF';
                                         }
                                     }
-    
+
                                  })
                                 item.style.backgroundColor = '#47b425';
                                  item.style.fontWeight= 'bold';
@@ -432,6 +435,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
     public function hook_before_add(&$postdata)
     {
         //Your code here
+        $postdata['key_pass'] = Crypt::encryptString($postdata['key_pass']);
+        // dd($postdata);
 
         $acc = Accounts::where('type_account_id', '=', $postdata['type_account_id'])->where('email', '=', $postdata['email'])->get();
         // {
@@ -489,7 +494,10 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
     public function hook_before_edit(&$postdata, $id)
     {
         //Your code here
-
+        $acc = Accounts::where('id','=',$id)->first()->key_pass;
+        if($postdata['key_pass']!=$acc){
+            $postdata['key_pass'] = Crypt::encryptString($postdata['key_pass']);
+        }
     }
 
     /*

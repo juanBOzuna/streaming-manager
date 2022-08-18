@@ -237,7 +237,8 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                <td>' . $nameType . ' </td>
                <td>' . $accountSelected->email . ' </td>
                <td>' . Carbon::parse($detail->date_finish)->format('Y-m-d H:i:s') . '</td>
-               
+               <td><a href="' . env('LINK_SYSTEM') . 'accounts/edit/' . $accountSelected->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Faccounts" target="_blank">Editar </a></td>
+
                <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
                </tr>';
             }
@@ -281,6 +282,7 @@ class AdminCustomersController extends \crocodicstudio\crudbooster\controllers\C
                       <th scope="col">Tipo</th>
                       <th scope="col">Correo</th>
                       <th scope="col">Vence</th>
+                      <th scope="col">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>

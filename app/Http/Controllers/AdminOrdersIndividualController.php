@@ -388,7 +388,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
             <td>'  .  $is_renewed . '</td>
             <td>' . $key->number_renovations . '</td>
             <td>' .  $parent . '</td>
-            <td> <a href="' . env('LINK_SYSTEM') . 'screens/edit/' .$screen_of_order_detail->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens" target="_blank">Editar</a> </td>
+            <td> <a href="' . env('LINK_SYSTEM') . 'accounts/edit/' .$screen_of_order_detail->id . '?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens" target="_blank">Editar</a> </td>
             <!-- <td> <button onclick ="actualizar()" > sdfsd </button>  </td> -->
             </tr>';
            }
