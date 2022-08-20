@@ -623,6 +623,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 
     public function getSetNotificar($id)
 	{
+		///dd("asd");
         $order_id = OrderDetail::where('parent_order_detail', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->first();
         $email = Accounts::where('id','=',$order_id->account_id)->first()->email;
         $screen = Screens::where('id','=',$order_id->screen_id)->first();
@@ -632,26 +633,26 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 
         $nombre =  explode(" ", $screen->name)[0].'%20'. explode(" ", $screen->name)[1] .'%20pin%20'.$screen->code_screen;
         if (isset(explode(" ", $screen->name)[2])) {
-            $nombre .= explode(" ", $screen->name)[2] . '%20%20%0A';
+            $nombre .= "%0A".explode(" ", $screen->name)[2] . '%20%20%0A';
         }else{
             $nombre .=  '%20%20%0A';
         }
 
         if ($screen->type_device_id != null) {
             $typeDevice = TypeDevice::where('id', '=', $screen->type_device_id)->first();
-            $nombre .= $typeDevice->name . '%20' . $typeDevice->emoji . '%20' . $screen->device . '%0A%0A%0A';
+            $nombre .= $typeDevice->name . '%20' . $typeDevice->emoji . '%20' . $screen->device . '%0A%0A';
         } else {
-            $nombre .= '%0A%0A%0A';
+            $nombre .= '%0A%0A';
         }
 
-        $message= '*'. str_replace(' ', '%20', $type_account->name).'*%0A%0A'.'Ok%20listo%20renovada%20por%2030%20dias%20mas%20de%20garantia%0A%0A'.$nombre.'Y%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20dias';
+        $message= '*'. str_replace(' ', '%20', $type_account->name).'*%0A%0A'.'Ok%20listo%20renovada%20por%2030%20dias%20mas%20de%20garantia%0A%0A'.$email."%0A%0A".$nombre.'Y%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20dias';
     	$number_phone = $customer->number_phone;
         $host = env('LINK_SYSTEM');
         echo "
 					<script>
 					let datos = " . json_encode($message) . "
 					let telefono = " . json_encode($number_phone ) . "
-                    let host = ".$host."
+                    let host =  ".json_encode($host)."
 					// alert();
 					//window.localStorage.setItem('miGato2', 'Juan');
 					//alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20REVENDEDOR,%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20*CADUCARA*%20esta%20noche.%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia.%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20bloqueara%20la%20cuenta%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');

@@ -461,8 +461,49 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 
     public function getSetAvisado($id)
 	{
+
+
+		// $details_of_exired = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('is_renewed','=',0)->where('is_discarded','=',0)->where('screen_id', '!=', null)->where('is_venta_revendedor', '=', 0)->get();
+		// $details_of_exired_accounts_completed = OrderDetail::where('customer_id', '=', $row->id)->where('is_notified', '=', '0')->where('is_renewed','=',0)->where('is_discarded','=',0)->where('screen_id', '=', null)->where('is_venta_revendedor', '=', 0)->get();
+		// $number_screens_expired = 0;
+		// $number_accounts_expired = 0;
+		// // for ($i = 0; $i < 10; $i++) {
+		// // 	if ($i == 2) {
+		// // 		dd(\Carbon\Carbon::parse("")->month);
+		// // 	}
+		// // }
+
+		// foreach ($details_of_exired as $key) {
+		// 	date_default_timezone_set('America/Bogota');
+		// 	$d = explode(" ", $key->finish_date);
+		// 	$fv = \Carbon\Carbon::parse($d[0]);
+		// 	$da = \Carbon\Carbon::parse("");
+		// 	$da2 = explode(" ", $da);
+		// 	$da = \Carbon\Carbon::parse($da2[0]);
+		// 	$da->addDays(1);
+
+		// 	if ($fv == $da) {
+		// 		$number_screens_expired++;
+		// 	}
+		// }
+
+		// foreach ($details_of_exired_accounts_completed as $key) {
+		// 	date_default_timezone_set('America/Bogota');
+		// 	$d = explode(" ", $key->finish_date);
+		// 	$fv = \Carbon\Carbon::parse($d[0]);
+		// 	$da = \Carbon\Carbon::parse("");
+		// 	$da2 = explode(" ", $da);
+		// 	$da = \Carbon\Carbon::parse($da2[0]);
+		// 	$da->addDays(1);
+		// 	if ($fv == $da) {
+		// 		$number_accounts_expired++;
+		// 	}
+		// }
+
+
+
         $customer = Customers::where('id', '=', $id)->first();
-		$details = OrderDetail::where('customer_id', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->where('is_notified', '=', '0')->get();
+		$details = OrderDetail::where('customer_id', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->where('is_notified', '=', '0')->where('is_venta_revendedor', '=', 0)->get();
 		$list_details_to_expired = [];
 		$number_screens = 1;
 
@@ -488,8 +529,8 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
                 $order_dt->is_notified = 1;
                 $order_dt->save();
 
+			}
             \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect("http://streaming-manager.test/admin/customers_expired_tomorrow", "El cliente fue avisado exitosamente", "success");
-		}
     }
 	public function getSetWhatsapp($id)
 	{

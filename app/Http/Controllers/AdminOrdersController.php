@@ -147,22 +147,12 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
            //dd( $htmlForTable);
 
            $this->script_js = "
-           console.log('ASD');
+         //  console.log('ASD');
            let table = " . json_encode($htmlForTable) . "
            let area = document.getElementById('parent-form-area');
 
            area.innerHTML+= table ;
 
-        //    let list = document.querySelectorAll('tr');
-        //    list.forEach(function (trs) {
-        //             trs.childNodes.forEach(function (tds) {
-        //                if (tds.innerText == 'VENDIDA') {
-        //                    trs.style.backgroundColor = '#a5eea0';
-        //                    // trs.style.color = 'white';
-        //                    trs.style.fontWeight = 'bold';
-        //                }
-        //             });
-        //     });
            ";
 
 
@@ -312,6 +302,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             }else{
                 $telefono_send_sms = $cliente->number_phone;
             }
+          //  dd($details_text);
 
             $link_sms = '*MOSERCON*%20*Streaming*%0A%0ATe%20activa%20las%20siguientes%20pantallas%20%0A%0A' . $details_text . '%0ANos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20días';
 
@@ -326,25 +317,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             $this->script_js .= "
             let tabla = document.querySelector('#table-order_details');
 
-            // let i=0;
-            // tabla.childNodes[3].childNodes.forEach(function (item) {
-            //    let=i++;
-            //    if(i%2==0){
-            //     // console.log(item.children[8].innerText);
-            //     if(item.children[8].innerText=='0'){
-            //         item.children[8].innerText = 'No';
-            //         // item.children[8].style.color = '#DD4B39';
-            //         item.children[8].style.fontWeight = 'bold';
-            //     }else{
-            //         item.children[1].childElementCount=1;
-            //         item.children[8].innerText = 'Si';
-            //         item.children[8].style.color = '#04AA6D';
-            //         item.children[8].style.fontWeight = 'bold';
-            //     }
-
-            //    }
-            //  });
-
+          
             document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
             <a  href='https://api.whatsapp.com/send?phone=" . $telefono_send_sms . "&text=" . $link_sms . "' class='float' target='_blank'>
             <i class='fa fa-whatsapp my-float'></i>

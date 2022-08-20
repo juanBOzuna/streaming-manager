@@ -438,6 +438,72 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
 			$this->script_js = "
 
+			document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+			<a  href='https://api.whatsapp.com/send?phone=" . $telefono_send_sms . "&text=" . $url_send_sms . ".' class='float' target='_blank'>
+			<i class='fa fa-whatsapp my-float'></i>
+			</a>`+document.querySelector('#content_section').innerHTML;
+			document.querySelector('#content_section').innerHTML+= `
+		   <style type='text/css'>
+				.float{
+					position:fixed;
+					width:55px;
+					height:55px;
+					bottom:35px;
+					right:35px;
+					background-color:#25d366;
+					color:#FFF;
+					border-radius:45px;
+					text-align:center;
+				font-size:25px;
+					box-shadow: 2px 2px 3px #999;
+				z-index:100;
+				}
+				.float:hover {
+					text-decoration: none;
+					color: #25d366;
+				background-color:#fff;
+				}
+
+				.my-float{
+					margin-top:16px;
+				}
+		   </style>
+			`;
+
+
+
+			document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+			   <a  href='" . $link_customer_viewer . "' class='float2' target='_blank'>
+			   <i class='fa fa-user my-float2'></i>
+			   </a>`+document.querySelector('#content_section').innerHTML;
+			   document.querySelector('#content_section').innerHTML+= `
+			  <style type='text/css'>
+				   .float2{
+					   position:fixed;
+					   width:55px;
+					   height:55px;
+					   bottom:35px;
+					   right:100px;
+					   background-color:red;
+					   color:#FFFFFF;
+					   border-radius:45px;
+					   text-align:center;
+				   font-size:25px;
+					   box-shadow: 2px 2px 3px #999;
+				   z-index:100;
+				   }
+				   .float2:hover {
+					   text-decoration: none;
+					   color: #25d366;
+				   background-color:#fff;
+				   }
+
+				   .my-float2{
+					   margin-top:16px;
+				   }
+			  </style>
+			   `;
+
             let table = " . json_encode($htmlForTable) . "
             let area = document.getElementById('parent-form-area');
 
@@ -446,13 +512,6 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
             let tabla = document.querySelector('#table-order_details');
 
-            // console.log(tabla.childNodes[3].childNodes);
-
-            // let trs=  ;
-
-            // for(let i =0 ; i<tabla.childNodes[3].childNodes.length){
-            //     console.log(item[i]);
-            // }
             let i=0;
             tabla.childNodes[3].childNodes.forEach(function (item) {
                let=i++;
@@ -473,71 +532,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 
              });
 
-			 document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
-			 <a  href='https://api.whatsapp.com/send?phone=" . $telefono_send_sms . "&text=" . $url_send_sms . ".' class='float' target='_blank'>
-			 <i class='fa fa-whatsapp my-float'></i>
-			 </a>`+document.querySelector('#content_section').innerHTML;
-			 document.querySelector('#content_section').innerHTML+= `
-			<style type='text/css'>
-				 .float{
-					 position:fixed;
-					 width:55px;
-					 height:55px;
-					 bottom:35px;
-					 right:35px;
-					 background-color:#25d366;
-					 color:#FFF;
-					 border-radius:45px;
-					 text-align:center;
-				 font-size:25px;
-					 box-shadow: 2px 2px 3px #999;
-				 z-index:100;
-				 }
-				 .float:hover {
-					 text-decoration: none;
-					 color: #25d366;
-				 background-color:#fff;
-				 }
-
-				 .my-float{
-					 margin-top:16px;
-				 }
-			</style>
-			 `;
-
-
-
-			 document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
-				<a  href='" . $link_customer_viewer . "' class='float2' target='_blank'>
-				<i class='fa fa-user my-float2'></i>
-				</a>`+document.querySelector('#content_section').innerHTML;
-				document.querySelector('#content_section').innerHTML+= `
-			   <style type='text/css'>
-					.float2{
-						position:fixed;
-						width:55px;
-						height:55px;
-						bottom:35px;
-						right:100px;
-						background-color:red;
-						color:#FFFFFF;
-						border-radius:45px;
-						text-align:center;
-					font-size:25px;
-						box-shadow: 2px 2px 3px #999;
-					z-index:100;
-					}
-					.float2:hover {
-						text-decoration: none;
-						color: #25d366;
-					background-color:#fff;
-					}
-
-					.my-float2{
-						margin-top:16px;
-					}
-			   </style>
-				`;
+			
 
 
             ";

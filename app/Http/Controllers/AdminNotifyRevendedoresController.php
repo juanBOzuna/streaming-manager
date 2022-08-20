@@ -113,7 +113,7 @@ class AdminNotifyRevendedoresController extends \crocodicstudio\crudbooster\cont
 				// if($number_screens_expired > 1){
 				// 	$text .=' y '. $number_accounts_expired . " cuentas Completas";
 				// }else{
-				$text .= $number_accounts_expired . " cuentas Completas";
+				$text .= ' '.$number_accounts_expired . " cuentas Completas";
 				// }
 
 			}
