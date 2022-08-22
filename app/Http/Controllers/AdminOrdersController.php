@@ -304,7 +304,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             }
           //  dd($details_text);
 
-            $link_sms = '*MOSERCON*%20*Streaming*%0A%0ATe%20activa%20las%20siguientes%20pantallas%20%0A%0A' . $details_text . '%0ANos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20días';
+            $link_sms = '*MOSERCON*%20*Streaming*%0A%0ATe%20activa%20las%20siguientes%20pantallas%20%0A%0A' . $details_text . '%0ANos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%20'.$details[0]->membership_days	.'%20días';
 
 
             $host = env('LINK_SYSTEM');
@@ -395,7 +395,11 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                 // $disccount = ($key->total_screens - $key->available_screens) * $cuentas;
                 // $total_p = $cuentas * $key->total_screens;
                 // $total_p = (($total_p - $pVendidas) - $cuentas) - ($disccount - $cuentas);
-                $total = Screens::where('type_account_id', '=', $key->id)->where('profile_number', '>', 1)->where('profile_number', '<', ($key->available_screens + 2))->where('is_sold', '=', 0)->count();
+                $total = Screens::where('type_account_id', '=', $key->id)
+                ->where('profile_number', '>', 1)
+                ->where('profile_number', '<', ($key->available_screens + 2))
+                ->where('is_sold', '=', 0)
+                ->where('is_account_expired','=',0)->count();
                 $js_screens .= '
                 screens[' . $i . '] ={"name":"' . $key->name . '","screens":' . $total . ',"type_id":' . $key->id . '};
                 ';
@@ -683,6 +687,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                 'date_sold' => null,
                 'price_of_membership' => 0,
                 'date_expired' => null,
+                'screen_replace'=>null,
+                'is_screen_replace_notified'=> 0,
                 'is_sold' => 0,
                 'device' => null,
                 'ip' => null

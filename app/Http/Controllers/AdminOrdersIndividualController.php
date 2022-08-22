@@ -45,6 +45,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 
 		# START COLUMNS DO NOT REMOVE THIS LINE
 		$this->col = [];
+		$this->col[] = ["label" => "ID", "name" => "id", "join" => "customers,number_phone"];
 		$this->col[] = ["label" => "Cliente", "name" => "customers_id", "join" => "customers,number_phone", "callback" => function ($row) {
 			$cliente = Customers::where('id', '=', $row->customers_id)->first();
 			return $cliente->name . ' | ' . $cliente->number_phone;
@@ -343,7 +344,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
                 $telefono_send_sms = $customer_of_order->number_phone;
             }
 			// $telefono_send_sms = $customer->number_phone;
-			$url_send = '*' . $type->name . '*' . '%0A%0AOk%20listo%20Vendida%20por%2030%20dias%20mas%20de%20garantia%0A%0A' . $email . '%20%0A%0A' . $screensText . 'Nos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20dias';
+			$url_send = '*' . $type->name . '*' . '%0A%0AOk%20listo%20Vendida%20por%20'.$detail->membership_days.'%20dias%20mas%20de%20garantia%0A%0A' . $email . '%20%0A%0A' . $screensText . 'Nos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%20'.$detail->membership_days.'%20dias';
 
 			$host = env('LINK_SYSTEM');
 			$link_customer_viewer = $host . "customers/detail/" . $detail->customer_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers";
@@ -672,6 +673,10 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		if($screen->profile_number>1 && $screen->profile_number<($type->available_screens+2)){
 			$acc->screens_sold = $acc->screens_sold + 1;
 
+		}else{
+			$acc->number_screens_extraordinary_sold = ($acc->number_screens_extraordinary_sold + 1);
+			
+
 		}
 
 		// $acc->screens_sold = $acc->screens_sold + 1;
@@ -765,6 +770,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 				'date_sold' => null,
 				'price_of_membership' => 0,
 				'date_expired' => null,
+				'screen_replace'=>null,
+                'is_screen_replace_notified'=>0,
 				'is_sold' => 0,
 				'device' => null,
 				'ip' => null
@@ -782,6 +789,10 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 					$account_of_screen->is_sold_ordinary = 1;
 				}
 				$account_of_screen->screens_sold = ($account_of_screen->screens_sold - 1);
+			}else{
+				$account_of_screen->number_screens_extraordinary_sold = ($account_of_screen->number_screens_extraordinary_sold - 1);
+				
+
 			}
 			$account_of_screen->save();
 			// Screens::where('id', $screen)

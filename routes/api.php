@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ScreensController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,3 +19,16 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+
+// Route::put('/screensupdate/{id}', [ScreensController::class, 'update']);
+
+
+// Route::resource('screens_edit', ScreensController::class)->parameters([
+//     'screens_edit' => 'id'
+// ]);
+
+// Route::controller(ScreensController::class)->group(function () {
+//     Route::get('admin/screens_edit/{id}', 'update');
+// });

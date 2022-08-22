@@ -20,6 +20,8 @@ class Screens extends Model
         'code_screen',
         'profile_number',
         'is_sold',
+        'screen_replace',
+        'is_screen_replace_notified',
         'date_sold',
         'date_expired',
         'price_of_membership',

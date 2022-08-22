@@ -14,6 +14,7 @@ use App\Models\Screens;
 use App\Models\Accounts;
 use App\Models\TypeAccount;
 use App\Models\TypeDevice;
+use App\Models\Usuarios;
 use Carbon\Carbon;
 use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
 use Illuminate\Support\Facades\DB as FacadesDB;
@@ -382,7 +383,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 		//dd($dateSimpli);
 		//Your code here
 		// dd($dateSimpli);
-		$query->where('order_details.is_discarded', '=', '0')->where('order_details.is_notified_renovation', '=', '0')->where('type_order', '=', Order::TYPE_INDIVIDUAL)->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)->where('screen_id', '!=', null)->join('customers', 'order_details.customer_id', '=', 'customers.id')
+		$query->where('order_details.is_discarded', '=', '0')->where('order_details.is_notified_renovation', '=', '0')->where('type_order', '!=', Order::TYPE_FULL)->where('is_venta_revendedor', '=', '0')->where('finish_date', '<', $dateSimpli)->where('screen_id', '!=', null)->join('customers', 'order_details.customer_id', '=', 'customers.id')
 			->join('accounts', 'order_details.account_id', '=', 'accounts.id')
 			->join('screens', 'order_details.screen_id', 'screens.id')
 			->select('order_details.*',  'customers.name', 'customers.number_phone', 'accounts.email', 'screens.name', 'screens.date_sold', 'screens.date_expired')
@@ -583,6 +584,8 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 
 	public function getSetDesechar($id)
 	{
+
+
 		$order_detail = OrderDetail::where('id', '=', $id)->update([
 			'is_discarded' => 1
 		]);
@@ -624,8 +627,13 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
     public function getSetNotificar($id)
 	{
 		///dd("asd");
-        $order_id = OrderDetail::where('parent_order_detail', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->first();
-        $email = Accounts::where('id','=',$order_id->account_id)->first()->email;
+		$order_id = OrderDetail::where('id','=',$id)->first();
+		//s$order_id=null;
+		if($order_id->parent_order_detail!=null){
+			$order_id = OrderDetail::where('parent_order_detail', '=',$order_id->parent_order_detail)->where('is_renewed','=',0)->where('is_discarded','=',0)->first();
+		}
+
+		$email = Accounts::where('id','=',$order_id->account_id)->first()->email;
         $screen = Screens::where('id','=',$order_id->screen_id)->first();
         $customer= Customers::where('id','=',$order_id->customer_id)->first();
         $type_account = TypeAccount::where('id','=',$order_id->type_account_id)->first();
@@ -645,8 +653,14 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
             $nombre .= '%0A%0A';
         }
 
-        $message= '*'. str_replace(' ', '%20', $type_account->name).'*%0A%0A'.'Ok%20listo%20renovada%20por%2030%20dias%20mas%20de%20garantia%0A%0A'.$email."%0A%0A".$nombre.'Y%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%2030%20dias';
+        $message= '*'. str_replace(' ', '%20', $type_account->name).'*%0A%0A'.'Ok%20listo%20renovada%20por%20'.$order_id->membership_days.'%20dias%20mas%20de%20garantia%0A%0A'.$email."%0A%0A".$nombre.'Y%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%20'.$order_id->membership_days.'%20dias';
     	$number_phone = $customer->number_phone;
+
+		if($customer->revendedor_id !=null){
+			$number_phone = Usuarios::where('id','=',$customer->revendedor_id)->first()->number_phone;
+		}else{
+			$number_phone = $customer->number_phone;
+		}
         $host = env('LINK_SYSTEM');
         echo "
 					<script>
@@ -655,8 +669,8 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
                     let host =  ".json_encode($host)."
 					// alert();
 					//window.localStorage.setItem('miGato2', 'Juan');
-					//alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20REVENDEDOR,%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20*CADUCARA*%20esta%20noche.%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia.%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20bloqueara%20la%20cuenta%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
-					window.open('https://wa.me/'+telefono+'?text='+datos,'_blank');
+					//alert('https://api.whatsapp.com/send?phone='+telefono+'&text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20REVENDEDOR,%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20*CADUCARA*%20esta%20noche.%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia.%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20bloqueara%20la%20cuenta%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
+					window.open('https://api.whatsapp.com/send?phone='+telefono+'&text='+datos,'_blank');
 					window.location.href = host+'order_details_renovations'
 
 					</script>

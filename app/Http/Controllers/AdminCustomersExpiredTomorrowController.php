@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\TypeAccount;
 use App\Models\Screens;
+use App\Models\Usuarios;
 use DateTime;
 
 class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooster\controllers\CBController
@@ -280,7 +281,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 					// alert();
 					//window.localStorage.setItem('miGato2', 'Juan');
 					//alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
-					window.open('https://wa.me/'+telefono+'?text='+datos,'_blank');
+					window.open('https://api.whatsapp.com/send?phone='+telefono+'&text='+datos,'_blank');
 					window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow'
 					</script>
 					";
@@ -536,7 +537,7 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 	{
 		$datos = "";
 		$customer = Customers::where('id', '=', $id)->first();
-		$details = OrderDetail::where('customer_id', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->where('is_notified', '=', '0')->get();
+		$details = OrderDetail::where('customer_id', '=', $id)->where('is_renewed','=',0)->where('is_discarded','=',0)->where('is_notified', '=', '0')->where('screen_id', '!=', null)->where('is_venta_revendedor', '=', 0)->get();
 		$list_details_to_expired = [];
 		$number_screens = 1;
 
@@ -575,8 +576,14 @@ class AdminCustomersExpiredTomorrowController extends \crocodicstudio\crudbooste
 		}
 
 		///\crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "El cliente fue avisado exitosamente", "success");
-		$telefono =  $customer->number_phone;
-
+		
+		// if()
+		$telefono = null;
+		if($customer->revendedor_id !=null){
+			$telefono = Usuarios::where('id','=',$customer->revendedor_id)->first()->number_phone;
+		}else{
+			$telefono = $customer->number_phone;
+		}
 
 		// echo "
 		// <script>

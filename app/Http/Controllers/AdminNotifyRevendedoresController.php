@@ -281,7 +281,7 @@ class AdminNotifyRevendedoresController extends \crocodicstudio\crudbooster\cont
 					// alert();
 					//window.localStorage.setItem('miGato2', 'Juan');
 					//alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20REVENDEDOR,%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20*CADUCARA*%20esta%20noche.%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia.%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20bloqueara%20la%20cuenta%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
-					window.open('https://wa.me/'+telefono+'?text='+datos,'_blank');
+					window.open('https://api.whatsapp.com/send?phone='+telefono+'&text='+datos,'_blank');
 					window.location.href = 'http://streaming-manager.test/admin/notify_revendedores'
 
 					</script>

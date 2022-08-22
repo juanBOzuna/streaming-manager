@@ -73,6 +73,17 @@ class AdminScreensController extends \crocodicstudio\crudbooster\controllers\CBC
         $this->form[] = ['label' => 'Tipo de dispositivo', 'name' => 'type_device_id', 'type' => 'select2', 'width' => 'col-sm-9', 'datatable' => 'type_devices,name'];
         $this->form[] = ['label' => 'Nombre del equipo', 'name' => 'device', 'type' => 'text', 'width' => 'col-sm-9'];
         $this->form[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'text', 'width' => 'col-sm-9'];
+        // $this->form[] = ['label'=>'Platform','name'=>'platform','type'=>'checkbox','dataenum'=>'Android;IOS;Website'];
+        
+        $urlPage = $_SERVER['REQUEST_URI'];
+        $porciones = explode("?", $urlPage);
+        $porciones = explode("/", $porciones[0]);
+        $id= $porciones[sizeof($porciones) - 1];
+
+        if(Screens::where('id','=',$id)->first()->is_account_expired==1){
+
+            $this->form[] = ['label'=>'Aviso de cuenta caida','name'=>'is_screen_replace_notified','type'=>'radio','dataenum'=>'1|SI;0|NO'];
+        }
 
         if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
             $this->form[] = ['label' => 'Membresia', 'name' => 'price_of_membership', 'type' => 'money', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-10'];

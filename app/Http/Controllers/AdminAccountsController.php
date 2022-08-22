@@ -17,8 +17,10 @@ use Illuminate\Support\Facades\Crypt;
 
 use Illuminate\Support\Arr;
 use App\Models\Accounts;
+use App\Models\Revendedores;
 use App\Models\TypeAccount;
 use App\Models\Screens;
+use App\Models\TypeDevice;
 use crocodicstudio\crudbooster\helpers\CRUDBooster as HelpersCRUDBooster;
 use Illuminate\Support\Facades\DB as FacadesDB;
 
@@ -58,6 +60,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,name"];
         $this->col[] = ["label" => "fecha de creacion", "name" => "created_at"];
         $this->col[] = ["label" => "Pantallas Vendidas", "name" => "screens_sold"];
+        $this->col[] = ["label" => "Pantallas extra vendidas", "name" => "number_screens_extraordinary_sold"];
         $this->col[] = ["label" => "esta renovada?", "name" => "is_renewed", "callback" => function ($row) {
             if ($row->is_renewed == 0) {
                 return 'No';
@@ -88,7 +91,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $this->form = [];
         $this->form[] = ['label' => 'Correo', 'name' => 'email', 'type' => 'email', 'validation' => 'required|min:1|max:255|email', 'width' => 'col-sm-10', 'placeholder' => 'Please enter a valid email address'];
         $this->form[] = ['label' => 'Clave', 'name' => 'key_pass', 'type' => 'text', 'validation' => 'min:3', 'width' => 'col-sm-10'];
-        $this->form[] = ['label' => 'Tipo de cuenta', 'name' => 'type_account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'type_account,name'];
+        $this->form[] = ['label' => 'Tipo', 'name' => 'type_account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'type_account,name'];
 
         if (HelpersCRUDBooster::getCurrentMethod() == "getDetail") {
 
@@ -103,7 +106,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             $screens[] = ['label' => 'Cliente #', 'name' => 'client_id'];
             $screens[] = ['label' => 'Dispositivo', 'name' => 'device'];
             $screens[] = ['label' => 'IP', 'name' => 'ip', 'type' => 'text'];
-            $this->form[] = ['label' => 'Pantallas', 'name' => 'screens', 'type' => 'child', 'columns' => $screens, 'table' => 'screens', 'foreign_key' => 'account_id'];
+            //$this->form[] = ['label' => 'Pantallas', 'name' => 'screens', 'type' => 'child', 'columns' => $screens, 'table' => 'screens', 'foreign_key' => 'account_id'];
         }
 
         # END FORM DO NOT REMOVE THIS LINE
@@ -237,7 +240,11 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         foreach (TypeAccount::get() as $key) {
             # code...
 
-            $total = Screens::where('type_account_id', '=', $key->id)->where('profile_number', '>', 1)->where('profile_number', '<', ($key->available_screens + 2))->where('is_sold', '=', 0)->count();
+            $total = Screens::where('type_account_id', '=', $key->id)
+            ->where('profile_number', '>', 1)
+            ->where('profile_number', '<', ($key->available_screens + 2))
+            ->where('is_sold', '=', 0)
+            ->where('is_account_expired','=',0)->count();
             $screens_availables_info[$i] = [
                 'name' => $key->name,
                 'screens' => $total
@@ -261,7 +268,200 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         |
         */
 
-        if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getIndex") {
+        if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getDetail") {
+        
+            $urlPage = $_SERVER['REQUEST_URI'];
+            $porciones = explode("?", $urlPage);
+            $porciones = explode("/", $porciones[0]);
+            $id= $porciones[sizeof($porciones) - 1];
+            $acc= Accounts::where('id','=',$id)->first();
+
+            $screens = Screens::where('account_id','=',$id)->get();
+            $detail = OrderDetail::where('account_id', '=', $id)->where('type_order', '=', Order::TYPE_FULL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
+            $trHtml = '';
+            foreach ($screens as $key) {
+                # code...
+
+                $cliente =$key->client_id ==null ?'':'id: '.$key->client_id;
+                $trHtml .= '
+                <tr>
+                <th scope="row">' . $key->id . '</th>
+                <td>'.$key->name.'</td>
+                <th>' .$key->code_screen.' </th>
+                <td>' . Carbon::parse($key->date_sold)->format('Y-m-d H:i:s') . ' </td>
+                <td>' .Carbon::parse($key->date_expired)->format('Y-m-d H:i:s')    . ' </td>
+                <td>'  . $cliente . '</td>
+                <td>' .$key->device . '</td>
+                <td>' . $key->ip  . '</td>';
+                
+                if($key->is_account_expired==1){
+                if($key->screen_replace !=null && $key->is_screen_replace_notified==0 ){
+                    $id=   explode(",", $key->screen_replace);
+                    $screenReplace= Screens::where('id','=',intval($id[0]))->first();
+                    $details_text='';
+                    $details_text .=  '%0A%0A'. $screenReplace->email . '%0A%0A';
+                    $details_text .= 'Pantalla%20' . $screenReplace->profile_number . '%20pin%20' . $screenReplace->code_screen . '%0A';
+                    if (isset(explode(" ", $screenReplace->name)[2])) {
+                        $details_text .= explode(" ", $screenReplace->name)[2] . '%20%20%0A';
+                    }
+                    // dd($screen->type_device_id);
+                    if ($screenReplace->type_device_id != null) {
+                        $typeDevice = TypeDevice::where('id', '=', $screenReplace->type_device_id)->first();
+                        $details_text .= $typeDevice->name . '%20' . $typeDevice->emoji . '%20' . $screenReplace->device . '%0A%0A%0A';
+                    } else {
+                        $details_text .= '%0A%0A';
+                    }
+
+                    $message='*MOSERCON*%20*Streaming*%0A%0Ale%20informa%20%20que%20por%20motivos%20%20de%20daños%20en%20la%20Plataforma%0ALos%20datos%20de%20su%20*Pantalla%20o%20Cuenta*%20fueron%20modificados'.$details_text.'Pedimos%20%20disculpas%20por%20%20si%20causamos%20un%20poco%20de%20molestia%20estamos%20trabajando%20internamente%20%20para%20este%20tipo%20de%20errores%20fuera%20de%20nuestro%20alcance%20%0AAtt%20:%20*Admin*';
+                    $trHtml .='<td> '.$screenReplace->email.' <b>PERFIL:</b> '.$screenReplace->profile_number.'</td>';         
+                    // $trHtml .='<td> '.$screenReplace->email.' , <b>P-ID:</b> '.$screenReplace->id.' <b>PERFIL:</b> '.$screenReplace->profile_number.'</td>';         
+                    $trHtml .='<td></td>';    
+                    if(!isset($detail)){
+                        $trHtml .='<td> <a href="https://api.whatsapp.com/send?phone=573044155592&text='. $message.'" target="_blank">Avisar</a> <p1>/</p1> <a href="'.env('LINK_SYSTEM').'screens/edit/'.$key->id.'?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens&parent_id=&parent_field=" target="_blank">Editar</a> </td>';         
+                    }     
+                }else{
+                    if($key->screen_replace !=null && $key->is_screen_replace_notified==1){
+                        $id=   explode(",", $key->screen_replace);
+                        $screenReplace= Screens::where('id','=',intval($id[0]))->first();
+                        // $trHtml .='<td> '.$screenReplace->email.' , <b>P-ID:</b> '.$screenReplace->id.' <b>PERFIL:</b> '.$screenReplace->profile_number.'</td>';         
+                        $trHtml .='<td> '.$screenReplace->email.'  <b>PERFIL:</b> '.$screenReplace->profile_number.'</td>';         
+                        $trHtml .='<td>SI</td>';
+                        $trHtml .='<td><a href="'.env('LINK_SYSTEM').'screens/edit/'.$key->id.'?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens&parent_id=&parent_field=" target="_blank">Editar</a> </td>';
+                    }else{
+                        $trHtml .='<td></td>';
+                        $trHtml .='<td></td>';
+                        $trHtml .='<td><a href="'.env('LINK_SYSTEM').'screens/edit/'.$key->id.'?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens&parent_id=&parent_field=" target="_blank">Editar</a> </td>';
+                    }
+                }
+                }else{
+                    $trHtml .='<td><a href="'.env('LINK_SYSTEM').'screens/edit/'.$key->id.'?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fscreens&parent_id=&parent_field=" target="_blank">Editar</a> </td>';
+                }
+                $trHtml .='</tr>';
+            }
+            
+            if($acc->is_expired==1){
+                $htmlForTable = '
+                <br>
+                <span><strong>  DETALLE DE VENTA (PANTALLAS VENDIDAS) </strong></span>
+                ';
+                if($acc->account_replace!=null){
+                    $accReplace = explode(",", $acc->account_replace)[0];
+                    $linkEditAccount='http://streaming-manager.test/admin/accounts/edit/'.$accReplace .'?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Faccounts&parent_id=&parent_field=';
+                    $linkEditThisAccount ='http://streaming-manager.test/admin/accounts/edit/'.$acc->id .'?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Faccounts&parent_id=&parent_field=';
+                    $htmlForTable.='  //  <a href="'.$linkEditAccount.'" target="_blank"> Editar Cuenta De reemplazo </a> </strong></span>';
+                    $htmlForTable.='  //  <a href="'.$linkEditAccount.'" target="_blank"> Editar Esta Cuenta </a> </strong></span>';
+                }else{
+                    $htmlForTable.='</strong></span>';
+                }
+                
+                $htmlForTable.='<br>
+                <br>
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col">ID</th>
+                      <th scope="col">NOMBRE</th>
+                      <th scope="col">PIN</th>
+                      <th scope="col">VENDIDA</th>
+                      <th scope="col">VENCE</th>
+                      <th scope="col">CLIENTE</th>
+                      <th scope="col">DISPOSITIVO</th>
+                      <th scope="col">IP</th>
+                      <th scope="col">CAMBIO</th>
+                      <th scope="col">AVISO</th>
+                       <th scope="col"> Acciones </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ' . $trHtml . '
+                  </tbody>
+                </table>';
+            }else{
+                $htmlForTable = '
+           <br>
+           <span><strong>  DETALLE DE VENTA (PANTALLAS VENDIDAS)</strong></span>
+           <br>
+           <br>
+           <table class="table table-striped">
+             <thead>
+               <tr>
+                 <th scope="col">ID</th>
+                 <th scope="col">NOMBRE</th>
+                 <th scope="col">PIN</th>
+                 <th scope="col">VENDIDA</th>
+                 <th scope="col">VENCE</th>
+                 <th scope="col">CLIENTE</th>
+                 <th scope="col">DISPOSITIVO</th>
+                 <th scope="col">IP</th>
+                  <th scope="col"> Acciones </th>
+               </tr>
+             </thead>
+             <tbody>
+               ' . $trHtml . '
+             </tbody>
+           </table>';
+           }
+
+            $this->script_js ="
+            let table = " . json_encode($htmlForTable) . "
+            let area = document.getElementById('parent-form-area');
+            area.innerHTML+= table ;
+            ";
+
+            if($acc->account_replace!=null ){
+                //dd();
+                $email = $acc->email;
+                $accReplace = Accounts::where('id','=',explode(",", $acc->account_replace)[0])->first();
+                $mesageReporte = '*MOSERCON*%20*Streaming*%0A%0Ale%20informa%20%20que%20por%20motivos%20%20de%20daños%20en%20la%20Plataforma%0ALos%20datos%20de%20su%20*Cuenta*%20fueron%20modificados%0A%0A'. $accReplace->email.'%20%0A%0AContraseña%20%20'.Crypt::decryptString($accReplace->key_pass).'%20%0A%0ACuenta%20completa%20con%20Pines%20%0A%0APedimos%20%20disculpas%20por%20%20si%20causamos%20un%20poco%20de%20molestia%20estamos%20trabajando%20internamente%20%20para%20evitar%20este%20tipo%20de%20errores%20fuera%20de%20nuestro%20alcance%20%0AAtt%20:%20*Admin*';
+                $telefono=null;
+
+                $detail3 = OrderDetail::where('account_id', '=', $accReplace->id)->where('type_order', '=', Order::TYPE_FULL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
+            
+                if($accReplace->revendedor_id!=null){
+                    $telefono= Revendedores::where('id','=',$accReplace->revendedor_id)->first()->telefono;
+                }else{
+                    $telefono= Customers::where('id','=',$detail3->customer_id)->first()->number_phone;
+                }
+
+
+                $this->script_js.="
+                    document.querySelector('#content_section').innerHTML= ` <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+                    <a  href='https://api.whatsapp.com/send?phone=".$telefono."&text=".$mesageReporte."' class='float2' target='_blank'>
+                    <i class='fa fa-whatsapp my-float2'></i>
+                    <h4 style='color:black ; font-weight: bold; ' >Reporte</h4>
+                    </a>`+document.querySelector('#content_section').innerHTML;
+                    document.querySelector('#content_section').innerHTML+= `
+                    <style type='text/css'>
+                        .float2{
+                            position:fixed;
+                            width:55px;
+                            height:55px;
+                            bottom:35px;
+                            right:100px;
+                            background-color:green;
+                            color:#FFF;
+                            border-radius:45px;
+                            text-align:center;
+                        font-size:25px;
+                            box-shadow: 2px 2px 3px #999;
+                        z-index:100;
+                        }
+                        .float2:hover {
+                            text-decoration: none;
+                            color: #25d366;
+                        background-color:#fff;
+                        }
+
+                        .my-float2{
+                            margin-top:16px;
+                        }
+                </style>
+                    `;
+                ";
+
+            }
+        }
+            if (\crocodicstudio\crudbooster\helpers\CRUDBooster::getCurrentMethod() == "getIndex") {
             $this->script_js = "
 
                         let list = document.querySelectorAll('td');
@@ -555,10 +755,11 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
     public function getSetDesactive($id)
     {
+      
         $account = Accounts::where("id", "=", $id)->first();
         $type = TypeAccount::where('id', '=', $account->type_account_id)->first();
         $detail = OrderDetail::where('account_id', '=', $account->id)->where('type_order', '=', Order::TYPE_FULL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
-
+      //  dd($detail);
         if ($account->screens_sold == 0) {
             $account->is_expired = 1;
             $account->is_sold_ordinary = 0;
@@ -566,21 +767,28 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             $account->is_sold_extraordinary = 0;
             $account->screens_sold = 0;
             $account->save();
+            
+            $screensOfAccount = Screens::where('account_id', '=', $id)->get();
+
+            foreach ($screensOfAccount as $key) {
+                # code...
+                $key->is_account_expired=1;
+                $key->save();
+            }
 
             \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
-        }
+        }  
+        //dd('');
 
         if (isset($detail)) {
             $renovations = [];
             $to_renovation = [];
+          //  dd('');
+       
             $screensOfAccount = Screens::where('account_id', '=', $id)->get();
             $accReplace = Accounts::where('screens_sold', '=', 0)->where('is_expired', '=', 0)->first();
+            //
             if (isset($accReplace)) {
-                foreach ($screensOfAccount as $item) {
-                    $item->is_account_expired = 1;
-                    $item->save();
-                }
-
                 $accReplace->is_sold_ordinary = $account->is_sold_ordinary;
                 $accReplace->is_sold_extraordinary = $account->is_sold_extraordinary;
                 $accReplace->screens_sold = $account->screens_sold;
@@ -592,16 +800,50 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                 $detail->account_id =  $accReplace->id;
                 $detail->save();
 
+                
+
                 $account->is_expired = 1;
                 $account->is_sold_ordinary = 0;
+                $account->account_replace = ''.$accReplace->id.','.$detail->id;
                 $account->revendedor_id = null;
                 $account->is_sold_extraordinary = 0;
                 $account->screens_sold = 0;
                 $account->save();
 
-                foreach ($screensOfAccount as $item) {
-                    $item->is_account_expired = 1;
-                    $item->save();
+                $screens_of_replace = Screens::where('account_id','=',$accReplace->id)->get();
+                
+                $i=0;
+                foreach ($screensOfAccount as $key) {
+                    # code...
+
+                    $screen_of_replace = $screens_of_replace[$i];
+
+                     $screen_of_replace->client_id = $key->client_id;
+                     $screen_of_replace->date_sold = $key->date_sold;
+                     $screen_of_replace->date_expired = $key->date_expired;
+                     $screen_of_replace->is_sold = $key->is_sold;
+                     $screen_of_replace->name=$screen_of_replace->name;
+                     $screen_of_replace->type_device_id = $key->type_device_id;
+                     $screen_of_replace->code_screen = $key->code_screen;
+                     $screen_of_replace->price_of_membership = $key->price_of_membership;
+                     $screen_of_replace->device = $key->device;
+                     $screen_of_replace->ip = $key->ip;
+                     $screen_of_replace->save();
+
+                    $key->client_id = null;
+                    $key->date_sold = null;
+                    $key->code_screen = null;
+                    $key->date_expired = null;
+                    $key->screen_replace = ''.$screen_of_replace->id.','.$detail->id;
+                    $key->is_sold = 0;
+                    $key->is_account_expired=1;
+                    $key->name='Pantalla '.$key->profile_number;
+                    $key->type_device_id = $key->type_device_id;
+                    $key->price_of_membership = 0;
+                    $key->device = null;
+                    $key->ip = null;
+                    $key->save();
+                    $i++;
                 }
 
                 \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
@@ -641,12 +883,15 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
                 foreach ($screensOfAccount as $screen) {
                     // $screen->save();
+                    
                     if ($screen->client_id != null) {
 
                         $screenToChange = Screens::where('is_sold', '=', '0')->where("is_account_expired", "=", 0)->get();
                         foreach ($screenToChange as $key) {
                             # code...
                             $detail = OrderDetail::where('account_id', '=', $key->account_id)->where('type_order', '=', Order::TYPE_INDIVIDUAL)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
+                            
+                            
                             if (!isset($detail)) {
                                 $order_detail = OrderDetail::where('customer_id', '=', $screen->client_id)->where('screen_id', '=', $screen->id)->where('is_renewed', '=', 0)->where('is_discarded', '=', 0)->first();
                                 // dd($order_detail);
@@ -654,6 +899,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                 $key->date_sold = $screen->date_sold;
                                 $key->date_expired = $screen->date_expired;
                                 $key->is_sold = $screen->is_sold;
+                                $key->name=$screen->name;
+                                $key->type_device_id = $screen->type_device_id;
                                 $key->code_screen = $screen->code_screen;
                                 $key->price_of_membership = $screen->price_of_membership;
                                 $key->device = $screen->device;
@@ -664,7 +911,11 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                 $screen->date_sold = null;
                                 $screen->code_screen = null;
                                 $screen->date_expired = null;
+                                $screen->screen_replace = ''.$key->id.','.$order_detail->id;
                                 $screen->is_sold = 0;
+                                $screen->is_account_expired=1;
+                                $screen->name='Pantalla '.$key->profile_number;
+                               
                                 $screen->price_of_membership = 0;
                                 $screen->device = null;
                                 $screen->ip = null;
@@ -698,6 +949,9 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                 break;
                             }
                         }
+                    }else{
+                                $screen->is_account_expired=1;
+                                $screen->save();
                     }
                 }
                 \crocodicstudio\crudbooster\helpers\CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Los clientes fueron trasladados a otras pantallas exitosamente", "success");
@@ -712,13 +966,17 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
         $account = Accounts::where("id", "=", $id)->first();
         $account->is_expired = 0;
+        $account->account_replace = null;
+        $account->is_account_replace_notified = 0;
         $account->save();
 
 
         $screensOfAccount = Screens::where('account_id', '=', $id)->get();
 
         foreach ($screensOfAccount as $item) {
-            $item->is_account_expired = 0;
+            $item->is_account_expired = 0; 
+            $item->screen_replace = null; 
+            $item->is_screen_replace_notified = 0; 
             $item->save();
         }
 
