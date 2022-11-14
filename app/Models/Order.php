@@ -18,6 +18,7 @@ class Order extends Model
 
         'customers_id',
         'is_discarded',
+        'is_venta_victor',
         'number_screens_discarded',
         'total_price',
         'type_order',

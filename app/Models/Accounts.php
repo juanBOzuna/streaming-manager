@@ -23,13 +23,12 @@ class Accounts extends Model
         'is_active',
         'is_expired',
         'account_replace',
+        'is_venta_victor',
         'is_account_replace_notified',
         'date_renewed',
         'times_renewed',
         'screens_sold',
         'type_account_id',
-        
-
     ];
 
 }

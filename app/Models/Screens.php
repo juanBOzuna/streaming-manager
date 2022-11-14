@@ -23,6 +23,7 @@ class Screens extends Model
         'screen_replace',
         'is_screen_replace_notified',
         'date_sold',
+        'is_venta_victor',
         'date_expired',
         'price_of_membership',
         'device',

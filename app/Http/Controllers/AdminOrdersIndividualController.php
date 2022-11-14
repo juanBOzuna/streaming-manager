@@ -58,6 +58,14 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		}];
 		$this->col[] = ["label" => "Fecha Venta", "name" => "created_at"];
 		$this->col[] = ["label" => "Precio Total", "name" => "total_price"];
+		$this->col[] = ["label" => "Referencia", "callback" => function ($row) {
+            if($row->is_venta_victor==1){
+                return 'VICTOR';
+            }else{
+                return '';
+            }
+
+        }, "name" => "is_venta_victor"];
 		# END COLUMNS DO NOT REMOVE THIS LINE
 
 		# START FORM DO NOT REMOVE THIS LINE
@@ -83,6 +91,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			$this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,number_phone'];
 			$this->form[] = ['label' => 'Pantalla', 'name' => 'pantalla_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'screens,id'];
 			$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
+			$this->form[] = ['label'=>'Venta de VICTOR','name'=>'is_venta_victor','type'=>'radio','validation' => 'required','dataenum'=>'0|NO;1|SI'];
 		}
 		# END FORM DO NOT REMOVE THIS LINE
 
@@ -320,7 +329,9 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			$detail = OrderDetail::where('orders_id', '=', $order->id)->first();
 			$account = Accounts::where('id', '=', $detail->account_id)->first();
 			$type = TypeAccount::where('id', '=', $account->type_account_id)->first();
-			$email = $account->email;
+			
+			//$email_of_screen=str_replace("+", "%2B", $screen->email);
+			$email =str_replace("+", "%2B", $account->email) ;
 			$screen = Screens::where('id', '=', $detail->screen_id)->first();
 			$screensText = 'Pantalla%20' . $screen->profile_number . '%20pin%20' . $screen->code_screen . '%0A';
 			if (isset(explode(" ", $screen->name)[2])) {
@@ -637,7 +648,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 	public function hook_before_add(&$postdata)
 	{
 		//Your code here
-
+		//dd($postdata);
 		date_default_timezone_set('America/Bogota');
 		$screen = Screens::where("id", "=", $postdata["pantalla_id"])->first();
 
@@ -655,6 +666,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		$screen->code_screen = strval($number_cliente);
 		$screen->client_id = $postdata["customers_id"];
 		$screen->date_sold =  strval($dateInstant);
+		$screen->is_venta_victor =  $postdata["is_venta_victor"];
 		$dateExpired = $dateInstant->addDays($postdata['dias_membersia']);
 		$screen->date_expired = strval($dateExpired);
 		$screen->price_of_membership = $total_price;
@@ -670,21 +682,21 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 		}
 
 		$screen = Screens::where("id", "=", $postdata["pantalla_id"])->first();
+		
 		if($screen->profile_number>1 && $screen->profile_number<($type->available_screens+2)){
 			$acc->screens_sold = $acc->screens_sold + 1;
-
 		}else{
 			$acc->number_screens_extraordinary_sold = ($acc->number_screens_extraordinary_sold + 1);
-			
-
 		}
 
 		// $acc->screens_sold = $acc->screens_sold + 1;
+		$acc->is_venta_victor =  request()['is_venta_victor'];
 		$acc->save();
 
 		$order = Order::create([
 			'customers_id' => $postdata["customers_id"],
 			'total_price' => $total_price,
+			'is_venta_victor' => request()['is_venta_victor'],
 			'type_order' => Order::ONLY_SCREEN,
 		]);
 
@@ -693,6 +705,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 			'type_account_id' => $screen->type_account_id,
 			'customer_id' => $postdata["customers_id"],
 			'screen_id' => $postdata["pantalla_id"],
+			'is_venta_victor' => $postdata["customers_id"],
 			'account_id' => $screen->account_id,
 			'type_order' => Order::ONLY_SCREEN,
 			'membership_days' => $postdata["dias_membersia"],
@@ -768,6 +781,7 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 				'code_screen' => null,
 				'date_expired' => null,
 				'date_sold' => null,
+				'is_venta_victor' =>0,
 				'price_of_membership' => 0,
 				'date_expired' => null,
 				'screen_replace'=>null,
@@ -794,6 +808,8 @@ class AdminOrdersIndividualController extends \crocodicstudio\crudbooster\contro
 				
 
 			}
+
+			$account_of_screen->is_venta_victor=0;
 			$account_of_screen->save();
 			// Screens::where('id', $screen)
 

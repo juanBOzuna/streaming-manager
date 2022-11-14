@@ -49,6 +49,14 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         $this->col[] = ["label" => "Cliente", "name" => "customers_id", "join" => "customers,name"];
         $this->col[] = ["label" => "Telefono", "name" => "customers_id", "join" => "customers,number_phone"];
         $this->col[] = ["label" => "Precio Total", "name" => "total_price"];
+        $this->col[] = ["label" => "Referencia", "callback" => function ($row) {
+            if($row->is_venta_victor==1){
+                return 'VICTOR';
+            }else{
+                return '';
+            }
+
+        }, "name" => "is_venta_victor"];
         $this->col[] = ["label" => "Estado", "name" => "is_discarded_all", "callback" => function ($row) {
             if ($row->is_discarded_all == 0) {
                 return 'Normal';
@@ -67,7 +75,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         }
         $this->form[] = ['label' => 'Cliente', 'name' => 'customers_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'customers,name', 'datatable_format' => 'name,\'  -  \',number_phone'];
 
-
+        $this->form[] = ['label'=>'Venta de VICTOR','name'=>'is_venta_victor','type'=>'radio','validation' => 'required','dataenum'=>'0|NO;1|SI'];
         $columns = [];
         if (CRUDBooster::getCurrentMethod() == "getDetail") {
             // dd($_REQUEST);
@@ -161,6 +169,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         } else {
             $columns[] = ['label' => 'Numero de pantallas', 'name' => 'number_screens', 'type' => 'number', 'required' => true];
             $columns[] = ['label' => 'Dias de membresia', 'name' => 'membership_days', 'type' => 'number', 'required' => true];
+            
             $this->form[] = ['label' => 'Venta', 'name' => 'order_details', 'type' => 'child', 'columns' => $columns, 'table' => 'order_details', 'foreign_key' => 'orders_id'];
         }
 
@@ -281,7 +290,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                 $screen = Screens::where('id', '=', $key->screen_id)->first();
                 $type = TypeAccount::where('id', '=', $screen->type_account_id)->first()->name;
                 $details_text .= '*' . $type . '*%0A%0A';
-                $details_text .=   $screen->email . '%0A%0A';
+                $email_of_screen=str_replace("+", "%2B", $screen->email);
+                $details_text .= $email_of_screen  . '%0A%0A';
                 $details_text .= 'Pantalla%20' . $screen->profile_number . '%20pin%20' . $screen->code_screen . '%0A';
                 if (isset(explode(" ", $screen->name)[2])) {
                     $details_text .= explode(" ", $screen->name)[2] . '%20%20%0A';
@@ -302,10 +312,9 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
             }else{
                 $telefono_send_sms = $cliente->number_phone;
             }
-          //  dd($details_text);
+
 
             $link_sms = '*MOSERCON*%20*Streaming*%0A%0ATe%20activa%20las%20siguientes%20pantallas%20%0A%0A' . $details_text . '%0ANos%20confirmas%20que%20todo%20haya%20salido%20bien%0AY%20recuerda%20cumplir%20las%20reglas%20para%20que%20la%20garantia%20sea%20efectiva%20por%20'.$details[0]->membership_days	.'%20días';
-
 
             $host = env('LINK_SYSTEM');
             $link_customer_viewer = $host . "customers/detail/" . $order->customers_id . "?return_url=http%3A%2F%2Fstreaming-manager.test%2Fadmin%2Fcustomers";
@@ -573,6 +582,8 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
     */
     public function hook_before_add(&$postdata)
     {
+
+        //dd(request()['is_venta_victor']);
         $types = $this->ordenate_types();
         // dd();
         $index_types = 0;
@@ -687,6 +698,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                 'date_sold' => null,
                 'price_of_membership' => 0,
                 'date_expired' => null,
+                'is_venta_victor' => 0,
                 'screen_replace'=>null,
                 'is_screen_replace_notified'=> 0,
                 'is_sold' => 0,
@@ -696,6 +708,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
 
             $account_of_screen =  Accounts::where('id', '=', $key->account_id)->first();
             $account_of_screen->screens_sold = ($account_of_screen->screens_sold - 1);
+            $account_of_screen->is_venta_victor = 0;
             $account_of_screen->save();
             $key->delete();
         }
@@ -730,6 +743,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         $order = Order::create([
             'customers_id' => $customer_id,
             'type_order' => Order::TYPE_INDIVIDUAL,
+            'is_venta_victor' =>request()['is_venta_victor'],
             'total_price' => intval($total)
         ]);
         foreach ($list_types as $key) {
@@ -749,6 +763,7 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                     'type_account_id' => $key['type_account_id'],
                     'customer_id' => $customer_id,
                     'screen_id' => $screenClaimed['screen_id'],
+                    'is_venta_victor' => request()['is_venta_victor'],
                     'type_order' => Order::TYPE_INDIVIDUAL,
                     'account_id' => $screenClaimed['account_id'],
                     'membership_days' => $key['membership_days'],
@@ -759,12 +774,14 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
                 $screenSelected->update([
                     'client_id' => $customer_id,
                     'is_sold' => 1,
+                    'is_venta_victor' => request()['is_venta_victor'],
                     'code_screen' => $number_cliente,
                     'date_sold' => Carbon::parse('')->format('Y-m-d H:i:s'),
                     'price_of_membership' =>  $price,
                     'date_expired' => (string)$dateExpired->format('Y-m-d H:i:s')
                 ]);
                 $account->screens_sold = ($account->screens_sold + 1);
+                $account->is_venta_victor = request()['is_venta_victor'];
                 $account->save();
             }
         }
@@ -775,76 +792,76 @@ class AdminOrdersController extends \crocodicstudio\crudbooster\controllers\CBCo
         CRUDBooster::redirect($_SERVER['HTTP_REFERER'], 'Se creo el pedido exitosamente' . '</br></br> <td><h4 style="font-weight: bold;color: white;">Unda en el boton flotante para ir a la orden creada Automaticamente</h4>  </td>', "success");
     }
 
-    public static function generateOrder($typeAccountToTypeAccount, $listToList, $searchToSearch, $errorsInSearch, $containsError, $request)
-    {
-        $total_price = 0;
+    // public static function generateOrder($typeAccountToTypeAccount, $listToList, $searchToSearch, $errorsInSearch, $containsError, $request)
+    // {
+    //     $total_price = 0;
 
-        $order = Order::create([
-            'customers_id' => $request['customers_id'],
-            'type_order' => Order::TYPE_INDIVIDUAL,
-            'total_price' => 0
-        ]);
+    //     $order = Order::create([
+    //         'customers_id' => $request['customers_id'],
+    //         'type_order' => Order::TYPE_INDIVIDUAL,
+    //         'total_price' => 0
+    //     ]);
 
-        $index = 0;
-        foreach ($typeAccountToTypeAccount as $typeAccount) {
-            $price_of_membership_days = $typeAccount->price_day * $request['venta-membership_days'][$index];
-            date_default_timezone_set('America/Bogota');
+    //     $index = 0;
+    //     foreach ($typeAccountToTypeAccount as $typeAccount) {
+    //         $price_of_membership_days = $typeAccount->price_day * $request['venta-membership_days'][$index];
+    //         date_default_timezone_set('America/Bogota');
 
 
-            $screens = $listToList[$index];
-            $dateInstant = Carbon::parse('');
-            $dateExpired = $dateInstant->addDays($request['venta-membership_days'][$index]);
+    //         $screens = $listToList[$index];
+    //         $dateInstant = Carbon::parse('');
+    //         $dateExpired = $dateInstant->addDays($request['venta-membership_days'][$index]);
 
-            //dd($dateExpired);
+    //         //dd($dateExpired);
 
-            foreach ($screens as $screen) {
+    //         foreach ($screens as $screen) {
 
-                $screenSelected = Screens::where('id', $screen)->first();
+    //             $screenSelected = Screens::where('id', $screen)->first();
 
-                OrderDetail::create([
-                    'orders_id' => $order->id,
-                    'type_account_id' => $typeAccount->id,
-                    'customer_id' => $request['customers_id'],
-                    'screen_id' => $screenSelected->id,
-                    'type_order' => Order::TYPE_INDIVIDUAL,
-                    'account_id' => $screenSelected->account_id,
-                    'membership_days' => $request['venta-membership_days'][$index],
-                    'price_of_membership_days' => intval($price_of_membership_days),
-                    'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s')
-                ]);
+    //             OrderDetail::create([
+    //                 'orders_id' => $order->id,
+    //                 'type_account_id' => $typeAccount->id,
+    //                 'customer_id' => $request['customers_id'],
+    //                 'screen_id' => $screenSelected->id,
+    //                 'type_order' => Order::TYPE_INDIVIDUAL,
+    //                 'account_id' => $screenSelected->account_id,
+    //                 'membership_days' => $request['venta-membership_days'][$index],
+    //                 'price_of_membership_days' => intval($price_of_membership_days),
+    //                 'finish_date' => (string)$dateExpired->format('Y-m-d H:i:s')
+    //             ]);
 
-                $screenSelected->update([
-                    'client_id' => $request['customers_id'],
-                    'is_sold' => 1,
-                    'date_sold' => Carbon::parse('')->format('Y-m-d H:i:s'),
-                    'price_of_membership' => intval($price_of_membership_days),
-                    'date_expired' => $dateExpired->format('Y-m-d H:i:s')
-                ]);
-                $total_price = $price_of_membership_days + $total_price;
-            }
-            $index++;
-        }
+    //             $screenSelected->update([
+    //                 'client_id' => $request['customers_id'],
+    //                 'is_sold' => 1,
+    //                 'date_sold' => Carbon::parse('')->format('Y-m-d H:i:s'),
+    //                 'price_of_membership' => intval($price_of_membership_days),
+    //                 'date_expired' => $dateExpired->format('Y-m-d H:i:s')
+    //             ]);
+    //             $total_price = $price_of_membership_days + $total_price;
+    //         }
+    //         $index++;
+    //     }
 
-        $order->update([
-            'total_price' => intval($total_price)
-        ]);
+    //     $order->update([
+    //         'total_price' => intval($total_price)
+    //     ]);
 
-        if ($containsError == 0) {
-            CRUDBooster::redirect($_SERVER['HTTP_REFERER'] . '/is_sold_successfull=1', "Se creo el pedido exitosamente", "success");
-            //     echo "
-            // <script>
-            // let datos = " . json_encode($datos) . "
-            // let telefono = " . json_encode($telefono) . "
-            // //alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
-            // window.open('https://wa.me/3044155592','_blank');
-            // // window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow'
-            // </script>
-            // ";
-        } else {
-            session(['is_success' => 1]);
-            CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente" . $errorsInSearch, "success");
-        }
-    }
+    //     if ($containsError == 0) {
+    //         CRUDBooster::redirect($_SERVER['HTTP_REFERER'] . '/is_sold_successfull=1', "Se creo el pedido exitosamente", "success");
+    //         //     echo "
+    //         // <script>
+    //         // let datos = " . json_encode($datos) . "
+    //         // let telefono = " . json_encode($telefono) . "
+    //         // //alert('https://wa.me/'+telefono+'?text='+'*COMUNICADO%20MOSERCON*%0A%0AEstimado%20cliente%20nuestro%20sistema%20le%20informa%20que%20el%20servicio%20adquirido%20con%20nosotros%20caducara%20esta%20noche%0A%0A' + datos + 'Si%20desea%20seguir%20con%20nuestro%20servicio%20con%20la%20misma%20pantalla%20debe%20mandarnos%20comprobante%20de%20pago%20en%20este%20dia%0ADe%20lo%20contrario%20el%20sistema%20automaticamente%20blokeara%20su%20pantalla%20a%20partir%20de%20media%20noche%0A%20Att:%20*Admin*');
+    //         // window.open('https://wa.me/3044155592','_blank');
+    //         // // window.location.href = 'http://streaming-manager.test/admin/customers_expired_tomorrow'
+    //         // </script>
+    //         // ";
+    //     } else {
+    //         session(['is_success' => 1]);
+    //         CRUDBooster::redirect($_SERVER['HTTP_REFERER'], "Se creo el pedido exitosamente" . $errorsInSearch, "success");
+    //     }
+    // }
 
 
 

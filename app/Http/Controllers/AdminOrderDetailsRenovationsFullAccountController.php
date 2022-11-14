@@ -460,6 +460,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 				'orders_id' => $detail->orders_id,
 				'type_account_id' => $detail->type_account_id,
 				'customer_id' => $detail->customer_id,
+				'is_venta_victor' => $detail->is_venta_victor,
 				'type_order' => Order::TYPE_FULL,
 				'is_venta_revendedor' => $detail->is_venta_revendedor,
 				'account_id' => $detail->account_id,
@@ -501,6 +502,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 				'type_account_id' => $detail->type_account_id,
 				'customer_id' => $detail->customer_id,
 				'type_order' => Order::TYPE_FULL,
+				'is_venta_victor' =>$detail->is_venta_victor,
 				'is_venta_revendedor' => $detail->is_venta_revendedor,
 				'account_id' => $detail->account_id,
 				'membership_days' => $detail->membership_days,
@@ -529,7 +531,8 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 	public function getSetDesechar($id)
 	{
 		$order_detail = OrderDetail::where('id', '=', $id)->update([
-			'is_discarded' => 1
+			'is_discarded' => 1,
+			'is_venta_victor'=>0
 		]);
 		$order_detail = OrderDetail::where('id', '=', $id)->first();
 		$type_account = TypeAccount::where('id', '=', $order_detail->type_account_id)->first();
@@ -548,6 +551,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 				'client_id' => null,
 				'code_screen' => null,
 				'date_expired' => null,
+				'is_venta_victor' => 0,
 				'price_of_membership' => 0,
 				'date_sold' => null,
 				'is_sold_revendedor' => 0,
@@ -562,6 +566,7 @@ class AdminOrderDetailsRenovationsFullAccountController extends \crocodicstudio\
 		// $screen = Screens::where('id',  $order_detail->screen_id)->first();
 		$account_of_screen =  Accounts::where('id', '=', $order_detail->account_id)->first();
 		$account_of_screen->screens_sold = 0;
+		$account_of_screen->is_venta_victor = 0;
 		$account_of_screen->revendedor_id = null;
 		$account_of_screen->is_sold_ordinary = 0;
 		$account_of_screen->save();

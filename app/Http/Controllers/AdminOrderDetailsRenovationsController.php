@@ -602,6 +602,7 @@ class AdminOrderDetailsRenovationsController extends \crocodicstudio\crudbooster
 			'price_of_membership' => 0,
 			'date_sold' => null,
 			'is_sold' => 0,
+			'is_venta_victor'=>0,
 			'device' => null,
 			'ip' => null
 

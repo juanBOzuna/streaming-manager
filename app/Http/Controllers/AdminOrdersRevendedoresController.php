@@ -96,7 +96,16 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			return $telefono;
 		}];
 		$this->col[] = ["label" => "Fecha Venta", "name" => "created_at"];
+		
 		$this->col[] = ["label" => "Precio Total", "name" => "total_price"];
+		$this->col[] = ["label" => "Referencia", "callback" => function ($row) {
+            if($row->is_venta_victor==1){
+                return 'VICTOR';
+            }else{
+                return '';
+            }
+
+        }, "name" => "is_venta_victor"];
 
 
 		# END COLUMNS DO NOT REMOVE THIS LINE
@@ -159,6 +168,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 			$this->form[] = ['label' => 'Cuenta', 'name' => 'account_id', 'type' => 'select2', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10', 'datatable' => 'accounts,id'];
 			$this->form[] = ['label' => 'Dias Membresia', 'name' => 'dias_membersia', 'type' => 'number', 'validation' => 'required|min:1|max:255', 'width' => 'col-sm-10'];
 		}
+		$this->form[] = ['label'=>'Venta de VICTOR','name'=>'is_venta_victor','type'=>'radio','validation' => 'required','dataenum'=>'0|NO;1|SI'];
 		//
 		//if (CRUDBooster::getCurrentMethod() == "getDetail") {
 		//
@@ -821,6 +831,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				$dateExpired = $dateInstant->addDays($_REQUEST['dias_membersia']);
 				$screen->date_expired = strval($dateExpired);
 				$screen->price_of_membership = $total_price;
+				$screen->is_venta_victor = $postdata["is_venta_victor"];
 				$screen->code_screen = strval($telefono);
 				if ($_REQUEST['customers_id'] != 0) {
 					$screen->client_id = $_REQUEST['customers_id'];
@@ -839,12 +850,14 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				$accounts->revendedor_id = $_REQUEST["customers_id"];
 			}
 			$accounts->is_sold_ordinary = 1;
+			$accounts->is_venta_victor = request()['is_venta_victor'];
 			$accounts->save();
 
 			if ($_REQUEST['customers_id'] != 0) {
 				$order = Order::create([
 					'customers_id' => $_REQUEST["customers_id"],
 					'total_price' => $total_price,
+					'is_venta_victor' => request()['is_venta_victor'],
 					'type_order' => 'Cuenta Completa',
 					'is_venta_revendedor' => 1
 				]);
@@ -852,6 +865,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				$order = Order::create([
 					'customers_id' => $_REQUEST["customers_id2"],
 					'total_price' => $total_price,
+					'is_venta_victor' => request()['is_venta_victor'],
 					'type_order' => 'Cuenta Completa',
 					'is_venta_revendedor' => 0
 				]);
@@ -866,6 +880,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 					'is_venta_revendedor' => 1,
 					'type_order' => Order::TYPE_FULL,
 					'account_id' => $accounts->id,
+					'is_venta_victor' => request()['is_venta_victor'],
 					'membership_days' => $_REQUEST["dias_membersia"],
 					'price_of_membership_days' => $total_price,
 					'finish_date' => (string)$dateInstant->format('Y-m-d H:i:s')
@@ -878,6 +893,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 					'is_venta_revendedor' => 0,
 					'type_order' => Order::TYPE_FULL,
 					'account_id' => $accounts->id,
+					'is_venta_victor' => request()['is_venta_victor'],
 					'membership_days' => $_REQUEST["dias_membersia"],
 					'price_of_membership_days' => $total_price,
 					'finish_date' => (string)$dateInstant->format('Y-m-d H:i:s')
@@ -970,6 +986,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 				'date_sold' => null,
 				'is_sold_revendedor' => 0,
 				'revendedor_id' => null,
+				'is_venta_victor' => 0,
 				'screen_replace'=>null,
                 'is_screen_replace_notified'=>0,
 				'is_sold' => 0,
@@ -981,6 +998,7 @@ class AdminOrdersRevendedoresController extends \crocodicstudio\crudbooster\cont
 		// $screen = Screens::where('id',  $order_detail->screen_id)->first();
 		$account_of_screen =  Accounts::where('id', '=', $order_detail->account_id)->first();
 		$account_of_screen->screens_sold = 0;
+		$account_of_screen->is_venta_victor = 0;
 		$account_of_screen->revendedor_id = null;
 		$account_of_screen->is_sold_ordinary = 0;
 		$account_of_screen->save();

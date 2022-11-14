@@ -40,7 +40,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $this->button_action_style = "button_icon";
         $this->button_add = true;
         $this->button_edit = true;
-        $this->button_delete = true;
+        $this->button_delete = false;
         $this->button_detail = true;
         $this->button_show = true;
         $this->button_filter = true;
@@ -53,9 +53,9 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         $this->col = [];
         $this->col[] = ["label" => "Id", "name" => "id"];
         $this->col[] = ["label" => "Correo", "name" => "email"];
-        $this->col[] = ["label" => "Clave", "name" => "key_pass", "callback" => function ($row) {
-            return 'Clave Encriptada';
-        }];
+        // $this->col[] = ["label" => "Clave", "name" => "key_pass", "callback" => function ($row) {
+        //     return 'Clave Encriptada';
+        // }];
         // $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,picture", "image" => true];
         $this->col[] = ["label" => "Tipo de cuenta", "name" => "type_account_id", "join" => "type_account,name"];
         $this->col[] = ["label" => "fecha de creacion", "name" => "created_at"];
@@ -85,6 +85,17 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
         }];
 
         $this->col[] = ["label" => "Cant. renovaciones", "name" => "times_renewed"];
+        $this->col[] = ["label" => "Vendida completa", "callback" => function ($row) {
+           
+            $detail = OrderDetail::where('account_id','=',$row->id)->where('type_order','=',Order::TYPE_FULL)->where('is_renewed','=',0)->where('is_discarded','=',0)->first();
+            if(isset( $detail)){
+                return 'SI';
+            }else{
+                return 'NO';
+            }
+            
+        }, "name" => "times_renewed"];
+
         # END COLUMNS DO NOT REMOVE THIS LINE
 
         # START FORM DO NOT REMOVE THIS LINE
@@ -792,6 +803,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                 $accReplace->is_sold_ordinary = $account->is_sold_ordinary;
                 $accReplace->is_sold_extraordinary = $account->is_sold_extraordinary;
                 $accReplace->screens_sold = $account->screens_sold;
+                $accReplace->is_venta_victor = $account->is_venta_victor;
                 if ($account->revendedor_id != null) {
                     $accReplace->revendedor_id = $account->revendedor_id;
                 }
@@ -808,6 +820,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                 $account->revendedor_id = null;
                 $account->is_sold_extraordinary = 0;
                 $account->screens_sold = 0;
+                $account->is_venta_victor = 0;
                 $account->save();
 
                 $screens_of_replace = Screens::where('account_id','=',$accReplace->id)->get();
@@ -822,7 +835,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                      $screen_of_replace->date_sold = $key->date_sold;
                      $screen_of_replace->date_expired = $key->date_expired;
                      $screen_of_replace->is_sold = $key->is_sold;
-                     $screen_of_replace->name=$screen_of_replace->name;
+                     $screen_of_replace->name=$key->name;
+                     $screen_of_replace->is_venta_victor=$key->is_venta_victor;
                      $screen_of_replace->type_device_id = $key->type_device_id;
                      $screen_of_replace->code_screen = $key->code_screen;
                      $screen_of_replace->price_of_membership = $key->price_of_membership;
@@ -834,6 +848,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                     $key->date_sold = null;
                     $key->code_screen = null;
                     $key->date_expired = null;
+                    $key->is_venta_victor = 0;
                     $key->screen_replace = ''.$screen_of_replace->id.','.$detail->id;
                     $key->is_sold = 0;
                     $key->is_account_expired=1;
@@ -878,6 +893,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
             if ($validation_screens_free >= $screens_to_change) {
                 foreach ($screensOfAccount as $item) {
                     $item->is_account_expired = 1;
+                    $item->is_venta_victor = 0;
                     $item->save();
                 }
 
@@ -905,6 +921,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                 $key->price_of_membership = $screen->price_of_membership;
                                 $key->device = $screen->device;
                                 $key->ip = $screen->ip;
+                                $key->is_venta_victor = $screen->is_venta_victor;
                                 $key->save();
 
                                 $screen->client_id = null;
@@ -914,6 +931,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                 $screen->screen_replace = ''.$key->id.','.$order_detail->id;
                                 $screen->is_sold = 0;
                                 $screen->is_account_expired=1;
+                                $screen->is_venta_victor=0;
                                 $screen->name='Pantalla '.$key->profile_number;
                                
                                 $screen->price_of_membership = 0;
@@ -931,6 +949,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                 $type = TypeAccount::where('id', '=', $accReplace->type_account_id)->first();
                                 if ($accReplace->screens_sold >=   ($type->available_screens - 1)) {
                                     $accReplace->is_sold_ordinary = 1;
+                                    $accReplace->is_venta_victor = $key->is_venta_victor;
                                 }
                                 $accReplace->screens_sold = $accReplace->screens_sold + 1;
                                 $accReplace->save();
@@ -939,6 +958,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                                 $account->is_expired = 1;
                                 $account->is_sold_ordinary = 0;
                                 $account->revendedor_id = null;
+                                $account->is_venta_victor = 0;
                                 $account->is_sold_extraordinary = 0;
                                 $account->screens_sold = 0;
                                 $account->save();
@@ -951,6 +971,8 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
                         }
                     }else{
                                 $screen->is_account_expired=1;
+                                $screen->is_venta_victor=0;
+                                $screen->is_sold=1;
                                 $screen->save();
                     }
                 }
@@ -975,6 +997,7 @@ class AdminAccountsController extends \crocodicstudio\crudbooster\controllers\CB
 
         foreach ($screensOfAccount as $item) {
             $item->is_account_expired = 0; 
+            $item->is_sold = 0; 
             $item->screen_replace = null; 
             $item->is_screen_replace_notified = 0; 
             $item->save();
